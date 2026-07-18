@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build
+.next/
+out/
+
+# environment
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# logs
+*.log
+npm-debug.log*
+
+# TypeScript
+next-env.d.ts
+
+# Prisma
+prisma/generated/
+
+# Vercel
+.vercel/
+
+.agents/
+action.md
