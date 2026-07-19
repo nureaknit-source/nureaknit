@@ -1,64 +1,63 @@
-# ROADMAP.md: Nureaknite
+# ROADMAP.md: Nurea Knit
 
 ## Phased Delivery Plan
 
 | Phase | Duration | Goals | Key Deliverables |
 |:------|:---------|:------|:-----------------|
-| **Phase 1: Foundation & Content** | 6 weeks | Establish brand presence, launch pattern library, and enable user accounts. | Homepage, About page, Pattern Library (all free), User authentication, Strapi CMS configured. |
-| **Phase 2: Showcase & Coaching** | 4 weeks | Launch product showcase, blog, portfolio, and coaching features. | Product Showcase (catalog), Wishlist feature, Blog/Tutorials, Portfolio Showcase, Coaching request form. |
-| **Phase 3: Refinement & Launch** | 3 weeks | Polish, testing, performance optimization, and go-live preparation. | QA testing, performance tuning, security audit, admin training, production deployment. |
+| **Phase 1: Foundation & Restructure** | 3 weeks | Set up Payload CMS, Supabase Auth, restructure codebase, shared design system. | Payload integrated, Supabase Auth working, feature-based architecture, UI foundations, route placeholders. |
+| **Phase 2: Feature Development** | 5 weeks | Implement auth, pattern library, blog, portfolio, product showcase. | Login/register, pattern CRUD + download, blog with Payload rich text, portfolio gallery, product catalog. |
+| **Phase 3: Conversion & Refinement** | 3 weeks | Coaching, wishlist, profile, FAQ, contact, SEO optimization. | Coaching request form, wishlist CRUD, user profile pages, SEO audit, performance tuning. |
+| **Phase 4: Launch** | 2 weeks | QA, content population, production deployment. | Bug fixes, content upload, production go-live on Vercel. |
 
-**Timeline Disclaimer:** This roadmap assumes a solo developer with part-time QA support. Adjust phase durations proportionally for different team sizes.
+**Timeline:** ~13 weeks total for MVP.
 
 ---
 
 ## MVP Feature List
 
-### P0: Must Have for Launch (Phase 1)
+### P0: Must Have for Launch
 
-| Feature | Requirement ID | Description | Phase |
-|:--------|:---------------|:-----------|:------|
-| User Authentication | FR-01 | Email/password registration and login via NextAuth.js. | Phase 1 |
-| Pattern Library (Browse & Filter) | FR-02 | Filterable gallery by craft type and difficulty. | Phase 1 |
-| Pattern Download | FR-03 | PDF download for authenticated users. | Phase 1 |
-| Content Pages (Static) | FR-08 | Blog, Portfolio, and About pages managed via Strapi CMS. | Phase 1 |
-| Admin CMS (Strapi) | FR-09 | Full CRUD for Patterns, Blog Posts, Portfolio Items, Products. | Phase 1 |
-| Pattern Management (Admin) | FR-10 | Upload PDF, define attributes (difficulty, craft type). | Phase 1 |
+| Feature | ID | Description | Phase |
+|:--------|:---|:-----------|:------|
+| Supabase Auth (Register/Login) | FR-01 | Email/password authentication | Phase 1 |
+| Payload CMS Integration | FR-09 | Embedded CMS with all collections | Phase 1 |
+| Feature-Based Architecture | — | Restructured codebase | Phase 1 |
+| Shared UI Components | — | Button, Card, Input, Badge, Layout | Phase 1 |
+| Pattern Library (Browse & Filter) | FR-02 | Gallery with craft type/difficulty filters | Phase 2 |
+| Pattern Download | FR-03 | PDF download for authenticated users | Phase 2 |
+| Content Pages | FR-08 | Blog, Portfolio, About via Payload | Phase 2 |
+| Product Showcase | FR-05 | Catalog with images and external links | Phase 2 |
 
-### P1: Should Have Within 1 Month Post-Launch (Phase 2)
+### P1: Should Have (Phase 3)
 
-| Feature | Requirement ID | Description | Target Week |
-|:--------|:---------------|:-----------|:-----------|
-| Product Showcase | FR-05 | Catalog of physical products with images and external links. | Week 1–2 |
-| Wishlist | FR-04 | Users can save products for later reference. | Week 2 |
-| Blog & Tutorials Section | FR-08 (Extended) | SEO-optimized blog posts for audience building. | Week 2–3 |
-| Portfolio Showcase | FR-08 (Extended) | Gallery of creator's finished works. | Week 2–3 |
-| Offline Coaching Request Form | FR-06 | Lead generation form for one-on-one coaching. | Week 3–4 |
-| User Profile | FR-07 | My Downloads, My Wishlist, Account Settings. | Week 4 |
+| Feature | ID | Description |
+|:--------|:---|:-----------|
+| Wishlist | FR-04 | Save/remove products |
+| Offline Coaching Request | FR-06 | Lead generation form + email |
+| User Profile | FR-07 | Downloads, wishlist, settings |
+| Contact Form | — | Simple contact form |
+| FAQ Page | — | Frequently asked questions |
 
-### P2: Nice to Have for Future Releases
+### P2: Nice to Have (Post-Launch)
 
-| Feature | Description | Rationale |
-|:--------|:-----------|:---------|
-| Email Marketing Integration | Automated welcome series for new registrations. | Nurtures audience relationships. |
-| Advanced Analytics | Track pattern popularity, user engagement metrics. | Helps creator optimize content. |
-| User Reviews & Testimonials | Users can leave feedback on patterns. | Builds social proof. |
-| Multi-Language Support | Localize content for broader reach. | Expands addressable market. |
-| Newsletter Signup | Dedicated email signup form (not just pattern download). | Grows mailing list independently. |
+| Feature | Rationale |
+|:--------|:---------|
+| Email Marketing Integration | Nurture audience relationships |
+| Advanced Analytics | Track pattern popularity, engagement |
+| Newsletter Signup | Grow mailing list independently |
+| Search (patterns, blog) | Improve content discoverability |
+| Multi-Language Support | Expand addressable market |
 
 ---
 
 ## Milestones
 
-| Milestone | Phase | Target Date | Deliverables |
-|:----------|:------|:-----------|:------------|
-| **M1: Brand Foundation** | Phase 1 | Week 2 | Homepage, About page, brand guidelines applied, Strapi CMS configured. |
-| **M2: Pattern Library Live** | Phase 1 | Week 4 | All patterns uploaded, filterable gallery, authenticated downloads working. |
-| **M3: Auth & User Accounts** | Phase 1 | Week 6 | NextAuth.js integrated, user registration/login working, profile page with downloads. |
-| **M4: Shop & Coaching Live** | Phase 2 | Week 8 | Product catalog live, wishlist functional, coaching form working. |
-| **M5: Blog & Portfolio** | Phase 2 | Week 10 | Blog section populated, Portfolio Showcase live, SEO optimization applied. |
-| **M6: QA & Optimization** | Phase 3 | Week 12 | Performance testing, security audit, bug fixes, documentation complete. |
-| **M7: Production Launch** | Phase 3 | Week 13 | Go-live on production, monitoring enabled, admin training completed. |
+| Milestone | Phase | Target | Deliverables |
+|:----------|:------|:-------|:-------------|
+| **M1: Foundation** | Phase 1 | Week 3 | Payload integrated, Supabase Auth working, feature-based structure, UI components, route placeholders |
+| **M2: Core Features** | Phase 2 | Week 8 | Pattern library + download, blog, portfolio, products all working |
+| **M3: Full Features** | Phase 3 | Week 11 | Wishlist, coaching, profile, contact, FAQ complete |
+| **M4: Launch** | Phase 4 | Week 13 | QA complete, content populated, production live on Vercel |
 
 ---
 
@@ -66,97 +65,76 @@
 
 ### External Dependencies
 
-| Dependency | Purpose | Status | Notes |
-|:-----------|:--------|:-------|:------|
-| **Supabase Project** | Database, authentication, and file storage. | Required | PostgreSQL DB, auth schema, and storage bucket must be provisioned. |
-| **Vercel & Render Accounts** | Frontend and backend hosting. | Required | CI/CD pipelines configured; environment variables set for each stage. |
-| **Domain Name & SSL Certificate** | Website domain and HTTPS. | Required | Domain registered and pointed to Vercel; SSL auto-provisioned by Vercel. |
-| **Email Service (Resend)** | Transactional emails (password resets, admin alerts). | Required | Configure API key in backend. |
-| **Google Analytics & Search Console** | SEO tracking and performance monitoring. | Recommended | Set up for blog and organic search measurement. |
+| Dependency | Purpose | Status |
+|:-----------|:--------|:-------|
+| **Supabase Project** | PostgreSQL database, Auth, file storage | Required — existing |
+| **Vercel Account** | Frontend + CMS hosting | Required |
+| **Domain Name** | Custom domain for production | Required |
+| **Email Service (Resend)** | Transactional emails (coaching) | Required |
+| **Google Analytics & Search Console** | SEO tracking | Recommended |
 
 ### Internal Dependencies
 
-| Dependency | Purpose | Owner | Status |
-|:-----------|:--------|:-------|:-------|
-| **Brand Guidelines & Design System** | Visual identity, color palette, typography. | Designer | Must be finalized before frontend development. |
-| **Figma Mockups & Wireframes** | UI/UX designs for all key pages. | Designer | Required before frontend development begins. |
-| **Content Inventory** | List of initial patterns, blog posts, portfolio items, and products. | Creator | Needed by Week 2 to populate Strapi. |
-| **Strapi Data Models & API Specs** | Schema definitions for Patterns, Blog Posts, Products. | Developer | Must be finalized before frontend integration. |
-| **Admin Training Materials** | Documentation for content management in Strapi. | Developer | Needed before production launch. |
+| Dependency | Owner | Notes |
+|:-----------|:-------|:------|
+| Brand Guidelines & Design System | Designer | Must be finalized before UI development |
+| Content Inventory | Creator | Patterns, blog posts, products for initial population |
+| Payload Collection Definitions | Developer | Must be finalized before frontend integration |
+| Admin Training Materials | Developer | Needed before production launch |
 
 ---
 
 ## Risks & Mitigation
 
-| Risk | Impact | Probability | Mitigation Strategy |
-|:-----|:-------|:-----------|:-------------------|
-| **Creator Content Production Bottleneck** | High | Medium | Establish a content calendar and batch-produce patterns/blog posts before launch. Build a 2–3 week content buffer. |
-| **Database Performance Under Load** | Medium | Low | Conduct load testing with 100+ concurrent users. Implement caching if needed. |
-| **Scope Creep** | High | High | Strictly enforce the PRD and "personal studio" vision. Document feature requests in a P2 backlog. |
-| **Admin CMS Usability Issues** | Medium | Medium | Involve the creator in Strapi UI testing early. Provide clear documentation. |
-| **Email Delivery Failures** | Medium | Low | Test email service early. Monitor email logs post-launch. |
-| **Mobile Responsiveness Issues** | Medium | Medium | Conduct mobile testing on real devices. Use responsive design from the start. |
-| **Supabase Storage Quota Exceeded** | Low | Low | Monitor storage usage monthly. Implement image optimization. |
+| Risk | Impact | Prob. | Mitigation |
+|:-----|:-------|:-----:|:-----------|
+| **Creator Content Bottleneck** | High | Medium | Content calendar, batch production before launch |
+| **Payload CMS Learning Curve** | Medium | High | Follow Payload documentation, start with simple collections |
+| **Scope Creep** | High | High | Strictly enforce PRD, document feature requests in P2 backlog |
+| **Admin CMS Usability** | Medium | Medium | Involve creator in Payload testing early |
+| **Email Delivery Failures** | Medium | Low | Test Resend early, monitor logs post-launch |
+| **Supabase Storage Quota** | Low | Low | Monitor usage monthly, optimize images |
 
 ---
 
-## Success Criteria & Go-Live Checklist
+## Go-Live Checklist
 
-### Technical Success Criteria
+### Technical
+- [ ] All P0 features functional and tested
+- [ ] Performance metrics met: FCP < 1.8s, LCP < 2.5s, TTI < 3.0s
+- [ ] Security: HTTPS, Supabase RLS, Payload access control
+- [ ] Uptime monitoring configured (99.9% target)
+- [ ] Automated backups enabled
+- [ ] Error logging configured
+- [ ] CI/CD pipeline working on Vercel
 
-- [ ] All P0 features functional and tested in production-like environment.
-- [ ] Performance metrics met: FCP < 1.8s, LCP < 2.5s, TTI < 3.0s on key pages.
-- [ ] Security audit completed; no critical vulnerabilities identified.
-- [ ] Uptime monitoring configured; target 99.9% availability.
-- [ ] Automated backups enabled for database and file storage.
-- [ ] Error logging and monitoring configured.
-- [ ] CI/CD pipelines working for frontend and backend.
+### Business
+- [ ] At least 10 patterns available at launch
+- [ ] At least 5 products in shop catalog
+- [ ] Admin can manage all content independently via Payload
+- [ ] First 50 users registered within first month
 
-### Business Success Criteria
-
-- [ ] At least 10 patterns available at launch.
-- [ ] At least 10 physical products in shop catalog.
-- [ ] Admin can manage all content independently via Strapi CMS.
-- [ ] First 50 users registered within first month.
-- [ ] Email list grows to 100+ subscribers within first month.
-- [ ] Organic search traffic begins appearing for target keywords.
-
-### User Experience Success Criteria
-
-- [ ] User registration and login flow completes in < 2 minutes.
-- [ ] Pattern download flow completes in < 30 seconds.
-- [ ] Mobile experience is fully functional and responsive.
-- [ ] No critical bugs reported in first 2 weeks post-launch.
+### User Experience
+- [ ] Registration and login flow completes in < 2 minutes
+- [ ] Pattern download flow completes in < 30 seconds
+- [ ] Mobile experience fully functional and responsive
+- [ ] No critical bugs in first 2 weeks post-launch
 
 ---
 
-## Post-Launch Support & Iteration Plan
+## Post-Launch Plan
 
-### Week 1–2 Post-Launch (Stabilization)
-
-- Monitor system performance and error logs daily.
+### Weeks 1–2: Stabilization
+- Monitor performance and error logs daily.
 - Address critical bugs within 24 hours.
-- Gather user feedback via email and analytics.
-- Ensure admin can manage content without technical support.
+- Ensure admin can manage content without support.
 
-### Week 3–4 Post-Launch (Quick Wins)
+### Weeks 3–4: Quick Wins
+- Implement P1 features (wishlist, coaching, profile).
+- Optimize performance based on real usage data.
+- Expand content library.
 
-- Implement P1 features (product showcase, wishlist, blog, coaching).
-- Optimize performance based on real-world usage data.
-- Expand content library (add new patterns, blog posts).
-
-### Month 2–3 Post-Launch (Growth Phase)
-
-- Launch SEO campaign targeting long-tail keywords.
+### Months 2–3: Growth
+- SEO campaign targeting long-tail keywords.
 - Expand email marketing efforts.
 - Gather data for P2 feature prioritization.
-
----
-
-## Team & Responsibilities
-
-| Role | Responsibilities | Availability |
-|:-----|:-----------------|:------------|
-| **Developer** | Next.js app, UI components, Strapi CMS setup, API development, database schema. | Full-time, Phases 1–3 |
-| **Designer** | Brand guidelines, Figma mockups, UI/UX design. | Part-time, Phases 1–2 |
-| **Creator (Admin)** | Content production, pattern design, blog writing, feedback on UX. | Ongoing, all phases |

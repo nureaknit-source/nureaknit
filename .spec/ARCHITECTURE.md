@@ -1,80 +1,87 @@
-# ARCHITECTURE.md: Nureaknite
+# ARCHITECTURE.md: Nurea Knit
 
 ## System Overview
 
-Nureaknite is a personal brand website built on a modern, decoupled architecture. The frontend (Next.js) serves as a fast, SEO-optimized presentation layer for content consumption and product showcase. The backend (Strapi headless CMS) provides a flexible content management interface for the creator to manage patterns, blog posts, portfolio items, and shop products without technical overhead. Authentication (NextAuth.js) secures user accounts for pattern downloads and wishlists. This architecture prioritizes simplicity, performance, and the personal brand experience while remaining scalable for future growth.
+Nurea Knit is a personal brand website built on a modern, integrated architecture. The entire system runs as a single Next.js application on Vercel, with Payload CMS embedded directly inside the Next.js codebase. Supabase provides the PostgreSQL database, authentication, and file storage. This unified architecture simplifies deployment, reduces operational complexity, and keeps the entire system manageable for a solo developer.
 
 ## High-Level Architecture Diagram
 
 ```mermaid
 graph TD
-    A["Guest/User Browser"] -->|HTTPS| B["Next.js Frontend<br/>Vercel"]
-    A -->|HTTPS| C["Strapi Admin CMS<br/>Render"]
-    
-    B -->|API Calls| D["NextAuth.js<br/>Auth Layer"]
-    B -->|GraphQL/REST| E["Strapi Backend<br/>Render"]
-    B -->|Fetch| F["Supabase Storage<br/>PDFs & Images"]
-    
-    C -->|Manage| E
-    
-    E -->|Read/Write| I["Supabase PostgreSQL<br/>Database"]
-    E -->|Upload/Retrieve| F
-    
-    D -->|Verify| I
-    
-    K["Admin Email"] -.->|Notifications| C
+    A["Guest/User Browser"] -->|HTTPS| B["Next.js + Payload CMS<br/>Vercel (Single Deployment)"]
+
+    B -->|Auth| C["Supabase Auth"]
+    B -->|Database| D["Supabase PostgreSQL"]
+    B -->|Storage| E["Supabase Storage<br/>PDFs & Images"]
+    B -->|Email| F["Resend"]
+
+    G["Admin (Creator)"] -->|/admin| B
+    G -->|Manage Content| B
+
+    H["Admin Email"] -.->|Notifications| F
+
+    subgraph "Supabase"
+        C
+        D
+        E
+    end
 ```
 
 ## Component Breakdown
 
-### Next.js Frontend (Vercel)
+### Next.js + Payload CMS (Vercel — Single Deployment)
 
 **Responsibilities:**
-- Render public pages (Homepage, Blog, Portfolio, About, Pattern Library, Product Showcase, Coaching Request).
-- Provide user profile page for authenticated users to view downloads, wishlist, and account settings.
-- Implement client-side authentication flow via NextAuth.js.
+- Render all public pages (Homepage, Blog, Portfolio, About, Pattern Library, Product Showcase, Coaching Request).
+- Run Payload CMS admin panel at `/admin` route for content management.
+- Provide user profile page for authenticated users (downloads, wishlist, settings).
+- Implement client-side authentication flow via Supabase Auth.
 - Optimize for SEO via SSG (static generation) and ISR (incremental static regeneration).
-- Serve responsive, accessible UI aligned with the cozy, artisanal visual brand.
+- Serve responsive, accessible UI aligned with the artisanal visual brand.
+- Handle API routes for app-specific operations (download, wishlist, coaching).
 
 **Key Features:**
+- Payload CMS embedded as a dependency — no separate backend server.
 - Static generation for high-traffic pages (Homepage, Pattern Library, Shop catalog).
 - Image optimization and lazy loading for performance.
-- User authentication for pattern downloads and wishlist.
+- User authentication via Supabase Auth for pattern downloads and wishlist.
 
-### Strapi Headless CMS (Render)
+### Payload CMS (Embedded)
 
 **Responsibilities:**
-- Provide a unified admin interface for the creator to manage all content: Patterns, Blog Posts, Portfolio Items, and Shop Products.
-- Expose content via REST and GraphQL APIs consumed by the Next.js frontend.
-- Store metadata for all content types (title, description, difficulty, etc.).
+- Provide a unified admin interface for the creator to manage all content.
+- Expose content via REST and GraphQL APIs consumed by Next.js server components.
 - Manage file uploads (pattern PDFs, product images, portfolio images).
+- Handle rich text editing for blog posts and pages.
 - Provide role-based access control (only the creator/admin can modify content).
 
 **Key Features:**
-- Custom content types for Patterns, Blog Posts, Portfolio Items, and Products.
-- Built-in media library for image and PDF management.
-- Flexible field types (text, rich text, number, select, relation).
+- Custom collections for Patterns, Blog Posts, Portfolio Items, Products, Pages, and more.
+- Built-in media management with Supabase Storage integration.
+- Rich text editor for blog content.
+- Local API for direct server-side queries without HTTP calls.
 
-### NextAuth.js Authentication Layer
+### Supabase Auth (Authentication Layer)
 
 **Responsibilities:**
 - Manage user registration and login via email/password.
-- Secure session management and JWT token handling.
+- Secure session management with automatic token refresh.
 - Protect download and wishlist endpoints.
-- Integrate with Supabase as the user database provider.
+- Provide client and server SDK for auth state management.
 
 **Key Features:**
 - Email/password authentication (no OAuth required for V1).
-- Secure password hashing via bcrypt.
-- Session persistence across page reloads.
+- Secure password hashing (automatic via Supabase).
+- Session persistence across page reloads via HTTP-only cookies.
 - Automatic token refresh and expiration handling.
+- Row-level security (RLS) policies for direct database access.
 
 ### Supabase (PostgreSQL Database + Storage)
 
 **Responsibilities:**
-- Store all application data: users, download history, wishlist items, coaching requests.
+- Store all application data managed by Payload CMS collections.
 - Provide secure file storage for pattern PDFs and product images.
-- Manage authentication provider integration (users table).
+- Manage auth users table and session data.
 
 **Key Features:**
 - Managed PostgreSQL with automatic backups and replication.
@@ -85,218 +92,166 @@ graph TD
 
 **Responsibilities:**
 - Send coaching request notifications to the admin.
-- Send password reset emails.
-- Send pattern download confirmation emails (optional).
 
 **Key Features:**
 - Simple API for transactional emails.
-- Email templates for coaching notifications.
 
-## Critical Flow Sequence Diagram
-
-### Pattern Download Flow
+## Data Flow: Pattern Download
 
 ```mermaid
 sequenceDiagram
     actor User
-    participant Frontend as Next.js Frontend
-    participant Auth as NextAuth.js
-    participant Strapi as Strapi CMS
-    participant Supabase as Supabase<br/>DB & Storage
-    
+    participant Frontend as Next.js + Payload
+    participant Auth as Supabase Auth
+    participant Payload as Payload CMS
+    participant Storage as Supabase Storage
+
     User->>Frontend: Browse Pattern Library
-    Frontend->>Strapi: Fetch patterns (GET /patterns)
-    Strapi->>Supabase: Query content data
-    Supabase-->>Strapi: Return pattern list
-    Strapi-->>Frontend: Return JSON
+    Frontend->>Payload: Fetch patterns (Local API)
+    Payload-->>Frontend: Return pattern list
     Frontend-->>User: Display patterns
-    
+
     User->>Frontend: Click 'Download Pattern'
     Frontend->>Auth: Check session
     Auth-->>Frontend: Session valid
-    
-    Frontend->>Supabase: Log download (INSERT user_download)
-    Supabase-->>Frontend: Download logged
-    Frontend->>Supabase: Fetch signed URL for PDF
-    Supabase-->>Frontend: Return signed URL
-    Frontend->>Supabase: Download PDF
-    Supabase-->>User: Stream PDF file
+
+    Frontend->>Payload: Log download (create UserDownload)
+    Payload-->>Frontend: Download logged
+    Frontend->>Storage: Fetch signed URL for PDF
+    Storage-->>Frontend: Return signed URL
+    Frontend->>Storage: Download PDF
+    Storage-->>User: Stream PDF file
 ```
 
-### Offline Coaching Request Flow
+## Data Flow: Offline Coaching
 
 ```mermaid
 sequenceDiagram
     actor User
-    participant Frontend as Next.js Frontend
-    participant Strapi as Strapi CMS
-    participant Supabase as Supabase DB
-    participant Email as Email Service
+    participant Frontend as Next.js + Payload
+    participant Email as Resend
     participant Admin as Admin/Creator
-    
+
     User->>Frontend: Visit Coaching Request page
     Frontend-->>User: Display request form
     User->>Frontend: Fill form (name, email, message)
-    Frontend->>Strapi: Submit coaching request (POST /coaching-requests)
-    Strapi->>Supabase: Store request
-    Supabase-->>Strapi: Request saved
-    Strapi->>Email: Trigger email notification
+    Frontend->>Frontend: Create CoachingRequest via Payload API
+    Frontend->>Email: Send email notification
     Email->>Admin: Send coaching request email
-    Strapi-->>Frontend: Return confirmation
     Frontend-->>User: Show success message
-    
-    Admin->>Strapi: View coaching requests in admin panel
-    Strapi->>Supabase: Fetch all requests
-    Supabase-->>Strapi: Return requests
-    Strapi-->>Admin: Display requests
+
+    Admin->>Frontend: View coaching requests in Payload admin
+    Frontend-->>Admin: Display requests
     Admin->>Admin: Contact user directly via email
 ```
 
 ## Deployment Strategy
 
-### Frontend (Next.js) — Vercel
+### Frontend + CMS (Next.js + Payload) — Vercel
 
 - **Hosting:** Vercel (serverless platform optimized for Next.js).
 - **Deployment:** Automatic CI/CD on git push to main branch.
-- **Environment:** Production environment with custom domain (nureaknite.com).
+- **Environment:** Single production environment with custom domain.
 - **Performance:** Global CDN for static assets and edge caching.
+- **Database:** Payload connects to Supabase PostgreSQL.
+- **File Storage:** Payload uploads/retrieves files from Supabase Storage.
 - **Monitoring:** Built-in analytics and error tracking via Vercel dashboard.
-
-### Backend CMS (Strapi) — Render
-
-- **Hosting:** Render (managed Node.js hosting).
-- **Deployment:** Automatic deployment on git push.
-- **Environment:** Environment variables for API keys and database credentials.
-- **Database Connection:** Strapi connects to Supabase PostgreSQL via connection string.
-- **File Storage:** Strapi uploads/retrieves files from Supabase Storage.
-- **Monitoring:** Render provides logs and error tracking.
 
 ### Database (Supabase PostgreSQL)
 
 - **Hosting:** Supabase managed PostgreSQL (cloud-hosted).
 - **Backups:** Automatic daily backups with 7-day retention.
-- **Access:** Restricted to Strapi backend and NextAuth.js via connection strings and API keys.
+- **Access:** Restricted to Next.js/Payload via connection string.
 - **Security:** Row-level security (RLS) policies enforce data access rules.
 
 ### File Storage (Supabase Storage)
 
 - **Hosting:** Supabase Storage (S3-compatible object storage).
-- **Access:** Signed URLs for secure, time-limited access to PDFs and images.
+- **Access:** Uploads handled via Payload CMS; signed URLs for secure download.
 - **CDN:** Supabase Storage includes CDN for fast global delivery.
-
-### Email Service
-
-- **Provider:** Resend (or SendGrid as alternative).
-- **Use Cases:** Coaching request notifications, password reset emails.
-- **Configuration:** Environment variables for API keys.
 
 ## Data Model Overview
 
-### Core Entities
+### Payload Collections
 
-**Users**
-- id (UUID, primary key)
-- email (string, unique)
-- password_hash (string, bcrypt)
-- name (string)
-- created_at (timestamp)
-- updated_at (timestamp)
+All data is managed through Payload CMS collections rather than raw Prisma models. The key collections are:
 
-**Patterns**
-- id (UUID, primary key)
-- title (string)
-- description (text)
-- difficulty (enum: Beginner, Intermediate, Advanced)
-- craft_type (enum: Knitting, Crochet)
-- pdf_file_path (string, reference to Supabase Storage)
-- created_at (timestamp)
-- updated_at (timestamp)
+**Users** (managed by Supabase Auth, referenced by Payload)
+- id (UUID)
+- email (unique)
+- name
+- created_at
 
-**Products** (Shop Showcase)
-- id (UUID, primary key)
-- name (string)
-- description (text)
-- external_link (string, optional)
-- image_path (string, reference to Supabase Storage)
-- created_at (timestamp)
-- updated_at (timestamp)
+**Patterns** (Payload collection)
+- id, title, slug, description, difficulty (enum), craftType (enum)
+- pdf (upload), thumbnail (upload)
+- createdAt, updatedAt
 
-**Coaching Requests**
-- id (UUID, primary key)
-- name (string)
-- email (string)
-- message (text)
-- status (enum: New, Contacted, Archived)
-- created_at (timestamp)
-- updated_at (timestamp)
+**Blog Posts** (Payload collection)
+- id, title, slug, content (rich text), excerpt, featuredImage (upload)
+- publishedAt, createdAt, updatedAt
 
-**Blog Posts**
-- id (UUID, primary key)
-- title (string)
-- slug (string, unique)
-- content (rich text)
-- excerpt (text)
-- featured_image_path (string, reference to Supabase Storage)
-- published_at (timestamp, nullable)
-- created_at (timestamp)
-- updated_at (timestamp)
+**Products** (Payload collection)
+- id, name, slug, description, images (uploads), externalLink
+- createdAt, updatedAt
 
-**Portfolio Items**
-- id (UUID, primary key)
-- title (string)
-- description (text)
-- image_path (string, reference to Supabase Storage)
-- created_at (timestamp)
-- updated_at (timestamp)
+**Portfolio Items** (Payload collection)
+- id, title, description, images (uploads), techniques, category
+- createdAt, updatedAt
 
-**User Downloads**
-- user_id (UUID, foreign key)
-- pattern_id (UUID, foreign key)
-- downloaded_at (timestamp)
+**Coaching Requests** (Payload collection)
+- id, name, email, message, status (enum: new/contacted/archived)
+- createdAt, updatedAt
 
-**Wishlist Items**
-- id (UUID, primary key)
-- user_id (UUID, foreign key)
-- product_id (string)
-- created_at (timestamp)
+**User Downloads** (Payload collection)
+- user (relationship), pattern (relationship), downloadedAt
+
+**Wishlist Items** (Payload collection)
+- user (relationship), product (relationship), createdAt
+
+**Pages** (Payload collection)
+- id, title, slug, content (rich text), publishedAt
 
 ## API Integration Points
 
-### Strapi REST/GraphQL API
+### Next.js API Routes (Custom)
+- `POST /api/patterns/[id]/download` — Log download, return signed PDF URL
+- `GET/POST/DELETE /api/wishlist` — Wishlist CRUD
+- `POST /api/coaching` — Submit coaching request, email admin
 
-- **GET /api/patterns** — Fetch all patterns with filters (difficulty, craft_type).
-- **GET /api/patterns/:id** — Fetch single pattern details.
-- **GET /api/products** — Fetch all shop products.
-- **GET /api/blog** — Fetch blog posts with pagination.
-- **GET /api/portfolio** — Fetch portfolio items.
-- **POST /api/coaching-requests** — Submit coaching request form.
+### Payload REST API (Auto-generated, authenticated)
+- `GET /api/patterns` — Fetch all patterns with filters
+- `GET /api/patterns/:id` — Fetch single pattern
+- `GET /api/posts` — Fetch blog posts
+- `GET /api/products` — Fetch products
+- `GET /api/portfolio` — Fetch portfolio items
 
-### Supabase API
-
-- **Auth endpoints** — User registration, login, password reset (via NextAuth.js).
-- **Database queries** — CRUD operations on user data (via Next.js API routes).
-- **Storage endpoints** — Retrieve files with signed URLs.
+### Supabase Auth API
+- `signUp()` — Register new user
+- `signInWithPassword()` — Login
+- `signOut()` — Logout
+- `getSession()` / `getUser()` — Session management
 
 ## Security Considerations
 
-- **HTTPS/TLS:** All traffic encrypted in transit (enforced by Vercel and Render).
-- **Authentication:** Passwords hashed with bcrypt; sessions managed via NextAuth.js JWT tokens.
-- **Authorization:** Row-level security (RLS) policies in Supabase enforce user-specific data access.
-- **File Access:** Signed URLs with expiration time limit access to PDFs and images.
-- **Admin Access:** Strapi admin panel protected by email/password; accessible only to the creator.
-- **Environment Variables:** Sensitive keys stored securely in hosting platform environment.
+- **HTTPS/TLS:** All traffic encrypted in transit (enforced by Vercel).
+- **Authentication:** Managed by Supabase Auth with automatic password hashing and session management.
+- **Authorization:** Payload CMS access control for admin; RLS policies in Supabase.
+- **File Access:** Signed URLs with expiration time limit access to PDFs.
+- **Admin Access:** Payload admin panel protected by email/password; accessible only to the creator.
+- **Environment Variables:** Sensitive keys stored securely in Vercel environment.
 
 ## Performance Optimization
 
 - **Frontend:** Next.js SSG for static pages, ISR for content updates, image optimization, code splitting.
-- **Backend:** Strapi caching layer, database query optimization, indexed fields for common filters.
-- **Storage:** Supabase CDN for fast file delivery; signed URLs cached client-side.
+- **CMS:** Payload caching layer, database query optimization, indexed fields.
+- **Storage:** Supabase CDN for fast file delivery.
 
 ## Scalability Path
 
 - **Phase 1 (Current):** Single admin, static content, user accounts for downloads.
 - **Phase 2 (Future):** Email automation, advanced analytics dashboard.
-- **Phase 3 (Future):** Subscription model, affiliate/referral system.
+- **Phase 3 (Future):** Newsletter, advanced SEO tooling.
 - **Phase 4 (Future):** Multi-language support, advanced personalization.
 
 The architecture is designed to remain simple and maintainable while allowing incremental feature additions without major refactoring.
