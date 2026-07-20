@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { checkEmailAction } from "@/actions/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,6 +34,13 @@ export default function RegisterPage() {
       return;
     }
 
+    const emailCheck = await checkEmailAction(email);
+    if (!emailCheck.ok) {
+      setError(emailCheck.error);
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
     const { error: signUpError } = await supabase.auth.signUp({
       email,
@@ -49,8 +58,28 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/");
-    router.refresh();
+    setRegistered(true);
+  }
+
+  if (registered) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-sm rounded-lg border border-light-gray bg-off-white p-8 text-center">
+          <h1 className="font-serif text-2xl font-semibold text-charcoal">
+            Cek Email Kamu
+          </h1>
+          <p className="mt-4 text-sm text-medium-gray">
+            Kami sudah mengirimkan email konfirmasi. Klik tautan di email untuk mengaktifkan akun kamu.
+          </p>
+          <a
+            href="/login"
+            className="mt-6 inline-block rounded-lg bg-sage px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+          >
+            Ke Halaman Masuk
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -1,22 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
     });
+    return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setDropdownOpen(false);
+    router.push("/");
+    router.refresh();
+  }
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -56,12 +79,39 @@ export function Navbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           {user ? (
-            <Link
-              href="/profile/downloads"
-              className="rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-            >
-              Profile
-            </Link>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-1.5 rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                {user.user_metadata?.name || "Profile"}
+                <svg
+                  className={`h-4 w-4 transition ${dropdownOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-light-gray bg-white py-1 shadow-lg">
+                  <Link
+                    href="/profile/downloads"
+                    onClick={() => setDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-charcoal transition hover:bg-off-white"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full px-4 py-2 text-left text-sm text-medium-gray transition hover:bg-off-white"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <Link
@@ -124,13 +174,21 @@ export function Navbar() {
           ))}
           <div className="mt-3 flex flex-col gap-2 pt-3 border-t border-light-gray">
             {user ? (
-              <Link
-                href="/profile/downloads"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-lg bg-charcoal px-4 py-2 text-center text-sm font-medium text-white"
-              >
-                Profile
-              </Link>
+              <>
+                <Link
+                  href="/profile/downloads"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-lg bg-charcoal px-4 py-2 text-center text-sm font-medium text-white"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={() => { handleLogout(); setMenuOpen(false); }}
+                  className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-medium-gray"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <>
                 <Link
