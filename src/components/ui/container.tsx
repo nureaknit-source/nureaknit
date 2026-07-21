@@ -1,0 +1,24 @@
+import { HTMLAttributes, forwardRef } from "react";
+
+interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
+  size?: "sm" | "md" | "lg";
+}
+
+const sizes = {
+  sm: "max-w-3xl",
+  md: "max-w-4xl",
+  lg: "max-w-6xl",
+};
+
+export const Container = forwardRef<HTMLDivElement, ContainerProps>(
+  ({ size = "lg", className = "", children, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={`mx-auto px-4 sm:px-8 ${sizes[size]} ${className}`}
+      {...props}
+    >
+      {children}
+    </div>
+  ),
+);
+Container.displayName = "Container";
