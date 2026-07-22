@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { validateCoaching } from "@/lib/validation";
+import { sendCoachingNotification } from "@/lib/email";
 
 interface CoachingState {
   success: boolean;
@@ -31,6 +32,7 @@ export async function submitCoachingAction(
       collection: "coaching-requests",
       data,
     });
+    void sendCoachingNotification(data);
   } catch {
     return { success: false, errors: [{ field: "form", message: "Gagal mengirim. Silakan coba lagi." }] };
   }

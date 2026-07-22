@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { validateContact } from "@/lib/validation";
+import { sendContactNotification } from "@/lib/email";
 
 interface ContactState {
   success: boolean;
@@ -32,6 +33,7 @@ export async function submitContactAction(
       collection: "contact-messages",
       data,
     });
+    void sendContactNotification(data);
   } catch {
     return { success: false, errors: [{ field: "form", message: "Gagal mengirim pesan. Silakan coba lagi." }] };
   }
