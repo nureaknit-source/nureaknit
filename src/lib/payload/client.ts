@@ -117,6 +117,16 @@ export async function getFAQ(options?: FindOptions) {
   });
 }
 
+export async function searchContent(query: string) {
+  const payload = await getPayload({ config });
+  const [patterns, posts, products] = await Promise.all([
+    payload.find({ collection: "patterns", where: { title: { contains: query } } as any, limit: 10 }),
+    payload.find({ collection: "blog-posts", where: { title: { contains: query } } as any, limit: 10 }),
+    payload.find({ collection: "products", where: { title: { contains: query } } as any, limit: 10 }),
+  ]);
+  return { patterns: patterns.docs, posts: posts.docs, products: products.docs };
+}
+
 export async function getPatternCategories() {
   const payload = await getPayload({ config });
   return payload.find({

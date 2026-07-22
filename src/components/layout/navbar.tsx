@@ -48,6 +48,7 @@ export function Navbar() {
     { href: "/portfolio", label: "Portfolio" },
     { href: "/products", label: "Shop" },
     { href: "/about", label: "About" },
+    { href: "/search", label: "Search" },
     { href: "/coaching", label: "Coaching" },
   ];
 
