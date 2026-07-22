@@ -23,7 +23,13 @@ export default async function DownloadsPage() {
         </p>
         <p className="mt-1 text-sm text-medium-gray">{user.email}</p>
       </div>
-      <p className="mt-6 text-medium-gray">Coming soon.</p>
+      <div className="mt-12 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="mx-auto size-16 text-light-gray">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        <p className="mt-4 text-medium-gray">Belum ada pembelian.</p>
+        <p className="text-sm text-medium-gray">Pola yang kamu beli akan muncul di sini.</p>
+      </div>
       <form action={logoutAction} className="mt-6">
         <button
           type="submit"
