@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
-import { getProductBySlug } from "@/lib/payload/client";
+import { getBySlug } from "@/lib/payload/client";
 import { mediaUrl, formatPrice } from "@/lib/payload/utils";
-import type { Media } from "@/lib/payload/cms-types";
+import type { Media, Product } from "@/lib/payload/payload-types";
+
+// ponytail: getBySlug<Product> provides proper typing for product pages
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { getWishlistAction } from "@/actions/wishlist";
@@ -19,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getBySlug<Product>("products", slug);
   if (!product) return { title: "Not Found" };
   return {
     title: `${product.title} — Nurea Knit Shop`,
@@ -33,7 +36,7 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getBySlug<Product>("products", slug);
 
   if (!product) notFound();
 
@@ -74,15 +77,15 @@ export default async function ProductDetailPage({
                   {product.title}
                 </Heading>
               </div>
-              <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} />
+              <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} isLoggedIn={user !== null} />
             </div>
             <p className="mt-4 text-2xl font-semibold text-sage">
               {formatPrice(product.price)}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {product.featured && <Tag variant="gold">Featured</Tag>}
+              {product.featured && <Badge variant="gold" shape="square">Featured</Badge>}
               {product.type && (
-                <Tag variant="sage">{product.type === "digital" ? "Digital" : "Physical"}</Tag>
+                <Badge variant="sage" shape="square">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
               )}
             </div>
             {product.description && (

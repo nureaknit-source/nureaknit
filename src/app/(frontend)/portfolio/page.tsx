@@ -1,10 +1,11 @@
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
 import { EmptyState } from "@/components/shared/empty-state";
-import { getPortfolioEntries } from "@/lib/payload/client";
+import { getCollection } from "@/lib/payload/client";
 import { mediaUrl } from "@/lib/payload/utils";
 import { PortfolioGrid } from "@/features/portfolio/portfolio-grid";
-import type { Media } from "@/lib/payload/payload-types";
+import type { Media, Portfolio } from "@/lib/payload/payload-types";
 
 export const metadata = {
   title: "Portfolio — Nurea Knit",
@@ -12,7 +13,7 @@ export const metadata = {
 };
 
 export default async function PortfolioPage() {
-  const { docs: entries } = await getPortfolioEntries({ limit: 50 });
+  const { docs: entries } = await getCollection<Portfolio>("portfolio");
 
   return (
     <Section>

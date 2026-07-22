@@ -1,12 +1,13 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { submitCoachingAction } from "@/actions/coaching";
-import { ToastContainer, showToast } from "@/components/ui/toast";
+import { showToast } from "@/components/ui/toast";
 import type { ValidationError } from "@/lib/validation";
 
 interface FormState {
@@ -96,7 +97,6 @@ export default function CoachingPage() {
             {pending ? "Mengirim..." : "Kirim Permintaan"}
           </Button>
         </form>
-        <ToastContainer />
       </Container>
     </Section>
   );

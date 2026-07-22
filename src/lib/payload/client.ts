@@ -9,112 +9,40 @@ interface FindOptions {
   depth?: number;
 }
 
-function w(where?: Record<string, unknown>) {
-  return where as any;
+interface PaginatedDocs<T> {
+  docs: T[];
+  totalDocs: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
-export async function getPatterns(options?: FindOptions) {
+const defaults: Record<string, { sort?: string; limit: number; depth: number }> = {
+  patterns: { sort: "-publishedAt", limit: 50, depth: 1 },
+  "blog-posts": { sort: "-publishedAt", limit: 20, depth: 1 },
+  portfolio: { sort: "-createdAt", limit: 50, depth: 1 },
+  products: { sort: "-createdAt", limit: 50, depth: 1 },
+  faq: { sort: "order", limit: 100, depth: 1 },
+  "pattern-categories": { sort: "name", limit: 100, depth: 1 },
+};
+
+export async function getCollection<T>(collection: string, opts?: FindOptions) {
   const payload = await getPayload({ config });
+  const d = defaults[collection] || { limit: 50, depth: 1 };
   return payload.find({
-    collection: "patterns",
-    depth: options?.depth ?? 1,
-    sort: options?.sort ?? "-publishedAt",
-    page: options?.page ?? 1,
-    limit: options?.limit ?? 50,
-    where: w(options?.where),
-  });
+    collection: collection as any,
+    depth: opts?.depth ?? d.depth,
+    sort: opts?.sort ?? d.sort,
+    page: opts?.page ?? 1,
+    limit: opts?.limit ?? d.limit,
+    where: opts?.where as any,
+  }) as unknown as PaginatedDocs<T>;
 }
 
-export async function getPatternBySlug(slug: string) {
-  const payload = await getPayload({ config });
-  const result = await payload.find({
-    collection: "patterns",
-    where: { slug: { equals: slug } } as any,
-    depth: 2,
-    limit: 1,
-  });
+export async function getBySlug<T>(collection: string, slug: string, depth = 2) {
+  const result = await getCollection<T>(collection, { where: { slug: { equals: slug } }, depth, limit: 1 });
   return result.docs[0] || null;
-}
-
-export async function getBlogPosts(options?: FindOptions) {
-  const payload = await getPayload({ config });
-  return payload.find({
-    collection: "blog-posts",
-    depth: options?.depth ?? 1,
-    sort: options?.sort ?? "-publishedAt",
-    page: options?.page ?? 1,
-    limit: options?.limit ?? 20,
-    where: w(options?.where),
-  });
-}
-
-export async function getBlogPostBySlug(slug: string) {
-  const payload = await getPayload({ config });
-  const result = await payload.find({
-    collection: "blog-posts",
-    where: { slug: { equals: slug } } as any,
-    depth: 2,
-    limit: 1,
-  });
-  return result.docs[0] || null;
-}
-
-export async function getPortfolioEntries(options?: FindOptions) {
-  const payload = await getPayload({ config });
-  return payload.find({
-    collection: "portfolio",
-    depth: options?.depth ?? 1,
-    sort: options?.sort ?? "-createdAt",
-    page: options?.page ?? 1,
-    limit: options?.limit ?? 50,
-    where: w(options?.where),
-  });
-}
-
-export async function getPortfolioEntryBySlug(slug: string) {
-  const payload = await getPayload({ config });
-  const result = await payload.find({
-    collection: "portfolio",
-    where: { slug: { equals: slug } } as any,
-    depth: 2,
-    limit: 1,
-  });
-  return result.docs[0] || null;
-}
-
-export async function getProducts(options?: FindOptions) {
-  const payload = await getPayload({ config });
-  return payload.find({
-    collection: "products",
-    depth: options?.depth ?? 1,
-    sort: options?.sort ?? "-createdAt",
-    page: options?.page ?? 1,
-    limit: options?.limit ?? 50,
-    where: w(options?.where),
-  });
-}
-
-export async function getProductBySlug(slug: string) {
-  const payload = await getPayload({ config });
-  const result = await payload.find({
-    collection: "products",
-    where: { slug: { equals: slug } } as any,
-    depth: 2,
-    limit: 1,
-  });
-  return result.docs[0] || null;
-}
-
-export async function getFAQ(options?: FindOptions) {
-  const payload = await getPayload({ config });
-  return payload.find({
-    collection: "faq",
-    depth: options?.depth ?? 1,
-    sort: options?.sort ?? "order",
-    page: options?.page ?? 1,
-    limit: options?.limit ?? 100,
-    where: w(options?.where),
-  });
 }
 
 export async function searchContent(query: string) {
@@ -125,14 +53,4 @@ export async function searchContent(query: string) {
     payload.find({ collection: "products", where: { title: { contains: query } } as any, limit: 10 }),
   ]);
   return { patterns: patterns.docs, posts: posts.docs, products: products.docs };
-}
-
-export async function getPatternCategories() {
-  const payload = await getPayload({ config });
-  return payload.find({
-    collection: "pattern-categories",
-    depth: 1,
-    sort: "name",
-    limit: 100,
-  });
 }

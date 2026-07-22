@@ -1,39 +1,24 @@
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = "Nurea Knit <onboarding@resend.dev>";
 
-export async function sendContactNotification(data: {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}) {
-  await resend.emails.send({
-    from: "Nurea Knit <noreply@nureaknit.com>",
-    to: "admin@nureaknit.com",
-    subject: `[Contact] ${data.subject}`,
-    text: `From: ${data.name} (${data.email})\n\n${data.message}`,
-  });
+async function sendEmail(to: string, subject: string, text: string) {
+  try {
+    await resend.emails.send({ from: FROM, to, subject, text });
+  } catch (e) {
+    console.error("sendEmail failed:", e);
+  }
 }
 
-export async function sendCoachingNotification(data: {
-  name: string;
-  email: string;
-  message: string;
-}) {
-  await resend.emails.send({
-    from: "Nurea Knit <noreply@nureaknit.com>",
-    to: "admin@nureaknit.com",
-    subject: `[Coaching] New request from ${data.name}`,
-    text: `From: ${data.name} (${data.email})\n\n${data.message}`,
-  });
+export async function sendContactNotification(data: Record<string, string>) {
+  await sendEmail("nureaknit@gmail.com", `[Contact] ${data.subject}`, `From: ${data.name} (${data.email})\n\n${data.message}`);
+}
+
+export async function sendCoachingNotification(data: Record<string, string>) {
+  await sendEmail("nureaknit@gmail.com", `[Coaching] New request from ${data.name}`, `From: ${data.name} (${data.email})\n\n${data.message}`);
 }
 
 export async function sendWelcomeEmail(email: string, name: string) {
-  await resend.emails.send({
-    from: "Nurea Knit <noreply@nureaknit.com>",
-    to: email,
-    subject: "Welcome to Nurea Knit!",
-    text: `Hi ${name},\n\nWelcome to Nurea Knit! Happy crafting.\n\nBest,\nNurea Knit Team`,
-  });
+  await sendEmail(email, "Welcome to Nurea Knit!", `Hi ${name},\n\nWelcome to Nurea Knit! Happy crafting.\n\nBest,\nNurea Knit Team`);
 }

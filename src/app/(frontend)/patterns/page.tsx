@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { getPatterns, getPatternCategories } from "@/lib/payload/client";
+import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel } from "@/lib/payload/utils";
-import type { Media } from "@/lib/payload/cms-types";
+import type { Media, Pattern, PatternCategory } from "@/lib/payload/payload-types";
 
 export const metadata = {
   title: "Pattern Library — Nurea Knit",
@@ -27,8 +28,8 @@ export default async function PatternsPage({
   const page = params.page ? parseInt(params.page, 10) : 1;
 
   const [patternsData, categoriesData] = await Promise.all([
-    getPatterns({ where, page, limit: 50 }),
-    getPatternCategories(),
+    getCollection<Pattern>("patterns", { where, page }),
+    getCollection<PatternCategory>("pattern-categories"),
   ]);
 
   const patterns = patternsData?.docs || [];
@@ -91,9 +92,9 @@ export default async function PatternsPage({
                     )}
                     <div className="flex flex-wrap gap-2 mb-2">
                       {pattern.difficulty && (
-                        <Tag variant="sage">{difficultyLabel(pattern.difficulty)}</Tag>
+                        <Badge variant="sage" shape="square">{difficultyLabel(pattern.difficulty)}</Badge>
                       )}
-                      {pattern.featured && <Tag variant="gold">Featured</Tag>}
+                      {pattern.featured && <Badge variant="gold" shape="square">Featured</Badge>}
                     </div>
                     <h3 className="font-serif text-lg font-semibold text-charcoal">
                       {pattern.title}

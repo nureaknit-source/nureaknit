@@ -3,7 +3,6 @@ import { Footer } from "@/components/layout/footer";
 import { ToastContainer } from "@/components/ui/toast";
 
 import "../globals.css";
-import "./frontend.css";
 
 export default function FrontendLayout({
   children,

@@ -1,14 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
-import { Tag } from "@/components/ui/tag";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
-import { getPatternBySlug } from "@/lib/payload/client";
+import { getBySlug } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel, formatDate } from "@/lib/payload/utils";
-import type { Media } from "@/lib/payload/payload-types";
+import type { Pattern } from "@/lib/payload/payload-types";
+
+// ponytail: getBySlug<Pattern> provides proper typing for pattern pages
 
 export async function generateMetadata({
   params,
@@ -16,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const pattern = await getPatternBySlug(slug);
+  const pattern = await getBySlug<Pattern>("patterns", slug);
   if (!pattern) return { title: "Not Found" };
   return {
     title: `${pattern.title} — Nurea Knit`,
@@ -30,7 +32,7 @@ export default async function PatternDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const pattern = await getPatternBySlug(slug);
+  const pattern = await getBySlug<Pattern>("patterns", slug);
 
   if (!pattern) notFound();
 
@@ -64,10 +66,10 @@ export default async function PatternDetailPage({
 
           <div className="mt-4 flex flex-wrap gap-2">
             {pattern.difficulty && (
-              <Badge variant="sage">{difficultyLabel(pattern.difficulty)}</Badge>
+              <Badge variant="sage" shape="square">{difficultyLabel(pattern.difficulty)}</Badge>
             )}
-            {pattern.featured && <Badge variant="gold">Featured</Badge>}
-            {pattern.yarnWeight && <Badge variant="rose">{pattern.yarnWeight}</Badge>}
+            {pattern.featured && <Badge variant="gold" shape="square">Featured</Badge>}
+            {pattern.yarnWeight && <Badge variant="rose" shape="square">{pattern.yarnWeight}</Badge>}
           </div>
 
           {pattern.publishedAt && (

@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { getBlogPosts } from "@/lib/payload/client";
+import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, formatDate } from "@/lib/payload/utils";
-import type { Media } from "@/lib/payload/payload-types";
+import type { Media, BlogPost } from "@/lib/payload/payload-types";
 
 export const metadata = {
   title: "Blog — Nurea Knit",
@@ -14,7 +15,7 @@ export const metadata = {
 };
 
 export default async function BlogPage() {
-  const { docs: posts } = await getBlogPosts({ limit: 20 });
+  const { docs: posts } = await getCollection<BlogPost>("blog-posts");
 
   return (
     <Section>
@@ -44,7 +45,7 @@ export default async function BlogPage() {
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {post.featured && <Tag variant="gold">Featured</Tag>}
+                      {post.featured && <Badge variant="gold">Featured</Badge>}
                     </div>
                     <h3 className="font-serif text-lg font-semibold text-charcoal">
                       {post.title}

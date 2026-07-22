@@ -1,18 +1,25 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { addWishlistAction, removeWishlistAction } from "@/actions/wishlist";
 
 interface Props {
   productId: number;
   initialInWishlist: boolean;
+  isLoggedIn: boolean;
 }
 
-export function WishlistButton({ productId, initialInWishlist }: Props) {
+export function WishlistButton({ productId, initialInWishlist, isLoggedIn }: Props) {
+  const router = useRouter();
   const [inWishlist, setInWishlist] = useState(initialInWishlist);
   const [loading, setLoading] = useState(false);
 
   const toggle = useCallback(async () => {
+    if (!isLoggedIn) {
+      router.push("/login");
+      return;
+    }
     setLoading(true);
     if (inWishlist) {
       await removeWishlistAction(productId);
@@ -21,7 +28,7 @@ export function WishlistButton({ productId, initialInWishlist }: Props) {
     }
     setInWishlist(!inWishlist);
     setLoading(false);
-  }, [inWishlist, productId]);
+  }, [inWishlist, productId, isLoggedIn, router]);
 
   return (
     <button

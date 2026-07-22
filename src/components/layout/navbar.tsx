@@ -79,56 +79,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-1.5 rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                {user.user_metadata?.name || "Profile"}
-                <svg
-                  className={`h-4 w-4 transition ${dropdownOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-light-gray bg-white py-1 shadow-lg">
-                  <Link
-                    href="/profile/downloads"
-                    onClick={() => setDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-charcoal transition hover:bg-off-white"
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full px-4 py-2 text-left text-sm text-medium-gray transition hover:bg-off-white"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="text-sm font-medium text-medium-gray transition hover:text-charcoal"
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-lg bg-sage px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                Daftar
-              </Link>
-            </>
-          )}
+          {user ? <DesktopUserDropdown /> : <DesktopGuestLinks />}
         </div>
 
         <button
@@ -174,43 +125,106 @@ export function Navbar() {
             </Link>
           ))}
           <div className="mt-3 flex flex-col gap-2 pt-3 border-t border-light-gray">
-            {user ? (
-              <>
-                <Link
-                  href="/profile/downloads"
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg bg-charcoal px-4 py-2 text-center text-sm font-medium text-white"
-                >
-                  Profile
-                </Link>
-                <button
-                  onClick={() => { handleLogout(); setMenuOpen(false); }}
-                  className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-medium-gray"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-charcoal"
-                >
-                  Masuk
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg bg-sage px-4 py-2 text-center text-sm font-medium text-white"
-                >
-                  Daftar
-                </Link>
-              </>
-            )}
+            {user ? <MobileUserLinks onClose={() => setMenuOpen(false)} /> : <MobileGuestLinks onClose={() => setMenuOpen(false)} />}
           </div>
         </div>
       )}
     </header>
   );
+
+  function DesktopUserDropdown() {
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-1.5 rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          {user?.user_metadata?.name || "Profile"}
+          <svg
+            className={`h-4 w-4 transition ${dropdownOpen ? "rotate-180" : ""}`}
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {dropdownOpen && (
+          <div className="absolute right-0 mt-2 w-48 rounded-lg border border-light-gray bg-white py-1 shadow-lg">
+            <Link
+              href="/profile/downloads"
+              onClick={() => setDropdownOpen(false)}
+              className="block px-4 py-2 text-sm text-charcoal transition hover:bg-off-white"
+            >
+              Profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="block w-full px-4 py-2 text-left text-sm text-medium-gray transition hover:bg-off-white"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  function DesktopGuestLinks() {
+    return (
+      <>
+        <Link
+          href="/login"
+          className="text-sm font-medium text-medium-gray transition hover:text-charcoal"
+        >
+          Masuk
+        </Link>
+        <Link
+          href="/register"
+          className="rounded-lg bg-sage px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          Daftar
+        </Link>
+      </>
+    );
+  }
+
+  function MobileUserLinks({ onClose }: { onClose: () => void }) {
+    return (
+      <>
+        <Link
+          href="/profile/downloads"
+          onClick={onClose}
+          className="rounded-lg bg-charcoal px-4 py-2 text-center text-sm font-medium text-white"
+        >
+          Profile
+        </Link>
+        <button
+          onClick={() => { handleLogout(); onClose(); }}
+          className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-medium-gray"
+        >
+          Logout
+        </button>
+      </>
+    );
+  }
+
+  function MobileGuestLinks({ onClose }: { onClose: () => void }) {
+    return (
+      <>
+        <Link
+          href="/login"
+          onClick={onClose}
+          className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-charcoal"
+        >
+          Masuk
+        </Link>
+        <Link
+          href="/register"
+          onClick={onClose}
+          className="rounded-lg bg-sage px-4 py-2 text-center text-sm font-medium text-white"
+        >
+          Daftar
+        </Link>
+      </>
+    );
+  }
 }

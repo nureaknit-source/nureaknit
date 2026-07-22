@@ -1,12 +1,11 @@
 import type { MetadataRoute } from "next";
 
-const API_BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 async function fetchSlugs(collection: string): Promise<string[]> {
   try {
     const res = await fetch(
-      `${API_BASE}/api/${collection}?limit=1000&depth=0&fields=slug`,
+      `${BASE_URL}/api/${collection}?limit=1000&depth=0&fields=slug`,
       { next: { revalidate: 3600 } },
     );
     if (!res.ok) return [];

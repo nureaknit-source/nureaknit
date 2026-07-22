@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { checkEmailAction } from "@/actions/auth";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmailAction } from "@/actions/email";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -59,7 +59,7 @@ export default function RegisterPage() {
       return;
     }
 
-    void sendWelcomeEmail(email, name);
+    void sendWelcomeEmailAction(email, name);
     setRegistered(true);
   }
 

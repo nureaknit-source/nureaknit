@@ -1,68 +1,40 @@
-export function isEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-export function isRequired(value: string): boolean {
-  return value.trim().length > 0;
-}
-
-export function minLength(value: string, min: number): boolean {
-  return value.length >= min;
-}
-
 export interface ValidationError {
   field: string;
   message: string;
 }
 
-export function validateContact(data: {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}): ValidationError[] {
+type Rule = { field: string; label: string; email?: boolean; minLength?: number };
+
+function isEmail(v: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+function validate(data: Record<string, string>, rules: Rule[]): ValidationError[] {
   const errors: ValidationError[] = [];
-
-  if (!isRequired(data.name)) {
-    errors.push({ field: "name", message: "Nama harus diisi" });
+  for (const r of rules) {
+    const v = (data[r.field] || "").trim();
+    if (!v) {
+      errors.push({ field: r.field, message: `${r.label} harus diisi` });
+    } else if (r.email && !isEmail(v)) {
+      errors.push({ field: r.field, message: `${r.label} tidak valid` });
+    } else if (r.minLength && v.length < r.minLength) {
+      errors.push({ field: r.field, message: `${r.label} minimal ${r.minLength} karakter` });
+    }
   }
-  if (!isRequired(data.email)) {
-    errors.push({ field: "email", message: "Email harus diisi" });
-  } else if (!isEmail(data.email)) {
-    errors.push({ field: "email", message: "Email tidak valid" });
-  }
-  if (!isRequired(data.subject)) {
-    errors.push({ field: "subject", message: "Subjek harus diisi" });
-  }
-  if (!isRequired(data.message)) {
-    errors.push({ field: "message", message: "Pesan harus diisi" });
-  } else if (!minLength(data.message, 10)) {
-    errors.push({ field: "message", message: "Pesan minimal 10 karakter" });
-  }
-
   return errors;
 }
 
-export function validateCoaching(data: {
-  name: string;
-  email: string;
-  message: string;
-}): ValidationError[] {
-  const errors: ValidationError[] = [];
+export function validateContact(data: Record<string, string>) {
+  return validate(data, [
+    { field: "name", label: "Nama" },
+    { field: "email", label: "Email", email: true },
+    { field: "subject", label: "Subjek" },
+    { field: "message", label: "Pesan", minLength: 10 },
+  ]);
+}
 
-  if (!isRequired(data.name)) {
-    errors.push({ field: "name", message: "Nama harus diisi" });
-  }
-  if (!isRequired(data.email)) {
-    errors.push({ field: "email", message: "Email harus diisi" });
-  } else if (!isEmail(data.email)) {
-    errors.push({ field: "email", message: "Email tidak valid" });
-  }
-  if (!isRequired(data.message)) {
-    errors.push({ field: "message", message: "Pesan harus diisi" });
-  } else if (!minLength(data.message, 10)) {
-    errors.push({ field: "message", message: "Pesan minimal 10 karakter" });
-  }
-
-  return errors;
+export function validateCoaching(data: Record<string, string>) {
+  return validate(data, [
+    { field: "name", label: "Nama" },
+    { field: "email", label: "Email", email: true },
+    { field: "message", label: "Pesan", minLength: 10 },
+  ]);
 }

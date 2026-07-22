@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
-import { getBlogPostBySlug } from "@/lib/payload/client";
+import { getBySlug } from "@/lib/payload/client";
 import { mediaUrl, formatDate } from "@/lib/payload/utils";
+import type { BlogPost } from "@/lib/payload/payload-types";
 
 export async function generateMetadata({
   params,
@@ -13,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const post = await getBySlug<BlogPost>("blog-posts", slug);
   if (!post) return { title: "Not Found" };
   return {
     title: `${post.title} — Nurea Knit Blog`,
@@ -27,7 +29,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const post = await getBySlug<BlogPost>("blog-posts", slug);
 
   if (!post) notFound();
 

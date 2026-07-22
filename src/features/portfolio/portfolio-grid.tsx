@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/badge";
 import Lightbox from "@/components/ui/lightbox";
 
 interface PortfolioImage {
@@ -63,11 +63,11 @@ export function PortfolioGrid({ entries }: Props) {
                 </Link>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {entry.category && (
-                    <Tag variant={entry.category === "knitting" ? "sage" : "rose"}>
+                    <Badge variant={entry.category === "knitting" ? "sage" : "rose"} shape="square">
                       {entry.category}
-                    </Tag>
+                    </Badge>
                   )}
-                  {entry.year && <Tag>{entry.year}</Tag>}
+                  {entry.year && <Badge shape="square">{entry.year}</Badge>}
                 </div>
               </div>
             </Card>

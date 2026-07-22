@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { getProducts } from "@/lib/payload/client";
+import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, formatPrice } from "@/lib/payload/utils";
-import type { Media } from "@/lib/payload/payload-types";
+import type { Media, Product } from "@/lib/payload/payload-types";
 import { getWishlistAction } from "@/actions/wishlist";
 import { WishlistButton } from "@/features/products/wishlist-button";
 import { cookies } from "next/headers";
@@ -26,7 +27,7 @@ export default async function ProductsPage({
   const where: Record<string, unknown> = {};
   if (params.type) where.type = { equals: params.type };
 
-  const { docs: products } = await getProducts({ where, limit: 50 });
+  const { docs: products } = await getCollection<Product>("products", { where });
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -101,13 +102,13 @@ export default async function ProductsPage({
                       <div className="-mx-6 -mt-6 mb-4 aspect-[4/3] rounded-t-xl bg-light-gray" />
                     )}
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {product.featured && <Tag variant="gold">Featured</Tag>}
+                      {product.featured && <Badge variant="gold" shape="square">Featured</Badge>}
                       {product.type && (
-                        <Tag variant="sage">{product.type === "digital" ? "Digital" : "Physical"}</Tag>
+                        <Badge variant="sage" shape="square">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
                       )}
                     </div>
                     <div className="absolute right-4 top-4">
-                      <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} />
+                      <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} isLoggedIn={user !== null} />
                     </div>
                     <h3 className="font-serif text-lg font-semibold text-charcoal">
                       {product.title}

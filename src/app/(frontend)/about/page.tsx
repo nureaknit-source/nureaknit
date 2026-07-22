@@ -1,4 +1,5 @@
-import { Container, Section } from "@/components/ui/layout";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
 
 export default function AboutPage() {

@@ -1,15 +1,10 @@
-import type { Media } from "./cms-types";
+import type { Media } from "./payload-types";
 
 export function mediaUrl(media?: Media | string | number | null): string | null {
   if (!media) return null;
   if (typeof media === "string") return media;
   if (typeof media === "number") return null;
   return media.url || null;
-}
-
-export function mediaAlt(media?: Media | string | number | null): string {
-  if (!media || typeof media === "string" || typeof media === "number") return "";
-  return media.alt || "";
 }
 
 export function formatDate(date: string | Date): string {

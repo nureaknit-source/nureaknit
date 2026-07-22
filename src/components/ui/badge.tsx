@@ -4,6 +4,7 @@ type BadgeVariant = "default" | "sage" | "gold" | "rose" | "terracotta";
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
+  shape?: "pill" | "square";
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
@@ -14,11 +15,13 @@ const variantStyles: Record<BadgeVariant, string> = {
   terracotta: "bg-terracotta/10 text-terracotta",
 };
 
+const shapeStyles = { pill: "rounded-full px-2.5", square: "rounded-md px-2" };
+
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ variant = "default", className = "", children, ...props }, ref) => (
+  ({ variant = "default", shape = "pill", className = "", children, ...props }, ref) => (
     <span
       ref={ref}
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center ${shapeStyles[shape]} py-0.5 text-xs font-medium ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}
