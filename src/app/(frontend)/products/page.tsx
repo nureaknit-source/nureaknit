@@ -17,8 +17,16 @@ export const metadata = {
   description: "Browse knitting and crochet products, tools, and accessories.",
 };
 
-export default async function ProductsPage() {
-  const { docs: products } = await getProducts({ limit: 50 });
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}) {
+  const params = await searchParams;
+  const where: Record<string, unknown> = {};
+  if (params.type) where.type = { equals: params.type };
+
+  const { docs: products } = await getProducts({ where, limit: 50 });
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -33,6 +41,39 @@ export default async function ProductsPage() {
       <Container>
         <Heading as="h1">Shop</Heading>
         <Text className="mt-2">Tools, accessories, and more.</Text>
+
+        <div className="mt-8 flex flex-wrap gap-2">
+          <Link
+            href="/products"
+            className={`rounded-full px-4 py-1.5 text-sm transition ${
+              !params.type
+                ? "bg-sage text-white"
+                : "bg-light-gray text-medium-gray hover:bg-sage/20"
+            }`}
+          >
+            All
+          </Link>
+          <Link
+            href="/products?type=digital"
+            className={`rounded-full px-4 py-1.5 text-sm transition ${
+              params.type === "digital"
+                ? "bg-sage text-white"
+                : "bg-light-gray text-medium-gray hover:bg-sage/20"
+            }`}
+          >
+            Digital
+          </Link>
+          <Link
+            href="/products?type=physical"
+            className={`rounded-full px-4 py-1.5 text-sm transition ${
+              params.type === "physical"
+                ? "bg-sage text-white"
+                : "bg-light-gray text-medium-gray hover:bg-sage/20"
+            }`}
+          >
+            Physical
+          </Link>
+        </div>
 
         {products.length === 0 ? (
           <div className="mt-12">
