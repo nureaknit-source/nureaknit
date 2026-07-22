@@ -8,6 +8,10 @@ import { RichText } from "@/components/shared/rich-text";
 import { getProductBySlug } from "@/lib/payload/client";
 import { mediaUrl, formatPrice } from "@/lib/payload/utils";
 import type { Media } from "@/lib/payload/cms-types";
+import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
+import { getWishlistAction } from "@/actions/wishlist";
+import { WishlistButton } from "@/features/products/wishlist-button";
 
 export async function generateMetadata({
   params,
@@ -33,6 +37,14 @@ export default async function ProductDetailPage({
 
   if (!product) notFound();
 
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
+  let wishlistIds: number[] = [];
+  if (user) {
+    try { wishlistIds = await getWishlistAction(); } catch {}
+  }
+
   const firstImage = product.images?.[0]?.image
     ? mediaUrl(product.images[0].image)
     : null;
@@ -55,10 +67,15 @@ export default async function ProductDetailPage({
           )}
 
           <div>
-            <Caption>Product</Caption>
-            <Heading as="h1" className="mt-2">
-              {product.title}
-            </Heading>
+            <div className="flex items-start justify-between">
+              <div>
+                <Caption>Product</Caption>
+                <Heading as="h1" className="mt-2">
+                  {product.title}
+                </Heading>
+              </div>
+              <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} />
+            </div>
             <p className="mt-4 text-2xl font-semibold text-sage">
               {formatPrice(product.price)}
             </p>

@@ -11,6 +11,7 @@ import { ContactMessages } from "../../collections/ContactMessages";
 import { FAQ } from "../../collections/FAQ";
 import { Media } from "../../collections/Media";
 import { Navigation } from "../../collections/Navigation";
+import { WishlistItems } from "../../collections/WishlistItems";
 import { Pages } from "../../collections/Pages";
 import { PatternCategories } from "../../collections/PatternCategories";
 import { Patterns } from "../../collections/Patterns";
@@ -38,6 +39,7 @@ export default buildConfig({
     Navigation,
     CoachingRequests,
     ContactMessages,
+    WishlistItems,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

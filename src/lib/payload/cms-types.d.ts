@@ -90,6 +90,14 @@ export interface Product {
   updatedAt: string;
 }
 
+export interface WishlistItem {
+  id: number;
+  email: string;
+  product: number | Product;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FAQ {
   id: number;
   question: string;

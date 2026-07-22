@@ -7,6 +7,10 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { getProducts } from "@/lib/payload/client";
 import { mediaUrl, formatPrice } from "@/lib/payload/utils";
 import type { Media } from "@/lib/payload/payload-types";
+import { getWishlistAction } from "@/actions/wishlist";
+import { WishlistButton } from "@/features/products/wishlist-button";
+import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
 
 export const metadata = {
   title: "Shop — Nurea Knit",
@@ -15,6 +19,14 @@ export const metadata = {
 
 export default async function ProductsPage() {
   const { docs: products } = await getProducts({ limit: 50 });
+
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
+  let wishlistIds: number[] = [];
+  if (user) {
+    try { wishlistIds = await getWishlistAction(); } catch {}
+  }
 
   return (
     <Section>
@@ -34,7 +46,7 @@ export default async function ProductsPage() {
                 : null;
               return (
                 <Link key={product.id} href={`/products/${product.slug || product.id}`}>
-                  <Card hover className="h-full flex flex-col">
+                  <Card hover className="relative h-full flex flex-col">
                     {firstImage ? (
                       <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-xl">
                         <img
@@ -52,6 +64,9 @@ export default async function ProductsPage() {
                       {product.type && (
                         <Tag variant="sage">{product.type === "digital" ? "Digital" : "Physical"}</Tag>
                       )}
+                    </div>
+                    <div className="absolute right-4 top-4">
+                      <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} />
                     </div>
                     <h3 className="font-serif text-lg font-semibold text-charcoal">
                       {product.title}

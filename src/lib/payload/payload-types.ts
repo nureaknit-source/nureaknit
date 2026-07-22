@@ -79,6 +79,7 @@ export interface Config {
     navigation: Navigation;
     'coaching-requests': CoachingRequest;
     'contact-messages': ContactMessage;
+    'wishlist-items': WishlistItem;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,6 +99,7 @@ export interface Config {
     navigation: NavigationSelect<false> | NavigationSelect<true>;
     'coaching-requests': CoachingRequestsSelect<false> | CoachingRequestsSelect<true>;
     'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
+    'wishlist-items': WishlistItemsSelect<false> | WishlistItemsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -437,6 +439,17 @@ export interface ContactMessage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlist-items".
+ */
+export interface WishlistItem {
+  id: number;
+  email: string;
+  product: number | Product;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -506,6 +519,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'contact-messages';
         value: number | ContactMessage;
+      } | null)
+    | ({
+        relationTo: 'wishlist-items';
+        value: number | WishlistItem;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -768,6 +785,16 @@ export interface ContactMessagesSelect<T extends boolean = true> {
   subject?: T;
   message?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlist-items_select".
+ */
+export interface WishlistItemsSelect<T extends boolean = true> {
+  email?: T;
+  product?: T;
   updatedAt?: T;
   createdAt?: T;
 }
