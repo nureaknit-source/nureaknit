@@ -39,12 +39,12 @@ export default function Lightbox({ images, initialIndex, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
       onClick={onClose}
     >
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 text-white transition hover:text-light-gray"
+        className="absolute right-4 top-4 z-10 text-fg-inverse transition hover:text-fg-muted"
         aria-label="Close"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-8">
@@ -56,7 +56,7 @@ export default function Lightbox({ images, initialIndex, onClose }: Props) {
         {currentIndex > 0 && (
           <button
             onClick={() => setCurrentIndex(currentIndex - 1)}
-            className="text-white transition hover:text-light-gray"
+            className="text-fg-inverse transition hover:text-fg-muted"
             aria-label="Previous"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-8">
@@ -72,7 +72,7 @@ export default function Lightbox({ images, initialIndex, onClose }: Props) {
         {currentIndex < images.length - 1 && (
           <button
             onClick={() => setCurrentIndex(currentIndex + 1)}
-            className="text-white transition hover:text-light-gray"
+            className="text-fg-inverse transition hover:text-fg-muted"
             aria-label="Next"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-8">
@@ -82,7 +82,7 @@ export default function Lightbox({ images, initialIndex, onClose }: Props) {
         )}
       </div>
 
-      <div className="absolute bottom-4 text-sm text-white/60">
+      <div className="absolute bottom-4 text-sm text-fg-muted">
         {currentIndex + 1} / {images.length}
       </div>
     </div>

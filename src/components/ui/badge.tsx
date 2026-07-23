@@ -1,27 +1,24 @@
 import { HTMLAttributes, forwardRef } from "react";
 
-type BadgeVariant = "default" | "sage" | "gold" | "rose" | "terracotta";
+type BadgeVariant = "default" | "primary" | "secondary" | "accent" | "error";
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
-  shape?: "pill" | "square";
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: "bg-light-gray text-medium-gray",
-  sage: "bg-sage/10 text-sage",
-  gold: "bg-gold/10 text-gold",
-  rose: "bg-rose/10 text-rose",
-  terracotta: "bg-terracotta/10 text-terracotta",
+  default: "bg-accent-subtle text-secondary",
+  primary: "bg-primary text-primary-fg",
+  secondary: "bg-secondary text-secondary-fg",
+  accent: "bg-accent text-accent-fg",
+  error: "bg-error text-error-fg",
 };
 
-const shapeStyles = { pill: "rounded-full px-2.5", square: "rounded-md px-2" };
-
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ variant = "default", shape = "pill", className = "", children, ...props }, ref) => (
+  ({ variant = "default", className = "", children, ...props }, ref) => (
     <span
       ref={ref}
-      className={`inline-flex items-center ${shapeStyles[shape]} py-0.5 text-xs font-medium ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-bold ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

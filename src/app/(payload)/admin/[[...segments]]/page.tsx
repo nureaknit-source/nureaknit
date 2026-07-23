@@ -1,3 +1,5 @@
+import "@payloadcms/next/css";
+
 import configPromise from "@payload-config";
 import { RootPage } from "@payloadcms/next/views";
 import { generatePageMetadata } from "@payloadcms/next/views";

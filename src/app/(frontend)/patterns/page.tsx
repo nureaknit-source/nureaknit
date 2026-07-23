@@ -45,10 +45,10 @@ export default async function PatternsPage({
           <div className="mt-8 flex flex-wrap gap-2">
             <Link
               href="/patterns"
-              className={`rounded-full px-4 py-1.5 text-sm transition ${
+              className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
                 !params.category
-                  ? "bg-sage text-white"
-                  : "bg-light-gray text-medium-gray hover:bg-sage/20"
+                  ? "bg-primary text-primary-fg"
+                  : "bg-accent-subtle text-fg-secondary hover:bg-primary-subtle"
               }`}
             >
               All
@@ -57,10 +57,10 @@ export default async function PatternsPage({
               <Link
                 key={cat.id}
                 href={`/patterns?category=${cat.slug || cat.id}`}
-                className={`rounded-full px-4 py-1.5 text-sm transition ${
+                className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
                   params.category === (cat.slug || cat.id)
-                    ? "bg-sage text-white"
-                    : "bg-light-gray text-medium-gray hover:bg-sage/20"
+                    ? "bg-primary text-primary-fg"
+                    : "bg-accent-subtle text-fg-secondary hover:bg-primary-subtle"
                 }`}
               >
                 {cat.name}
@@ -81,7 +81,7 @@ export default async function PatternsPage({
                 <Link key={pattern.id} href={`/patterns/${pattern.slug || pattern.id}`}>
                   <Card hover className="h-full flex flex-col">
                     {img && (
-                      <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-xl">
+                        <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
                         <img
                           src={img}
                           alt=""
@@ -92,11 +92,11 @@ export default async function PatternsPage({
                     )}
                     <div className="flex flex-wrap gap-2 mb-2">
                       {pattern.difficulty && (
-                        <Badge variant="sage" shape="square">{difficultyLabel(pattern.difficulty)}</Badge>
+                        <Badge variant="primary">{difficultyLabel(pattern.difficulty)}</Badge>
                       )}
-                      {pattern.featured && <Badge variant="gold" shape="square">Featured</Badge>}
+                      {pattern.featured && <Badge variant="accent">Featured</Badge>}
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-charcoal">
+                    <h3 className="font-sans text-lg font-bold text-fg-default">
                       {pattern.title}
                     </h3>
                     {pattern.description && (

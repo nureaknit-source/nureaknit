@@ -37,8 +37,10 @@ export function ToastContainer() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`animate-slide-up rounded-lg px-4 py-3 text-sm font-medium text-white shadow-lg ${
-            toast.type === "success" ? "bg-success" : "bg-error"
+          className={`animate-slide-up rounded-lg border-l-4 px-4 py-3 text-sm font-bold shadow-lg ${
+            toast.type === "success"
+              ? "border-l-success bg-success-subtle text-success-fg"
+              : "border-l-error bg-error-subtle text-error-fg"
           }`}
         >
           {toast.message}

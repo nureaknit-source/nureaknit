@@ -13,9 +13,9 @@ export function EmptyState({
   return (
     <Container size="sm">
       <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
-        <div className="rounded-full bg-light-gray p-6">
+        <div className="rounded-full bg-accent-subtle p-6">
           <svg
-            className="h-8 w-8 text-medium-gray"
+            className="h-8 w-8 text-fg-muted"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -28,7 +28,7 @@ export function EmptyState({
             />
           </svg>
         </div>
-        <h3 className="mt-4 font-serif text-xl font-semibold text-charcoal">
+        <h3 className="mt-4 font-sans text-xl font-bold text-fg-default">
           {title}
         </h3>
         <Text size="sm" className="mt-2 max-w-xs">

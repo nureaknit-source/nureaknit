@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { generateSlug } from "@/lib/payload/slug";
 
 export const PatternCategories: CollectionConfig = {
   slug: "pattern-categories",
@@ -23,14 +24,7 @@ export const PatternCategories: CollectionConfig = {
       admin: { position: "sidebar" },
       hooks: {
         beforeValidate: [
-          ({ value, siblingData }) => {
-            if (value) return value;
-            const name = siblingData?.name || "";
-            return name
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "-")
-              .replace(/(^-|-$)/g, "");
-          },
+          ({ value, siblingData }) => generateSlug(value, siblingData?.name || ""),
         ],
       },
     },

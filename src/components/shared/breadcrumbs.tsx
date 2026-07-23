@@ -12,9 +12,9 @@ interface BreadcrumbsProps {
 export function Breadcrumbs({ crumbs }: BreadcrumbsProps) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6">
-      <ol className="flex items-center gap-2 text-sm text-medium-gray">
+      <ol className="flex items-center gap-2 text-sm text-fg-muted">
         <li>
-          <Link href="/" className="transition hover:text-sage">
+          <Link href="/" className="transition hover:text-accent">
             Home
           </Link>
         </li>
@@ -24,12 +24,12 @@ export function Breadcrumbs({ crumbs }: BreadcrumbsProps) {
             {crumb.href ? (
               <Link
                 href={crumb.href}
-                className="transition hover:text-sage"
+                className="transition hover:text-accent"
               >
                 {crumb.label}
               </Link>
             ) : (
-              <span className="text-charcoal">{crumb.label}</span>
+              <span className="text-fg-default">{crumb.label}</span>
             )}
           </li>
         ))}

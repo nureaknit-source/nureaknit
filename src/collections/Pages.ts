@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { generateSlug } from "@/lib/payload/slug";
 
 export const Pages: CollectionConfig = {
   slug: "pages",
@@ -23,14 +24,7 @@ export const Pages: CollectionConfig = {
       admin: { position: "sidebar" },
       hooks: {
         beforeValidate: [
-          ({ value, siblingData }) => {
-            if (value) return value;
-            const title = siblingData?.title || "";
-            return title
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "-")
-              .replace(/(^-|-$)/g, "");
-          },
+          ({ value, siblingData }) => generateSlug(value, siblingData?.title || ""),
         ],
       },
     },

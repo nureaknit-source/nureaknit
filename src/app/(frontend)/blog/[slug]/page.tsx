@@ -46,7 +46,7 @@ export default async function BlogPostPage({
         />
 
         {img && (
-          <div className="overflow-hidden rounded-xl">
+          <div className="overflow-hidden rounded-lg">
             <img src={img} alt="" className="aspect-[16/9] w-full object-cover" />
           </div>
         )}
@@ -64,7 +64,7 @@ export default async function BlogPostPage({
         </div>
 
         {post.excerpt && (
-          <p className="mt-6 text-lg text-medium-gray leading-relaxed">
+          <p className="mt-6 text-lg text-fg-secondary leading-relaxed">
             {post.excerpt}
           </p>
         )}
@@ -78,7 +78,7 @@ export default async function BlogPostPage({
         <div className="mt-12">
           <Link
             href="/blog"
-            className="text-sm text-sage underline transition hover:text-terracotta"
+            className="text-sm text-primary underline transition hover:text-accent"
           >
             &larr; Back to Blog
           </Link>

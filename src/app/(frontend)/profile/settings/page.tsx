@@ -35,24 +35,24 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
-      <h1 className="font-serif text-3xl font-semibold text-charcoal">Account Settings</h1>
+      <h1 className="font-sans text-3xl font-extrabold text-fg-default">Account Settings</h1>
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-charcoal">Nama</label>
+          <label htmlFor="name" className="block text-sm font-medium text-fg-default">Nama</label>
           <input
             id="name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-light-gray px-4 py-2 text-sm outline-none focus:border-sage"
+            className="mt-1 block w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
             required
           />
         </div>
-        {message && <p className={`text-sm ${message.includes("Gagal") ? "text-error" : "text-sage"}`}>{message}</p>}
+        {message && <p className={`text-sm ${message.includes("Gagal") ? "text-error" : "text-primary"}`}>{message}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-sage px-6 py-2 text-sm font-medium text-white transition hover:bg-sage/90 disabled:opacity-50"
+          className="rounded-full bg-primary px-6 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95 disabled:opacity-50"
         >
           {loading ? "Menyimpan..." : "Simpan"}
         </button>

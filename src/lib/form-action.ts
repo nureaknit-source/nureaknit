@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import { getPayload } from "payload";
 import config from "@payload-config";
 
-export interface ActionResult {
+interface ActionResult {
   success: boolean;
   errors?: { field: string; message: string }[];
 }

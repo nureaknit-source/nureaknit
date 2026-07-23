@@ -46,30 +46,30 @@ export default async function ProductsPage({
         <div className="mt-8 flex flex-wrap gap-2">
           <Link
             href="/products"
-            className={`rounded-full px-4 py-1.5 text-sm transition ${
+            className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
               !params.type
-                ? "bg-sage text-white"
-                : "bg-light-gray text-medium-gray hover:bg-sage/20"
+                ? "bg-primary text-primary-fg"
+                : "bg-accent-subtle text-fg-secondary hover:bg-primary-subtle"
             }`}
           >
             All
           </Link>
           <Link
             href="/products?type=digital"
-            className={`rounded-full px-4 py-1.5 text-sm transition ${
+            className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
               params.type === "digital"
-                ? "bg-sage text-white"
-                : "bg-light-gray text-medium-gray hover:bg-sage/20"
+                ? "bg-primary text-primary-fg"
+                : "bg-accent-subtle text-fg-secondary hover:bg-primary-subtle"
             }`}
           >
             Digital
           </Link>
           <Link
             href="/products?type=physical"
-            className={`rounded-full px-4 py-1.5 text-sm transition ${
+            className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
               params.type === "physical"
-                ? "bg-sage text-white"
-                : "bg-light-gray text-medium-gray hover:bg-sage/20"
+                ? "bg-primary text-primary-fg"
+                : "bg-accent-subtle text-fg-secondary hover:bg-primary-subtle"
             }`}
           >
             Physical
@@ -90,7 +90,7 @@ export default async function ProductsPage({
                 <Link key={product.id} href={`/products/${product.slug || product.id}`}>
                   <Card hover className="relative h-full flex flex-col">
                     {firstImage ? (
-                      <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-xl">
+                        <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
                         <img
                           src={firstImage}
                           alt=""
@@ -99,21 +99,21 @@ export default async function ProductsPage({
                         />
                       </div>
                     ) : (
-                      <div className="-mx-6 -mt-6 mb-4 aspect-[4/3] rounded-t-xl bg-light-gray" />
+                      <div className="-mx-6 -mt-6 mb-4 aspect-[4/3] rounded-t-lg bg-accent-subtle" />
                     )}
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {product.featured && <Badge variant="gold" shape="square">Featured</Badge>}
+                      {product.featured && <Badge variant="accent">Featured</Badge>}
                       {product.type && (
-                        <Badge variant="sage" shape="square">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
+                        <Badge variant="primary">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
                       )}
                     </div>
                     <div className="absolute right-4 top-4">
                       <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} isLoggedIn={user !== null} />
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-charcoal">
+                    <h3 className="font-sans text-lg font-bold text-fg-default">
                       {product.title}
                     </h3>
-                    <Text className="mt-1 font-medium text-sage">
+                    <Text className="mt-1 font-bold text-primary">
                       {formatPrice(product.price)}
                     </Text>
                   </Card>

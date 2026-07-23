@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, Caveat } from "next/font/google";
+import { Pacifico, Outfit } from "next/font/google";
 import type { ServerFunctionClient } from "payload";
-
-import "@payloadcms/next/css";
 
 import { handleServerFunctions, RootLayout as PayloadRootLayout } from "@payloadcms/next/layouts";
 
@@ -10,21 +8,16 @@ import configPromise from "@payload-config";
 import { importMap } from "./(payload)/admin/importMap";
 
 
-const playfairDisplay = Playfair_Display({
+const pacifico = Pacifico({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-display",
+  weight: ["400"],
   display: "swap",
 });
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap",
-});
-
-const caveat = Caveat({
-  subsets: ["latin"],
-  variable: "--font-handwriting",
   display: "swap",
 });
 
@@ -55,7 +48,8 @@ export default async function RootLayout({
       serverFunction={serverFunction}
       htmlProps={{
         lang: "id",
-        className: `${playfairDisplay.variable} ${inter.variable} ${caveat.variable} h-full antialiased`,
+        className: `${pacifico.variable} ${outfit.variable} h-full antialiased bg-bg-base`,
+        suppressHydrationWarning: true,
       }}
     >
       {children}

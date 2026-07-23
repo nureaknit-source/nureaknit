@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
-import { Heading, Text, Caption } from "@/components/ui/typography";
+import { Heading, Caption } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
@@ -26,7 +26,7 @@ export async function generateMetadata({
   if (!product) return { title: "Not Found" };
   return {
     title: `${product.title} — Nurea Knit Shop`,
-    description: product.description ? undefined : undefined,
+    description: product.description || undefined,
   };
 }
 
@@ -64,7 +64,7 @@ export default async function ProductDetailPage({
 
         <div className="grid gap-8 sm:grid-cols-2">
           {firstImage && (
-            <div className="overflow-hidden rounded-xl">
+            <div className="overflow-hidden rounded-lg">
               <img src={firstImage} alt="" className="w-full object-cover" />
             </div>
           )}
@@ -79,14 +79,23 @@ export default async function ProductDetailPage({
               </div>
               <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} isLoggedIn={user !== null} />
             </div>
-            <p className="mt-4 text-2xl font-semibold text-sage">
+            <p className="mt-4 text-2xl font-bold text-primary">
               {formatPrice(product.price)}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {product.featured && <Badge variant="gold" shape="square">Featured</Badge>}
+              {product.featured && <Badge variant="accent">Featured</Badge>}
               {product.type && (
-                <Badge variant="sage" shape="square">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
+                <Badge variant="primary">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
               )}
+            </div>
+            <div className="mt-6 flex gap-3">
+              <Link
+                href={`/contact?subject=${encodeURIComponent("Pesan: " + product.title)}`}
+                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95"
+              >
+                Pesan Sekarang
+              </Link>
+              {/* ponytail: no cart system yet, Pesan links to contact form */}
             </div>
             {product.description && (
               <div className="mt-6">
@@ -112,7 +121,7 @@ export default async function ProductDetailPage({
         <div className="mt-12">
           <Link
             href="/products"
-            className="text-sm text-sage underline transition hover:text-terracotta"
+            className="text-sm text-primary underline transition hover:text-accent"
           >
             &larr; Back to Shop
           </Link>

@@ -9,15 +9,15 @@ export default function GlobalError({
 }) {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
-      <h1 className="font-serif text-4xl font-semibold text-charcoal">
+      <h1 className="font-sans text-4xl font-extrabold text-fg-default">
       Terjadi Kesalahan
       </h1>
-      <p className="mt-4 text-medium-gray">
+      <p className="mt-4 text-fg-secondary">
       Silakan coba lagi.
       </p>
       <button
         onClick={() => reset()}
-        className="mt-8 rounded-lg bg-sage px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+        className="mt-8 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
       >
         Coba Lagi
       </button>

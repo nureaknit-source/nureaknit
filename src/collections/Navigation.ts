@@ -21,6 +21,18 @@ export const Navigation: CollectionConfig = {
       type: "text",
       required: true,
       label: "URL",
+      validate: (val: string | undefined | null) => {
+        if (!val) return true;
+        try {
+          const url = new URL(val);
+          if (!["http:", "https:", "mailto:"].includes(url.protocol)) {
+            return "URL harus http, https, atau mailto";
+          }
+          return true;
+        } catch {
+          return "URL tidak valid";
+        }
+      },
     },
     {
       name: "order",

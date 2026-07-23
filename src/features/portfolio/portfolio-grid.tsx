@@ -57,17 +57,17 @@ export function PortfolioGrid({ entries }: Props) {
               )}
               <div className="p-4">
                 <Link href={`/portfolio/${entry.slug || entry.id}`}>
-                  <h3 className="font-serif text-lg font-semibold text-charcoal transition hover:text-sage">
+                  <h3 className="font-sans text-lg font-bold text-fg-default transition hover:text-accent">
                     {entry.title}
                   </h3>
                 </Link>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {entry.category && (
-                    <Badge variant={entry.category === "knitting" ? "sage" : "rose"} shape="square">
+                    <Badge variant={entry.category === "knitting" ? "primary" : "accent"}>
                       {entry.category}
                     </Badge>
                   )}
-                  {entry.year && <Badge shape="square">{entry.year}</Badge>}
+                  {entry.year && <Badge variant="default">{entry.year}</Badge>}
                 </div>
               </div>
             </Card>

@@ -6,6 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
+const NAV_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/patterns", label: "Patterns" },
+  { href: "/blog", label: "Blog" },
+  { href: "/products", label: "Shop" },
+  { href: "/about", label: "About" },
+];
+
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -41,36 +49,25 @@ export function Navbar() {
     router.refresh();
   }
 
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/patterns", label: "Patterns" },
-    { href: "/blog", label: "Blog" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/products", label: "Shop" },
-    { href: "/about", label: "About" },
-    { href: "/search", label: "Search" },
-    { href: "/coaching", label: "Coaching" },
-  ];
-
   return (
-    <header className="sticky top-0 z-50 border-b border-light-gray bg-off-white/95 backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
+    <header className="sticky top-0 z-50 border-b border-[rgba(168,133,105,0.1)] bg-[#F4EBE1]/95 backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link
           href="/"
-          className="font-serif text-xl font-semibold text-charcoal"
+          className="font-display text-xl text-fg-default"
         >
           Nurea Knit
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm transition hover:text-sage ${
+              className={`text-sm transition hover:text-accent ${
                 pathname === link.href
-                  ? "font-medium text-sage"
-                  : "text-medium-gray"
+                  ? "font-medium text-primary"
+                  : "text-fg-secondary"
               }`}
             >
               {link.label}
@@ -88,7 +85,7 @@ export function Navbar() {
           aria-label="Toggle menu"
         >
           <svg
-            className="h-6 w-6"
+            className="h-6 w-6 text-fg-default"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -113,18 +110,18 @@ export function Navbar() {
       </nav>
 
       {menuOpen && (
-        <div className="border-t border-light-gray bg-off-white px-4 pb-4 md:hidden">
-          {navLinks.map((link) => (
+        <div className="border-t border-border bg-[#F4EBE1] px-4 pb-4 md:hidden">
+          {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block py-2 text-sm text-medium-gray transition hover:text-sage"
+              className="block py-2 text-sm text-fg-secondary transition hover:text-accent"
             >
               {link.label}
             </Link>
           ))}
-          <div className="mt-3 flex flex-col gap-2 pt-3 border-t border-light-gray">
+          <div className="mt-3 flex flex-col gap-2 pt-3 border-t border-border">
             {user ? <MobileUserLinks onClose={() => setMenuOpen(false)} /> : <MobileGuestLinks onClose={() => setMenuOpen(false)} />}
           </div>
         </div>
@@ -137,7 +134,7 @@ export function Navbar() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex items-center gap-1.5 rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
         >
           {user?.user_metadata?.name || "Profile"}
           <svg
@@ -148,17 +145,17 @@ export function Navbar() {
           </svg>
         </button>
         {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 rounded-lg border border-light-gray bg-white py-1 shadow-lg">
+          <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-[#F4EBE1] py-1 shadow-lg">
             <Link
               href="/profile/downloads"
               onClick={() => setDropdownOpen(false)}
-              className="block px-4 py-2 text-sm text-charcoal transition hover:bg-off-white"
+              className="block px-4 py-2 text-sm text-fg-default transition hover:bg-accent-subtle"
             >
               Profile
             </Link>
             <button
               onClick={handleLogout}
-              className="block w-full px-4 py-2 text-left text-sm text-medium-gray transition hover:bg-off-white"
+              className="block w-full px-4 py-2 text-left text-sm text-fg-secondary transition hover:bg-accent-subtle"
             >
               Logout
             </button>
@@ -170,20 +167,12 @@ export function Navbar() {
 
   function DesktopGuestLinks() {
     return (
-      <>
-        <Link
-          href="/login"
-          className="text-sm font-medium text-medium-gray transition hover:text-charcoal"
-        >
-          Masuk
-        </Link>
-        <Link
-          href="/register"
-          className="rounded-lg bg-sage px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-        >
-          Daftar
-        </Link>
-      </>
+      <Link
+        href="/login"
+        className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
+      >
+        Masuk
+      </Link>
     );
   }
 
@@ -193,13 +182,13 @@ export function Navbar() {
         <Link
           href="/profile/downloads"
           onClick={onClose}
-          className="rounded-lg bg-charcoal px-4 py-2 text-center text-sm font-medium text-white"
+          className="rounded-full bg-primary px-4 py-2 text-center text-sm font-bold text-primary-fg"
         >
           Profile
         </Link>
         <button
           onClick={() => { handleLogout(); onClose(); }}
-          className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-medium-gray"
+          className="rounded-full border border-border px-4 py-2 text-center text-sm font-medium text-fg-secondary"
         >
           Logout
         </button>
@@ -209,22 +198,13 @@ export function Navbar() {
 
   function MobileGuestLinks({ onClose }: { onClose: () => void }) {
     return (
-      <>
-        <Link
-          href="/login"
-          onClick={onClose}
-          className="rounded-lg border border-light-gray px-4 py-2 text-center text-sm font-medium text-charcoal"
-        >
-          Masuk
-        </Link>
-        <Link
-          href="/register"
-          onClick={onClose}
-          className="rounded-lg bg-sage px-4 py-2 text-center text-sm font-medium text-white"
-        >
-          Daftar
-        </Link>
-      </>
+      <Link
+        href="/login"
+        onClick={onClose}
+        className="rounded-full bg-primary px-4 py-2 text-center text-sm font-bold text-primary-fg"
+      >
+        Masuk
+      </Link>
     );
   }
 }

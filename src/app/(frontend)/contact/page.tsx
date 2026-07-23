@@ -12,7 +12,7 @@ import type { ValidationError } from "@/lib/validation";
 
 interface FormState {
   success: boolean;
-  errors?: ValidationError[] | { field: string; message: string }[];
+  errors?: ValidationError[];
 }
 
 const initialState: FormState = { success: false };
@@ -88,7 +88,7 @@ export default function ContactPage() {
           <div>
             <label
               htmlFor="message"
-              className="mb-1 block text-sm font-medium text-charcoal"
+              className="mb-1 block text-sm font-medium text-fg-default"
             >
               Pesan
             </label>
@@ -98,7 +98,7 @@ export default function ContactPage() {
               rows={5}
               required
               placeholder="Tulis pesan kamu di sini..."
-              className="w-full rounded-lg border border-light-gray px-3 py-2 text-sm text-charcoal placeholder:text-medium-gray focus:border-sage focus:ring-2 focus:ring-sage/10"
+              className="w-full rounded-lg border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
               aria-invalid={!!fieldError("message")}
             />
             {fieldError("message") && (

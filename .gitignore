@@ -52,3 +52,4 @@ TASK.md
 /src/generated/prisma
 error.md
 audit.md
+vuln.md

@@ -4,7 +4,7 @@ export const CoachingRequests: CollectionConfig = {
   slug: "coaching-requests",
   admin: { group: "Inquiries", useAsTitle: "name" },
   access: {
-    create: () => true,
+    create: () => false,
     read: ({ req: { user } }) => user?.role === "admin",
     update: ({ req: { user } }) => user?.role === "admin",
     delete: ({ req: { user } }) => user?.role === "admin",
@@ -27,6 +27,10 @@ export const CoachingRequests: CollectionConfig = {
       type: "textarea",
       required: true,
       label: "Message",
+      validate: (val: unknown) => {
+        if (typeof val !== "string" || val.trim().length < 10) return "Pesan minimal 10 karakter";
+        return true;
+      },
     },
     {
       name: "status",

@@ -1,39 +1,40 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
-    <footer className="border-t border-light-gray bg-cream">
+    <footer className="bg-primary text-primary-fg">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-8">
         <div className="grid gap-8 sm:grid-cols-3">
           <div>
-            <h3 className="font-serif text-lg font-semibold text-charcoal">
+            <h3 className="font-display text-lg">
               Nurea Knit
             </h3>
-            <p className="mt-2 text-sm text-medium-gray">
+            <p className="mt-2 text-sm text-primary-fg/70">
               Knitting & Crochet patterns, tutorials, and inspiration.
             </p>
           </div>
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-charcoal">
+            <h4 className="mb-3 text-sm font-bold">
               Navigasi
             </h4>
-            <ul className="space-y-2 text-sm text-medium-gray">
-              <li><a href="/patterns" className="transition hover:text-sage">Patterns</a></li>
-              <li><a href="/blog" className="transition hover:text-sage">Blog</a></li>
-              <li><a href="/products" className="transition hover:text-sage">Shop</a></li>
-              <li><a href="/about" className="transition hover:text-sage">About</a></li>
+            <ul className="space-y-2 text-sm text-primary-fg/70">
+              <li><Link href="/patterns" className="transition hover:text-primary-fg">Patterns</Link></li>
+              <li><Link href="/blog" className="transition hover:text-primary-fg">Blog</Link></li>
+              <li><Link href="/products" className="transition hover:text-primary-fg">Shop</Link></li>
+              <li><Link href="/about" className="transition hover:text-primary-fg">About</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-charcoal">
+            <h4 className="mb-3 text-sm font-bold">
               Kontak
             </h4>
-            <ul className="space-y-2 text-sm text-medium-gray">
-              <li><a href="/contact" className="transition hover:text-sage">Contact</a></li>
-              <li><a href="/coaching" className="transition hover:text-sage">Coaching</a></li>
-              <li><a href="/faq" className="transition hover:text-sage">FAQ</a></li>
+            <ul className="space-y-2 text-sm text-primary-fg/70">
+              <li><Link href="/contact" className="transition hover:text-primary-fg">Contact</Link></li>
+              <li><Link href="/faq" className="transition hover:text-primary-fg">FAQ</Link></li>
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-light-gray pt-6 text-center text-sm text-medium-gray">
+        <div className="mt-8 border-t border-primary-fg/20 pt-6 text-center text-sm text-primary-fg/50">
           &copy; {new Date().getFullYear()} Nurea Knit. All rights reserved.
         </div>
       </div>

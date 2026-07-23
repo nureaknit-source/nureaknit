@@ -17,18 +17,18 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
       {items.map((item) => (
         <div
           key={item.id}
-          className="rounded-lg border border-light-gray bg-off-white"
+          className="rounded-lg border border-border bg-[#F4EBE1]"
         >
           <button
             onClick={() => setOpenId(openId === item.id ? null : item.id)}
             className="flex w-full items-center justify-between px-6 py-4 text-left"
             aria-expanded={openId === item.id}
           >
-            <span className="font-serif text-lg font-semibold text-charcoal">
+            <span className="font-sans text-lg font-bold text-fg-default">
               {item.question}
             </span>
             <svg
-              className={`h-5 w-5 text-medium-gray transition ${
+              className={`h-5 w-5 text-fg-muted transition ${
                 openId === item.id ? "rotate-180" : ""
               }`}
               fill="none"
@@ -44,7 +44,7 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
             </svg>
           </button>
           {openId === item.id && (
-            <div className="border-t border-light-gray px-6 py-4">
+            <div className="border-t border-border px-6 py-4">
               <RichText data={item.answer} />
             </div>
           )}

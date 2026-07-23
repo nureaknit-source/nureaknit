@@ -35,7 +35,7 @@ export default async function BlogPage() {
                 <Link key={post.id} href={`/blog/${post.slug || post.id}`}>
                   <Card hover className="h-full flex flex-col">
                     {img && (
-                      <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-xl">
+                      <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-lg">
                         <img
                           src={img}
                           alt=""
@@ -45,9 +45,9 @@ export default async function BlogPage() {
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {post.featured && <Badge variant="gold">Featured</Badge>}
+                      {post.featured && <Badge variant="accent">Featured</Badge>}
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-charcoal">
+                    <h3 className="font-sans text-lg font-bold text-fg-default">
                       {post.title}
                     </h3>
                     {post.excerpt && (

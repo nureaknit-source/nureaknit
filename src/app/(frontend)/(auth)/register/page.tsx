@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { checkEmailAction } from "@/actions/auth";
 import { sendWelcomeEmailAction } from "@/actions/email";
 
 export default function RegisterPage() {
@@ -35,13 +34,6 @@ export default function RegisterPage() {
       return;
     }
 
-    const emailCheck = await checkEmailAction(email);
-    if (!emailCheck.ok) {
-      setError(emailCheck.error);
-      setLoading(false);
-      return;
-    }
-
     const supabase = createClient();
     const { error: signUpError } = await supabase.auth.signUp({
       email,
@@ -66,16 +58,16 @@ export default function RegisterPage() {
   if (registered) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-lg border border-light-gray bg-off-white p-8 text-center">
-          <h1 className="font-serif text-2xl font-semibold text-charcoal">
+        <div className="w-full max-w-sm rounded-lg border border-border bg-[#F4EBE1] p-8 text-center">
+          <h1 className="font-sans text-2xl font-extrabold text-fg-default">
             Cek Email Kamu
           </h1>
-          <p className="mt-4 text-sm text-medium-gray">
+          <p className="mt-4 text-sm text-fg-secondary">
             Kami sudah mengirimkan email konfirmasi. Klik tautan di email untuk mengaktifkan akun kamu.
           </p>
           <a
             href="/login"
-            className="mt-6 inline-block rounded-lg bg-sage px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            className="mt-6 inline-block rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
           >
             Ke Halaman Masuk
           </a>
@@ -88,28 +80,28 @@ export default function RegisterPage() {
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-light-gray bg-off-white p-8"
+        className="w-full max-w-sm space-y-4 rounded-lg border border-border bg-[#F4EBE1] p-8"
       >
-        <h1 className="font-serif text-2xl font-semibold text-charcoal">
+        <h1 className="font-sans text-2xl font-extrabold text-fg-default">
           Daftar
         </h1>
 
         {error && <p className="text-sm text-error">{error}</p>}
 
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-charcoal">
+          <label htmlFor="name" className="block text-sm font-medium text-fg-default">
             Nama
           </label>
           <input
             id="name"
             name="name"
             type="text"
-            className="mt-1 w-full rounded-lg border border-light-gray px-3 py-2 text-sm focus:border-sage focus:ring-2 focus:ring-sage/10"
+            className="mt-1 w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-charcoal">
+          <label htmlFor="email" className="block text-sm font-medium text-fg-default">
             Email
           </label>
           <input
@@ -117,12 +109,12 @@ export default function RegisterPage() {
             name="email"
             type="email"
             required
-            className="mt-1 w-full rounded-lg border border-light-gray px-3 py-2 text-sm focus:border-sage focus:ring-2 focus:ring-sage/10"
+            className="mt-1 w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-charcoal">
+          <label htmlFor="password" className="block text-sm font-medium text-fg-default">
             Password
           </label>
           <input
@@ -131,12 +123,12 @@ export default function RegisterPage() {
             type="password"
             required
             minLength={8}
-            className="mt-1 w-full rounded-lg border border-light-gray px-3 py-2 text-sm focus:border-sage focus:ring-2 focus:ring-sage/10"
+            className="mt-1 w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
           />
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-charcoal">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-fg-default">
             Konfirmasi Password
           </label>
           <input
@@ -144,21 +136,21 @@ export default function RegisterPage() {
             name="confirmPassword"
             type="password"
             required
-            className="mt-1 w-full rounded-lg border border-light-gray px-3 py-2 text-sm focus:border-sage focus:ring-2 focus:ring-sage/10"
+            className="mt-1 w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-sage px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95 disabled:opacity-50"
         >
           {loading ? "Memuat..." : "Daftar"}
         </button>
 
-        <p className="text-center text-sm text-medium-gray">
+        <p className="text-center text-sm text-fg-secondary">
           Sudah punya akun?{" "}
-          <a href="/login" className="text-sage underline transition hover:text-terracotta">
+          <a href="/login" className="text-primary underline transition hover:text-accent">
             Masuk
           </a>
         </p>

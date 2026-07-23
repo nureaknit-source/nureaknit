@@ -15,7 +15,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
   ({ variant = "text", className = "", ...props }, ref) => (
     <div
       ref={ref}
-      className={`animate-pulse bg-light-gray ${variants[variant]} ${className}`}
+      className={`animate-pulse bg-accent-subtle ${variants[variant]} ${className}`}
       {...props}
     />
   ),

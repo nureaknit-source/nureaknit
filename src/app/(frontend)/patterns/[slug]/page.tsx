@@ -49,7 +49,7 @@ export default async function PatternDetailPage({
         />
 
         {img && (
-          <div className="overflow-hidden rounded-xl">
+          <div className="overflow-hidden rounded-lg">
             <img
               src={img}
               alt=""
@@ -66,10 +66,10 @@ export default async function PatternDetailPage({
 
           <div className="mt-4 flex flex-wrap gap-2">
             {pattern.difficulty && (
-              <Badge variant="sage" shape="square">{difficultyLabel(pattern.difficulty)}</Badge>
+              <Badge variant="primary">{difficultyLabel(pattern.difficulty)}</Badge>
             )}
-            {pattern.featured && <Badge variant="gold" shape="square">Featured</Badge>}
-            {pattern.yarnWeight && <Badge variant="rose" shape="square">{pattern.yarnWeight}</Badge>}
+            {pattern.featured && <Badge variant="accent">Featured</Badge>}
+            {pattern.yarnWeight && <Badge variant="secondary">{pattern.yarnWeight}</Badge>}
           </div>
 
           {pattern.publishedAt && (
@@ -81,7 +81,7 @@ export default async function PatternDetailPage({
 
         <div className="mt-8">
           {pattern.description && (
-            <p className="text-lg text-medium-gray leading-relaxed">
+            <p className="text-lg text-fg-secondary leading-relaxed">
               {pattern.description}
             </p>
           )}
@@ -98,7 +98,7 @@ export default async function PatternDetailPage({
             <a
               href={mediaUrl(pattern.pdf) || "#"}
               download
-              className="inline-flex items-center gap-2 rounded-lg bg-sage px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -111,7 +111,7 @@ export default async function PatternDetailPage({
         <div className="mt-12">
           <Link
             href="/patterns"
-            className="text-sm text-sage underline transition hover:text-terracotta"
+            className="text-sm text-primary underline transition hover:text-accent"
           >
             &larr; Back to Patterns
           </Link>
