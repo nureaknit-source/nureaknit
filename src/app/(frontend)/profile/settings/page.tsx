@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -34,7 +36,8 @@ export default function SettingsPage() {
   if (fetching) return null;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
+    <Section>
+      <Container size="sm">
       <h1 className="font-sans text-3xl font-extrabold text-fg-default">Account Settings</h1>
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
         <div>
@@ -44,7 +47,7 @@ export default function SettingsPage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+            className="mt-1 block w-full rounded-full border border-border bg-bg-surface-muted px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
             required
           />
         </div>
@@ -56,7 +59,8 @@ export default function SettingsPage() {
         >
           {loading ? "Menyimpan..." : "Simpan"}
         </button>
-      </form>
-    </div>
+        </form>
+      </Container>
+    </Section>
   );
 }

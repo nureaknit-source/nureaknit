@@ -17,11 +17,11 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
       {items.map((item) => (
         <div
           key={item.id}
-          className="rounded-lg border border-border bg-[#F4EBE1]"
+          className="rounded-lg border border-border bg-bg-surface"
         >
           <button
             onClick={() => setOpenId(openId === item.id ? null : item.id)}
-            className="flex w-full items-center justify-between px-6 py-4 text-left"
+            className="flex w-full items-center justify-between px-6 py-4 text-left transition hover:opacity-90"
             aria-expanded={openId === item.id}
           >
             <span className="font-sans text-lg font-bold text-fg-default">

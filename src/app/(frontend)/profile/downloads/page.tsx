@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { logoutAction } from "@/actions/auth";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 
 export default async function DownloadsPage() {
   const cookieStore = await cookies();
@@ -15,9 +17,10 @@ export default async function DownloadsPage() {
   const name = user.user_metadata?.name || user.email?.split("@")[0] || "User";
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-8">
+    <Section>
+      <Container>
       <h1 className="font-sans text-3xl font-extrabold text-fg-default">My Downloads</h1>
-      <div className="mt-6 rounded-lg border border-border bg-[#F4EBE1] p-6">
+      <div className="mt-6 rounded-lg border border-border bg-bg-surface p-6">
         <p className="text-sm text-fg-secondary">
           Halo, <span className="font-bold text-fg-default">{name}</span>.
         </p>
@@ -38,6 +41,7 @@ export default async function DownloadsPage() {
           Logout
         </button>
       </form>
-    </div>
+    </Container>
+  </Section>
   );
 }

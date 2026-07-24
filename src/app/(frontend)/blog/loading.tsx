@@ -1,8 +1,11 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { Container } from "@/components/ui/container";
+import { Section } from "@/components/ui/section";
 
 export default function BlogLoading() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
+    <Section>
+      <Container>
       <Skeleton variant="text" className="h-8 w-32" />
       <Skeleton variant="text" className="mt-2 h-4 w-56" />
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -15,6 +18,7 @@ export default function BlogLoading() {
           </div>
         ))}
       </div>
-    </div>
+    </Container>
+  </Section>
   );
 }

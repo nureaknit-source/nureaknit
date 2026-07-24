@@ -20,6 +20,7 @@ export function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,18 +41,29 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
     setDropdownOpen(false);
+    setMenuOpen(false);
     router.push("/");
     router.refresh();
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgba(168,133,105,0.1)] bg-[#F4EBE1]/95 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <>
+    <header className="sticky top-0 z-50 bg-bg-surface backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Link
           href="/"
           className="font-display text-xl text-fg-default"
@@ -59,15 +71,85 @@ export function Navbar() {
           Nurea Knit
         </Link>
 
+        {/* Desktop nav */}
         <div className="hidden items-center gap-6 md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm transition hover:text-accent ${
+              className={`relative text-sm transition hover:text-accent ${
                 pathname === link.href
                   ? "font-medium text-primary"
                   : "text-fg-secondary"
+              }`}
+            >
+              {link.label}
+              {pathname === link.href && (
+                <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-primary" />
+              )}
+            </Link>
+          ))}
+        </div>
+
+        {/* Desktop auth */}
+        <div className="hidden items-center gap-3 md:flex">
+          {user ? <DesktopUserDropdown /> : <DesktopGuestLinks />}
+        </div>
+
+      </nav>
+    </header>
+
+    {/* Mobile hamburger — root level, above everything */}
+    <button
+      onClick={() => setMenuOpen(!menuOpen)}
+      className="fixed top-3 right-4 z-[80] flex h-10 w-10 items-center justify-center sm:top-4 sm:right-6 md:hidden"
+      aria-label="Toggle menu"
+    >
+      <span className="flex flex-col items-center justify-center gap-1.5">
+        <span
+          className={`block h-0.5 w-6 rounded-full bg-fg-default transition-all duration-300 ease-in-out ${
+            menuOpen ? "translate-y-2 rotate-45" : ""
+          }`}
+        />
+        <span
+          className={`block h-0.5 w-6 rounded-full bg-fg-default transition-all duration-300 ease-in-out ${
+            menuOpen ? "opacity-0" : ""
+          }`}
+        />
+        <span
+          className={`block h-0.5 w-6 rounded-full bg-fg-default transition-all duration-300 ease-in-out ${
+            menuOpen ? "-translate-y-2 -rotate-45" : ""
+          }`}
+        />
+      </span>
+    </button>
+
+    {/* Mobile menu overlay — root level */}
+    {menuOpen && (
+      <div
+        className="fixed inset-0 z-[60] bg-overlay/30 backdrop-blur-sm md:hidden"
+        onClick={() => setMenuOpen(false)}
+      />
+    )}
+
+    {/* Mobile menu panel — root level */}
+    <div
+      className={`fixed inset-y-0 right-0 z-[70] flex w-[min(85vw,320px)] flex-col bg-bg-surface shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
+        menuOpen ? "translate-x-0" : "translate-x-full"
+      }`}
+    >
+      <div className="flex h-full flex-col overflow-y-auto px-6 pb-8 pt-20">
+        {/* Nav links */}
+        <div className="flex flex-col gap-1">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className={`rounded-xl px-4 py-3 text-[15px] transition ${
+                pathname === link.href
+                  ? "bg-primary-subtle font-medium text-primary"
+                  : "text-fg-default hover:bg-accent-subtle"
               }`}
             >
               {link.label}
@@ -75,58 +157,49 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          {user ? <DesktopUserDropdown /> : <DesktopGuestLinks />}
-        </div>
+        {/* Divider */}
+        <div className="my-6 h-px bg-border" />
 
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="flex items-center md:hidden"
-          aria-label="Toggle menu"
-        >
-          <svg
-            className="h-6 w-6 text-fg-default"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            {menuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            )}
-          </svg>
-        </button>
-      </nav>
-
-      {menuOpen && (
-        <div className="border-t border-border bg-[#F4EBE1] px-4 pb-4 md:hidden">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="block py-2 text-sm text-fg-secondary transition hover:text-accent"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div className="mt-3 flex flex-col gap-2 pt-3 border-t border-border">
-            {user ? <MobileUserLinks onClose={() => setMenuOpen(false)} /> : <MobileGuestLinks onClose={() => setMenuOpen(false)} />}
-          </div>
+        {/* Auth actions */}
+        <div className="flex flex-col gap-3">
+          {user ? (
+            <>
+              <Link
+                href="/profile/downloads"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-[0.98]"
+              >
+                {user?.user_metadata?.name || "Profile"}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="rounded-xl border border-border px-4 py-3 text-center text-sm font-medium text-fg-secondary transition hover:bg-accent-subtle active:scale-[0.98]"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-[0.98]"
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl border border-border px-4 py-3 text-center text-sm font-medium text-fg-secondary transition hover:bg-accent-subtle active:scale-[0.98]"
+              >
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
-      )}
-    </header>
+      </div>
+    </div>
+    </>
   );
 
   function DesktopUserDropdown() {
@@ -145,7 +218,7 @@ export function Navbar() {
           </svg>
         </button>
         {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-[#F4EBE1] py-1 shadow-lg">
+          <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-bg-surface py-1 shadow-lg">
             <Link
               href="/profile/downloads"
               onClick={() => setDropdownOpen(false)}
@@ -170,38 +243,6 @@ export function Navbar() {
       <Link
         href="/login"
         className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
-      >
-        Masuk
-      </Link>
-    );
-  }
-
-  function MobileUserLinks({ onClose }: { onClose: () => void }) {
-    return (
-      <>
-        <Link
-          href="/profile/downloads"
-          onClick={onClose}
-          className="rounded-full bg-primary px-4 py-2 text-center text-sm font-bold text-primary-fg"
-        >
-          Profile
-        </Link>
-        <button
-          onClick={() => { handleLogout(); onClose(); }}
-          className="rounded-full border border-border px-4 py-2 text-center text-sm font-medium text-fg-secondary"
-        >
-          Logout
-        </button>
-      </>
-    );
-  }
-
-  function MobileGuestLinks({ onClose }: { onClose: () => void }) {
-    return (
-      <Link
-        href="/login"
-        onClick={onClose}
-        className="rounded-full bg-primary px-4 py-2 text-center text-sm font-bold text-primary-fg"
       >
         Masuk
       </Link>

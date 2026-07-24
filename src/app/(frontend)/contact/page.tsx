@@ -98,7 +98,7 @@ export default function ContactPage() {
               rows={5}
               required
               placeholder="Tulis pesan kamu di sini..."
-              className="w-full rounded-lg border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+              className="w-full rounded-lg border border-border bg-bg-surface-muted px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
               aria-invalid={!!fieldError("message")}
             />
             {fieldError("message") && (

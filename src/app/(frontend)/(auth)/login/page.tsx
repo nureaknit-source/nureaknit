@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 
 export default function LoginPage() {
@@ -38,7 +39,7 @@ export default function LoginPage() {
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-border bg-[#F4EBE1] p-8"
+        className="w-full max-w-sm space-y-4 rounded-lg border border-border bg-bg-surface p-8"
       >
         <h1 className="font-sans text-2xl font-extrabold text-fg-default">
           Masuk
@@ -55,7 +56,7 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
-            className="mt-1 w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+            className="mt-1 w-full rounded-full border border-border bg-bg-surface-muted px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
           />
         </div>
 
@@ -68,7 +69,7 @@ export default function LoginPage() {
             name="password"
             type="password"
             required
-            className="mt-1 w-full rounded-full border border-border bg-[rgba(244,235,225,0.5)] px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+            className="mt-1 w-full rounded-full border border-border bg-bg-surface-muted px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
           />
         </div>
 
@@ -82,9 +83,9 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-fg-secondary">
           Belum punya akun?{" "}
-          <a href="/register" className="text-primary underline transition hover:text-accent">
+          <Link href="/register" className="text-primary underline transition hover:text-accent">
             Daftar
-          </a>
+          </Link>
         </p>
       </form>
     </div>

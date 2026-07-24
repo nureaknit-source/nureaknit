@@ -18,12 +18,12 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-b from-bg-base to-surface">
+      <section className="relative overflow-hidden bg-bg-surface" style={{ backgroundImage: "url('/hero-pattern.svg')", backgroundRepeat: "repeat", backgroundAttachment: "fixed" }}>
         <Container>
-          <div className="flex flex-col items-center gap-12 py-16 sm:py-24 lg:flex-row lg:py-32">
+          <div className="flex flex-col items-center gap-12 py-16 sm:py-24 lg:flex-row lg:min-h-screen lg:justify-center lg:py-0">
             <div className="flex-1">
               <div className="mx-auto max-w-lg lg:mx-0">
-                <CrochetIllustration />
+                <img src="/heart-knite.svg" alt="Flower Knit illustration" className="w-full max-w-lg" />
               </div>
             </div>
             <div className="flex-1 text-center lg:text-left">
@@ -54,7 +54,6 @@ export default async function HomePage() {
             </div>
           </div>
         </Container>
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface to-transparent" />
       </section>
 
       {patterns.length > 0 && (
@@ -83,7 +82,7 @@ export default async function HomePage() {
                           <img
                             src={img}
                             alt=""
-                            className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105"
+                            className="aspect-4/3 w-full object-cover transition duration-500 group-hover:scale-105"
                             loading="lazy"
                           />
                         </div>
@@ -147,12 +146,12 @@ export default async function HomePage() {
                           <img
                             src={firstImage}
                             alt=""
-                            className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105"
+                            className="aspect-4/3 w-full object-cover transition duration-500 group-hover:scale-105"
                             loading="lazy"
                           />
                         </div>
                       ) : (
-                        <div className="-mx-6 -mt-6 mb-4 aspect-[4/3] rounded-t-2xl bg-accent-subtle" />
+                        <div className="-mx-6 -mt-6 mb-4 aspect-4/3 rounded-t-2xl bg-accent-subtle" />
                       )}
                       <div className="flex flex-wrap gap-2 mb-2">
                         {product.featured && <Badge variant="accent">Featured</Badge>}
@@ -185,7 +184,7 @@ export default async function HomePage() {
 
       <Section spacing="lg">
         <Container size="sm">
-          <div className="rounded-2xl bg-accent-subtle p-8 text-center sm:p-12">
+          <div className="rounded-2xl bg-bg-surface p-8 text-center sm:p-12">
             <Heading as="h2" display className="text-3xl sm:text-4xl">
               Let&apos;s Create Together
             </Heading>
@@ -214,46 +213,4 @@ export default async function HomePage() {
   );
 }
 
-function CrochetIllustration() {
-  return (
-    <svg viewBox="0 0 400 360" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full max-w-sm">
-      {/* Yarn ball - main body */}
-      <ellipse cx="160" cy="200" rx="90" ry="85" fill="#A88569" opacity="0.15" />
-      <ellipse cx="160" cy="195" rx="82" ry="78" fill="#C9A87C" opacity="0.25" />
-      <circle cx="160" cy="190" r="70" fill="#E8D5C4" stroke="#A88569" strokeWidth="1.5" />
-      
-      {/* Yarn winding lines */}
-      <path d="M100 170 Q130 140 160 145 Q190 150 200 170" stroke="#A88569" strokeWidth="1.5" fill="none" opacity="0.4" />
-      <path d="M105 190 Q135 160 165 165 Q195 170 205 190" stroke="#A88569" strokeWidth="1.5" fill="none" opacity="0.4" />
-      <path d="M110 210 Q140 185 165 185 Q190 185 200 210" stroke="#A88569" strokeWidth="1.5" fill="none" opacity="0.4" />
-      <path d="M120 230 Q145 210 165 210 Q185 210 195 230" stroke="#A88569" strokeWidth="1.5" fill="none" opacity="0.4" />
-      <path d="M135 245 Q150 235 165 235 Q180 235 185 245" stroke="#A88569" strokeWidth="1.5" fill="none" opacity="0.4" />
-      
-      {/* Yarn strand going up */}
-      <path d="M200 170 Q220 140 230 110 Q240 80 250 60 Q260 40 280 35"
-        stroke="#A88569" strokeWidth="2" fill="none" strokeLinecap="round" />
-      
-      {/* Yarn strand curves */}
-      <path d="M280 35 Q290 30 295 40 Q300 50 290 55" stroke="#A88569" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d="M290 55 Q280 60 285 70 Q290 80 300 75" stroke="#A88569" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d="M300 75 Q310 70 305 60" stroke="#A88569" strokeWidth="2" fill="none" strokeLinecap="round" />
 
-      {/* Crochet hook */}
-      <g transform="translate(265, 55) rotate(-30)">
-        <rect x="0" y="0" width="4" height="100" rx="2" fill="#73513C" opacity="0.8" />
-        <path d="M0 0 Q-4 -8 0 -16 Q4 -20 8 -16 L6 -8" stroke="#73513C" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      </g>
-
-      {/* Small decorative stitches */}
-      <g opacity="0.3">
-        <path d="M310 120 Q315 115 320 120 Q325 125 320 130" stroke="#73513C" strokeWidth="1.5" fill="none" />
-        <path d="M330 140 Q335 135 340 140 Q345 145 340 150" stroke="#73513C" strokeWidth="1.5" fill="none" />
-        <path d="M70 100 Q75 95 80 100" stroke="#A88569" strokeWidth="1.5" fill="none" />
-        <path d="M50 130 Q55 125 60 130" stroke="#A88569" strokeWidth="1.5" fill="none" />
-      </g>
-      
-      {/* Shadow under yarn ball */}
-      <ellipse cx="160" cy="265" rx="60" ry="8" fill="#3E2A1E" opacity="0.08" />
-    </svg>
-  );
-}
