@@ -43,11 +43,17 @@ export function FAQAccordion({ items }: { items: FAQItem[] }) {
               />
             </svg>
           </button>
-          {openId === item.id && (
-            <div className="border-t border-border px-6 py-4">
-              <RichText data={item.answer} />
+          <div
+            className={`grid transition-all duration-300 ease-out ${
+              openId === item.id ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="border-t border-border px-6 py-4">
+                <RichText data={item.answer} />
+              </div>
             </div>
-          )}
+          </div>
         </div>
       ))}
     </div>

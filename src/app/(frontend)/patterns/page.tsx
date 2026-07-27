@@ -4,6 +4,7 @@ import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { AnimateInView } from "@/components/shared/animate-in-view";
 import { EmptyState } from "@/components/shared/empty-state";
 import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel } from "@/lib/payload/utils";
@@ -45,6 +46,7 @@ export default async function PatternsPage({
           <div className="mt-8 flex flex-wrap gap-2">
             <Link
               href="/patterns"
+              transitionTypes={['page']}
               className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
                 !params.category
                   ? "bg-primary text-primary-fg"
@@ -56,6 +58,7 @@ export default async function PatternsPage({
             {categories.map((cat) => (
               <Link
                 key={cat.id}
+                transitionTypes={['page']}
                 href={`/patterns?category=${cat.slug || cat.id}`}
                 className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
                   params.category === (cat.slug || cat.id)
@@ -71,41 +74,43 @@ export default async function PatternsPage({
 
         {patterns.length === 0 ? (
           <div className="mt-12">
-            <EmptyState title="Belum ada pattern" message="Pattern akan segera hadir. Pantau terus!" />
+            <AnimateInView><EmptyState title="Belum ada pattern" message="Pattern akan segera hadir. Pantau terus!" /></AnimateInView>
           </div>
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {patterns.map((pattern) => {
+            {patterns.map((pattern, i) => {
               const img = mediaUrl(pattern.image as Media | number | null);
               return (
-                <Link key={pattern.id} href={`/patterns/${pattern.slug || pattern.id}`}>
-                  <Card hover className="h-full flex flex-col">
-                    {img && (
-                        <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
-                        <img
-                          src={img}
-                          alt=""
-                          className="aspect-[4/3] w-full object-cover transition duration-300 hover:scale-105"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {pattern.difficulty && (
-                        <Badge variant="primary">{difficultyLabel(pattern.difficulty)}</Badge>
+                <AnimateInView key={pattern.id} className={`animate-fade-in-up-d${Math.min(i + 1, 3)}`}>
+                  <Link href={`/patterns/${pattern.slug || pattern.id}`} transitionTypes={['page']}>
+                    <Card hover className="h-full flex flex-col">
+                      {img && (
+                          <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
+                          <img
+                            src={img}
+                            alt=""
+                            className="aspect-[4/3] w-full object-cover transition duration-300 hover:scale-105"
+                            loading="lazy"
+                          />
+                        </div>
                       )}
-                      {pattern.featured && <Badge variant="accent">Featured</Badge>}
-                    </div>
-                    <h3 className="font-sans text-lg font-bold text-fg-default">
-                      {pattern.title}
-                    </h3>
-                    {pattern.description && (
-                      <Text size="sm" className="mt-1 line-clamp-2">
-                        {pattern.description}
-                      </Text>
-                    )}
-                  </Card>
-                </Link>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {pattern.difficulty && (
+                          <Badge variant="primary">{difficultyLabel(pattern.difficulty)}</Badge>
+                        )}
+                        {pattern.featured && <Badge variant="accent">Featured</Badge>}
+                      </div>
+                      <h3 className="font-sans text-lg font-bold text-fg-default">
+                        {pattern.title}
+                      </h3>
+                      {pattern.description && (
+                        <Text size="sm" className="mt-1 line-clamp-2">
+                          {pattern.description}
+                        </Text>
+                      )}
+                    </Card>
+                  </Link>
+                </AnimateInView>
               );
             })}
           </div>

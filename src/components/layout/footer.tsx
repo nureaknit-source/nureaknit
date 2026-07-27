@@ -18,10 +18,10 @@ export function Footer() {
               Navigasi
             </h4>
             <ul className="space-y-2 text-sm text-primary-fg/70">
-              <li><Link href="/patterns" className="transition hover:text-primary-fg">Patterns</Link></li>
-              <li><Link href="/blog" className="transition hover:text-primary-fg">Blog</Link></li>
-              <li><Link href="/products" className="transition hover:text-primary-fg">Shop</Link></li>
-              <li><Link href="/about" className="transition hover:text-primary-fg">About</Link></li>
+              <li><Link href="/patterns" transitionTypes={['page']} className="transition hover:text-primary-fg">Patterns</Link></li>
+              <li><Link href="/blog" transitionTypes={['page']} className="transition hover:text-primary-fg">Blog</Link></li>
+              <li><Link href="/products" transitionTypes={['page']} className="transition hover:text-primary-fg">Shop</Link></li>
+              <li><Link href="/about" transitionTypes={['page']} className="transition hover:text-primary-fg">About</Link></li>
             </ul>
           </div>
           <div>
@@ -29,8 +29,8 @@ export function Footer() {
               Kontak
             </h4>
             <ul className="space-y-2 text-sm text-primary-fg/70">
-              <li><Link href="/contact" className="transition hover:text-primary-fg">Contact</Link></li>
-              <li><Link href="/faq" className="transition hover:text-primary-fg">FAQ</Link></li>
+              <li><Link href="/contact" transitionTypes={['page']} className="transition hover:text-primary-fg">Contact</Link></li>
+              <li><Link href="/faq" transitionTypes={['page']} className="transition hover:text-primary-fg">FAQ</Link></li>
             </ul>
           </div>
         </div>

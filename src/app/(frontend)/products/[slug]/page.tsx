@@ -10,11 +10,19 @@ import { getBySlug } from "@/lib/payload/client";
 import { mediaUrl, formatPrice } from "@/lib/payload/utils";
 import type { Media, Product } from "@/lib/payload/payload-types";
 
-// ponytail: getBySlug<Product> provides proper typing for product pages
-import { cookies } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
-import { getWishlistAction } from "@/actions/wishlist";
-import { WishlistButton } from "@/features/products/wishlist-button";
+const availabilityLabel: Record<string, string> = {
+  in_stock: "In Stock",
+  dropship: "Dropship",
+  pre_order: "Pre-Order",
+  unavailable: "Unavailable",
+};
+
+const availabilityBadge: Record<string, "primary" | "secondary" | "accent" | "error"> = {
+  in_stock: "primary",
+  dropship: "secondary",
+  pre_order: "accent",
+  unavailable: "error",
+};
 
 export async function generateMetadata({
   params,
@@ -40,17 +48,13 @@ export default async function ProductDetailPage({
 
   if (!product) notFound();
 
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-  let wishlistIds: number[] = [];
-  if (user) {
-    try { wishlistIds = await getWishlistAction(); } catch {}
-  }
-
   const firstImage = product.images?.[0]?.image
     ? mediaUrl(product.images[0].image)
     : null;
+
+  const availability = product.availability || "in_stock";
+  const showOrderButton = availability !== "unavailable";
+  const orderLabel = availability === "pre_order" ? "Pre-Order" : "Pesan Sekarang";
 
   return (
     <Section>
@@ -77,25 +81,63 @@ export default async function ProductDetailPage({
                   {product.title}
                 </Heading>
               </div>
-              <WishlistButton productId={product.id} initialInWishlist={wishlistIds.includes(product.id)} isLoggedIn={user !== null} />
             </div>
             <p className="mt-4 text-2xl font-bold text-primary">
               {formatPrice(product.price)}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {product.featured && <Badge variant="accent">Featured</Badge>}
-              {product.type && (
-                <Badge variant="primary">{product.type === "digital" ? "Digital" : "Physical"}</Badge>
+              {product.availability && (
+                <Badge variant={availabilityBadge[product.availability] || "default"}>
+                  {availabilityLabel[product.availability] || product.availability}
+                </Badge>
+              )}
+              {product.categories && product.categories.length > 0 && (
+                <Badge variant="default">
+                  {typeof product.categories[0] === "object"
+                    ? product.categories[0]?.name || "Uncategorized"
+                    : "Uncategorized"}
+                </Badge>
+              )}
+              {product.availability === "in_stock" && product.stock !== undefined && product.stock !== null && (
+                <Badge variant="secondary">
+                  Stock: {product.stock}
+                </Badge>
               )}
             </div>
-            <div className="mt-6 flex gap-3">
-              <Link
-                href={`/contact?subject=${encodeURIComponent("Pesan: " + product.title)}`}
-                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95"
-              >
-                Pesan Sekarang
-              </Link>
-              {/* ponytail: no cart system yet, Pesan links to contact form */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              {showOrderButton && (
+                <Link
+                  href={`/contact?subject=${encodeURIComponent("Pesan: " + product.title)}`}
+                  className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95"
+                >
+                  {orderLabel}
+                </Link>
+              )}
+              {product.availability === "unavailable" && (
+                <span className="inline-flex items-center rounded-full bg-error-subtle px-6 py-3 text-sm font-bold text-error-fg">
+                  Stok Habis
+                </span>
+              )}
+              {product.linkedProducts && product.linkedProducts.length > 0 && (
+                product.linkedProducts.map((item: Record<string, unknown>, i: number) => {
+                  const linkedProduct = item.product as Product;
+                  const label = (item.label as string) || linkedProduct?.title || "View";
+                  const href = linkedProduct?.slug
+                    ? `/products/${linkedProduct.slug}`
+                    : linkedProduct?.id
+                      ? `/products/${linkedProduct.id}`
+                      : "#";
+                  return (
+                    <Link
+                      key={i}
+                      href={href}
+                      className="inline-flex items-center justify-center rounded-full border-2 border-border px-6 py-3 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
+                    >
+                      {label}
+                    </Link>
+                  );
+                })
+              )}
             </div>
             {product.description && (
               <div className="mt-6">

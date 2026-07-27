@@ -2,13 +2,13 @@
 
 ## User Authentication
 
-This flow describes the standard process for users to register for a new account or log in to an existing one via Supabase Auth.
+This flow describes the process for users to sign in via Google OAuth (Supabase Auth). No email/password registration — email is verified by Google.
 
 | No | Actor | Action/Step | System Response | Alternative/Error Path |
 |:---|:---|:---|:---|:---|
-| 1 | Guest | Clicks "Login" or "Register" from navigation | Displays login/register page | N/A |
-| 2 | Guest | Fills registration form (email, password, confirm) and clicks "Register" | Supabase Auth creates user, logs in, redirects to homepage | Invalid input → validation errors. Email exists → error message |
-| 3 | Guest | Fills login form (email, password) and clicks "Login" | Supabase Auth authenticates, sets session, redirects to homepage | Invalid credentials → "Email atau password salah" |
+| 1 | Guest | Clicks "Masuk" from navigation | Displays login page with "Masuk dengan Google" button | N/A |
+| 2 | Guest | Clicks "Masuk dengan Google" | Redirects to Google OAuth consent screen | Network error → "Gagal terhubung ke Google" |
+| 3 | Guest | Selects Google account and consents | Redirects to `/auth/callback`, exchanges code for session, redirects to homepage | User cancels → back to login page |
 | 4 | Registered User | Clicks "Logout" from user menu | Supabase Auth clears session, redirects to homepage | N/A |
 
 **Trigger:** User wishes to download patterns or access profile features.

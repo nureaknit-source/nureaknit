@@ -73,6 +73,7 @@ export interface Config {
     patterns: Pattern;
     'blog-posts': BlogPost;
     portfolio: Portfolio;
+    'product-categories': ProductCategory;
     products: Product;
     faq: Faq;
     pages: Page;
@@ -93,6 +94,7 @@ export interface Config {
     patterns: PatternsSelect<false> | PatternsSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     portfolio: PortfolioSelect<false> | PortfolioSelect<true>;
+    'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -311,6 +313,18 @@ export interface Portfolio {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories".
+ */
+export interface ProductCategory {
+  id: number;
+  name: string;
+  slug?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
 export interface Product {
@@ -339,8 +353,16 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
-  type?: ('digital' | 'physical') | null;
-  featured?: boolean | null;
+  categories?: (number | ProductCategory)[] | null;
+  availability?: ('in_stock' | 'dropship' | 'pre_order' | 'unavailable') | null;
+  stock?: number | null;
+  linkedProducts?:
+    | {
+        product: number | Product;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -495,6 +517,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'portfolio';
         value: number | Portfolio;
+      } | null)
+    | ({
+        relationTo: 'product-categories';
+        value: number | ProductCategory;
       } | null)
     | ({
         relationTo: 'products';
@@ -710,6 +736,17 @@ export interface PortfolioSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories_select".
+ */
+export interface ProductCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
@@ -723,8 +760,16 @@ export interface ProductsSelect<T extends boolean = true> {
         image?: T;
         id?: T;
       };
-  type?: T;
-  featured?: T;
+  categories?: T;
+  availability?: T;
+  stock?: T;
+  linkedProducts?:
+    | T
+    | {
+        product?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

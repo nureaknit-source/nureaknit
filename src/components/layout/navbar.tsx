@@ -74,20 +74,21 @@ export function Navbar() {
         {/* Desktop nav */}
         <div className="hidden items-center gap-6 md:flex">
           {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`relative text-sm transition hover:text-accent ${
-                pathname === link.href
-                  ? "font-medium text-primary"
-                  : "text-fg-secondary"
-              }`}
-            >
-              {link.label}
-              {pathname === link.href && (
-                <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-primary" />
-              )}
-            </Link>
+        <Link
+          key={link.href}
+          href={link.href}
+          transitionTypes={['page']}
+          className={`relative text-sm transition hover:text-accent ${
+            pathname === link.href
+              ? "font-medium text-primary"
+              : "text-fg-secondary"
+          }`}
+        >
+          {link.label}
+          {pathname === link.href && (
+            <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-primary" />
+          )}
+        </Link>
           ))}
         </div>
 
@@ -141,10 +142,11 @@ export function Navbar() {
       <div className="flex h-full flex-col overflow-y-auto px-6 pb-8 pt-20">
         {/* Nav links */}
         <div className="flex flex-col gap-1">
-          {NAV_LINKS.map((link) => (
+              {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
+              transitionTypes={['page']}
               onClick={() => setMenuOpen(false)}
               className={`rounded-xl px-4 py-3 text-[15px] transition ${
                 pathname === link.href
@@ -166,6 +168,7 @@ export function Navbar() {
             <>
               <Link
                 href="/profile/downloads"
+                transitionTypes={['page']}
                 onClick={() => setMenuOpen(false)}
                 className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-[0.98]"
               >
@@ -179,22 +182,14 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            <>
-              <Link
-                href="/login"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-[0.98]"
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl border border-border px-4 py-3 text-center text-sm font-medium text-fg-secondary transition hover:bg-accent-subtle active:scale-[0.98]"
-              >
-                Daftar
-              </Link>
-            </>
+            <Link
+              href="/login"
+              transitionTypes={['page']}
+              onClick={() => setMenuOpen(false)}
+              className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-[0.98]"
+            >
+              Masuk
+            </Link>
           )}
         </div>
       </div>
@@ -221,6 +216,7 @@ export function Navbar() {
           <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-bg-surface py-1 shadow-lg">
             <Link
               href="/profile/downloads"
+              transitionTypes={['page']}
               onClick={() => setDropdownOpen(false)}
               className="block px-4 py-2 text-sm text-fg-default transition hover:bg-accent-subtle"
             >
@@ -242,6 +238,7 @@ export function Navbar() {
     return (
       <Link
         href="/login"
+        transitionTypes={['page']}
         className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
       >
         Masuk

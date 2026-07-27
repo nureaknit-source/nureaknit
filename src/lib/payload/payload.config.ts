@@ -16,6 +16,7 @@ import { Pages } from "../../collections/Pages";
 import { PatternCategories } from "../../collections/PatternCategories";
 import { Patterns } from "../../collections/Patterns";
 import { Portfolio } from "../../collections/Portfolio";
+import { ProductCategories } from "../../collections/ProductCategories";
 import { Products } from "../../collections/Products";
 import { Users } from "../../collections/Users";
 
@@ -33,6 +34,7 @@ export default buildConfig({
     Patterns,
     BlogPosts,
     Portfolio,
+    ProductCategories,
     Products,
     FAQ,
     Pages,

@@ -4,23 +4,21 @@
 
 This module provides the core functionality for users to create and manage their accounts, enabling access to pattern downloads and wishlist features. Authentication is powered by Supabase Auth.
 
-### 1.1. User Registration & Login (FR-01)
-- **Purpose:** Allow new users to create an account and existing users to sign in securely.
+### 1.1. Google Sign-In (FR-01)
+- **Purpose:** Allow users to sign in securely using their Google account. No email/password registration — email is verified by Google.
 - **User Stories:**
-  - As a guest, I want to register for an account using my email and a password so I can download patterns and save products to my wishlist.
-  - As a registered user, I want to log in with my credentials to access my downloads and wishlist.
+  - As a guest, I want to sign in with my Google account so I can download patterns and save products to my wishlist.
+  - As a registered user, I want to log in with Google to access my downloads and wishlist.
   - As a registered user, I want to log out to secure my account when I'm done.
-  - As a user, I want to be able to reset my password if I forget it.
 - **Acceptance Criteria:**
-  - Users can successfully register with a unique email address and a strong password.
-  - Users can log in using their registered email and password.
+  - Users can sign in with Google OAuth via a single button.
+  - First-time Google sign-in auto-creates the user account.
   - Users can log out from any authenticated session.
-  - A password reset flow is available via Supabase Auth.
-  - Authentication is handled by Supabase Auth.
+  - Welcome email is sent on first sign-in.
+  - Authentication is handled by Supabase Auth with Google provider.
 - **Edge Cases:**
-  - Attempting to register with an already existing email address.
-  - Attempting to log in with incorrect credentials.
-  - Network errors during registration or login.
+  - Network errors during Google OAuth redirect.
+  - User cancels Google consent popup.
   - Session expiration and automatic refresh.
 
 ## 2. Pattern Library

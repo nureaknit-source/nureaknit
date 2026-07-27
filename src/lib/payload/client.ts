@@ -25,6 +25,7 @@ const defaults: Record<string, { sort?: string; limit: number; depth: number }> 
   products: { sort: "-createdAt", limit: 50, depth: 1 },
   faq: { sort: "order", limit: 100, depth: 1 },
   "pattern-categories": { sort: "name", limit: 100, depth: 1 },
+  "product-categories": { sort: "name", limit: 100, depth: 1 },
 };
 
 export async function getCollection<T>(collection: string, opts?: FindOptions) {
