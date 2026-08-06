@@ -6,23 +6,14 @@ import { Heading, Caption } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
+import { WishlistButton } from "@/features/products/wishlist-button";
+import { ProductGallery } from "@/features/products/product-gallery";
 import { getBySlug } from "@/lib/payload/client";
-import { mediaUrl, formatPrice } from "@/lib/payload/utils";
-import type { Media, Product } from "@/lib/payload/payload-types";
-
-const availabilityLabel: Record<string, string> = {
-  in_stock: "In Stock",
-  dropship: "Dropship",
-  pre_order: "Pre-Order",
-  unavailable: "Unavailable",
-};
-
-const availabilityBadge: Record<string, "primary" | "secondary" | "accent" | "error"> = {
-  in_stock: "primary",
-  dropship: "secondary",
-  pre_order: "accent",
-  unavailable: "error",
-};
+import { formatPrice, availabilityLabel, availabilityBadgeVariant } from "@/lib/payload/utils";
+import type { Product } from "@/lib/payload/payload-types";
+import { getWishlistAction } from "@/actions/wishlist";
+import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
 
 export async function generateMetadata({
   params,
@@ -48,17 +39,24 @@ export default async function ProductDetailPage({
 
   if (!product) notFound();
 
-  const firstImage = product.images?.[0]?.image
-    ? mediaUrl(product.images[0].image)
-    : null;
-
   const availability = product.availability || "in_stock";
   const showOrderButton = availability !== "unavailable";
-  const orderLabel = availability === "pre_order" ? "Pre-Order" : "Pesan Sekarang";
+  const orderLabel =
+    availability === "pre_order" ? "Pre-Order" : "Pesan Sekarang";
+
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
+  let wishlistIds: number[] = [];
+  if (user) {
+    try {
+      wishlistIds = await getWishlistAction();
+    } catch {}
+  }
 
   return (
     <Section>
-      <Container size="md">
+      <Container size="lg">
         <Breadcrumbs
           crumbs={[
             { label: "Shop", href: "/products" },
@@ -66,14 +64,18 @@ export default async function ProductDetailPage({
           ]}
         />
 
-        <div className="grid gap-8 sm:grid-cols-2">
-          {firstImage && (
-            <div className="overflow-hidden rounded-lg">
-              <img src={firstImage} alt="" className="w-full object-cover" />
-            </div>
-          )}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start">
+          {/* Gallery */}
+          <div className="lg:pb-4">
+            <ProductGallery
+              images={product.images}
+              title={product.title}
+              priority
+            />
+          </div>
 
-          <div>
+          {/* Product info (sticks on desktop while scrolling) */}
+          <div className="lg:col-start-2 lg:sticky lg:top-24">
             <div className="flex items-start justify-between">
               <div>
                 <Caption>Product</Caption>
@@ -81,64 +83,80 @@ export default async function ProductDetailPage({
                   {product.title}
                 </Heading>
               </div>
+              <WishlistButton
+                productId={product.id}
+                initialInWishlist={wishlistIds.includes(product.id)}
+                isLoggedIn={!!user}
+              />
             </div>
+
             <p className="mt-4 text-2xl font-bold text-primary">
               {formatPrice(product.price)}
             </p>
+
             <div className="mt-4 flex flex-wrap gap-2">
               {product.availability && (
-                <Badge variant={availabilityBadge[product.availability] || "default"}>
-                  {availabilityLabel[product.availability] || product.availability}
+                <Badge
+                  variant={availabilityBadgeVariant(product.availability)}
+                >
+                  {availabilityLabel[product.availability]}
                 </Badge>
               )}
               {product.categories && product.categories.length > 0 && (
                 <Badge variant="default">
                   {typeof product.categories[0] === "object"
-                    ? product.categories[0]?.name || "Uncategorized"
+                    ? (product.categories[0] as { name?: string }).name ||
+                      "Uncategorized"
                     : "Uncategorized"}
                 </Badge>
               )}
-              {product.availability === "in_stock" && product.stock !== undefined && product.stock !== null && (
-                <Badge variant="secondary">
-                  Stock: {product.stock}
-                </Badge>
-              )}
+              {product.availability === "in_stock" &&
+                product.stock !== undefined &&
+                product.stock !== null && (
+                  <Badge variant="secondary">Stock: {product.stock}</Badge>
+                )}
             </div>
+
             <div className="mt-6 flex flex-wrap gap-3">
-              {showOrderButton && (
+              {showOrderButton ? (
                 <Link
                   href={`/contact?subject=${encodeURIComponent("Pesan: " + product.title)}`}
                   className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95"
                 >
                   {orderLabel}
                 </Link>
-              )}
-              {product.availability === "unavailable" && (
+              ) : (
                 <span className="inline-flex items-center rounded-full bg-error-subtle px-6 py-3 text-sm font-bold text-error-fg">
                   Stok Habis
                 </span>
               )}
-              {product.linkedProducts && product.linkedProducts.length > 0 && (
-                product.linkedProducts.map((item: Record<string, unknown>, i: number) => {
-                  const linkedProduct = item.product as Product;
-                  const label = (item.label as string) || linkedProduct?.title || "View";
-                  const href = linkedProduct?.slug
-                    ? `/products/${linkedProduct.slug}`
-                    : linkedProduct?.id
-                      ? `/products/${linkedProduct.id}`
-                      : "#";
-                  return (
-                    <Link
-                      key={i}
-                      href={href}
-                      className="inline-flex items-center justify-center rounded-full border-2 border-border px-6 py-3 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
-                    >
-                      {label}
-                    </Link>
-                  );
-                })
-              )}
+              {product.linkedProducts &&
+                product.linkedProducts.length > 0 &&
+                product.linkedProducts.map(
+                  (item: Record<string, unknown>, i: number) => {
+                    const linkedProduct = item.product as Product;
+                    const label =
+                      (item.label as string) ||
+                      linkedProduct?.title ||
+                      "View";
+                    const href = linkedProduct?.slug
+                      ? `/products/${linkedProduct.slug}`
+                      : linkedProduct?.id
+                        ? `/products/${linkedProduct.id}`
+                        : "#";
+                    return (
+                      <Link
+                        key={i}
+                        href={href}
+                        className="inline-flex items-center justify-center rounded-full border-2 border-border px-6 py-3 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
+                      >
+                        {label}
+                      </Link>
+                    );
+                  },
+                )}
             </div>
+
             {product.description && (
               <div className="mt-6">
                 <RichText data={product.description} />
@@ -146,19 +164,6 @@ export default async function ProductDetailPage({
             )}
           </div>
         </div>
-
-        {product.images && product.images.length > 1 && (
-          <div className="mt-12 grid grid-cols-3 gap-4">
-            {product.images.slice(1).map((item: Record<string, unknown>, i: number) => {
-              const url = mediaUrl(item.image as Media | number | null);
-              return url ? (
-                <div key={i} className="overflow-hidden rounded-lg">
-                  <img src={url} alt="" className="w-full object-cover" loading="lazy" />
-                </div>
-              ) : null;
-            })}
-          </div>
-        )}
 
         <div className="mt-12">
           <Link

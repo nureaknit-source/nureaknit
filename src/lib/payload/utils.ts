@@ -34,3 +34,26 @@ const difficultyLabels: Record<string, string> = {
 export function difficultyLabel(value?: string | null): string {
   return difficultyLabels[value || ""] || value || "";
 }
+
+export const availabilityLabel: Record<string, string> = {
+  in_stock: "In Stock",
+  dropship: "Dropship",
+  pre_order: "Pre-Order",
+  unavailable: "Unavailable",
+};
+
+export const availabilityVariant: Record<
+  string,
+  "primary" | "secondary" | "accent" | "error"
+> = {
+  in_stock: "primary",
+  dropship: "secondary",
+  pre_order: "accent",
+  unavailable: "error",
+};
+
+export function availabilityBadgeVariant(
+  value?: string | null,
+): "primary" | "secondary" | "accent" | "error" {
+  return availabilityVariant[value || ""] ?? "secondary";
+}
