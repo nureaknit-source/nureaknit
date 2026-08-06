@@ -81,6 +81,7 @@ export interface Config {
     'coaching-requests': CoachingRequest;
     'contact-messages': ContactMessage;
     'wishlist-items': WishlistItem;
+    downloads: Download;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -102,6 +103,7 @@ export interface Config {
     'coaching-requests': CoachingRequestsSelect<false> | CoachingRequestsSelect<true>;
     'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
     'wishlist-items': WishlistItemsSelect<false> | WishlistItemsSelect<true>;
+    downloads: DownloadsSelect<false> | DownloadsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -472,6 +474,18 @@ export interface WishlistItem {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "downloads".
+ */
+export interface Download {
+  id: number;
+  userEmail: string;
+  pattern: number | Pattern;
+  downloadedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -549,6 +563,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'wishlist-items';
         value: number | WishlistItem;
+      } | null)
+    | ({
+        relationTo: 'downloads';
+        value: number | Download;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -840,6 +858,17 @@ export interface ContactMessagesSelect<T extends boolean = true> {
 export interface WishlistItemsSelect<T extends boolean = true> {
   email?: T;
   product?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "downloads_select".
+ */
+export interface DownloadsSelect<T extends boolean = true> {
+  userEmail?: T;
+  pattern?: T;
+  downloadedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

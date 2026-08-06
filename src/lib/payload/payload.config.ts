@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { BlogPosts } from "../../collections/BlogPosts";
 import { CoachingRequests } from "../../collections/CoachingRequests";
 import { ContactMessages } from "../../collections/ContactMessages";
+import { Downloads } from "../../collections/Downloads";
 import { FAQ } from "../../collections/FAQ";
 import { Media } from "../../collections/Media";
 import { Navigation } from "../../collections/Navigation";
@@ -42,6 +43,7 @@ export default buildConfig({
     CoachingRequests,
     ContactMessages,
     WishlistItems,
+    Downloads,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

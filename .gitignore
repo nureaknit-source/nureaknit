@@ -54,3 +54,9 @@ error.md
 audit.md
 vuln.md
 client_secret_*.json
+graphify-out/
+opencode.json
+opencode.jsonc
+
+.opencode
+.claude
