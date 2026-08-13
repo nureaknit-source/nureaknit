@@ -6,9 +6,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ProductCard } from "@/components/features/product-card";
 import { getCollection } from "@/lib/payload/client";
 import type { Product, ProductCategory } from "@/lib/payload/payload-types";
-import { getWishlistAction } from "@/actions/wishlist";
-import { cookies } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
 import { Search, Funnel } from "lucide-react";
 
 const ALLOWED_SORTS = ["-createdAt", "price", "-price", "title", "-title"];
@@ -184,16 +181,6 @@ export default async function ProductsPage({
   const { docs: categories } =
     await getCollection<ProductCategory>("product-categories");
 
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-  let wishlistIds: number[] = [];
-  if (user) {
-    try {
-      wishlistIds = await getWishlistAction();
-    } catch {}
-  }
-
   const hasActiveFilters = q || category;
 
   return (
@@ -248,13 +235,10 @@ export default async function ProductsPage({
                   key={product.id}
                   className={`animate-fade-in-up-d${Math.min(i + 1, 3)}`}
                 >
-                  <ProductCard
-                    product={product}
-                    priority={i === 0}
-                    showWishlist
-                    isLoggedIn={!!user}
-                    wishlistIds={wishlistIds}
-                  />
+                   <ProductCard
+                      product={product}
+                      priority={i === 0}
+                    />
                 </AnimateInView>
               ))}
             </div>

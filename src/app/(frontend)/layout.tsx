@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { FloatingCart } from "@/components/layout/floating-cart";
 import { ToastContainer } from "@/components/ui/toast";
 
 import "../globals.css";
@@ -22,6 +23,7 @@ export default function FrontendLayout({
         {children}
       </main>
       <Footer />
+      <FloatingCart />
       <ToastContainer />
     </>
   );

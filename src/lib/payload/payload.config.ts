@@ -9,10 +9,11 @@ import { BlogPosts } from "../../collections/BlogPosts";
 import { CoachingRequests } from "../../collections/CoachingRequests";
 import { ContactMessages } from "../../collections/ContactMessages";
 import { Downloads } from "../../collections/Downloads";
+import { UserProfiles } from "../../collections/UserProfiles";
 import { FAQ } from "../../collections/FAQ";
 import { Media } from "../../collections/Media";
 import { Navigation } from "../../collections/Navigation";
-import { WishlistItems } from "../../collections/WishlistItems";
+import { CartItems } from "../../collections/CartItems";
 import { Pages } from "../../collections/Pages";
 import { PatternCategories } from "../../collections/PatternCategories";
 import { Patterns } from "../../collections/Patterns";
@@ -40,10 +41,11 @@ export default buildConfig({
     FAQ,
     Pages,
     Navigation,
+    CartItems,
     CoachingRequests,
     ContactMessages,
-    WishlistItems,
     Downloads,
+    UserProfiles,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

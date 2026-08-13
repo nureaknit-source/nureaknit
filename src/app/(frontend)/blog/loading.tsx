@@ -1,24 +1,17 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { Container } from "@/components/ui/container";
-import { Section } from "@/components/ui/section";
+import { SkeletonLoading } from "@/components/shared/skeleton-loading";
 
 export default function BlogLoading() {
   return (
-    <Section>
-      <Container>
-      <Skeleton variant="text" className="h-8 w-32" />
-      <Skeleton variant="text" className="mt-2 h-4 w-56" />
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i}>
-            <Skeleton variant="image" />
-            <Skeleton variant="text" className="mt-3 h-4 w-3/4" />
-            <Skeleton variant="text" className="mt-1 h-4 w-full" />
-            <Skeleton variant="text" className="mt-1 h-4 w-1/2" />
-          </div>
-        ))}
-      </div>
-    </Container>
-  </Section>
+    <SkeletonLoading
+      titleWidth="w-32"
+      subtitleWidth="w-56"
+      count={3}
+      cardVariant="image"
+      cardTexts={[
+        { width: "w-3/4", marginTop: "mt-3" },
+        { width: "w-full", marginTop: "mt-1" },
+        { width: "w-1/2", marginTop: "mt-1" },
+      ]}
+    />
   );
 }

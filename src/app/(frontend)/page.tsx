@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeartHandshake, GraduationCap, Leaf, Users } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
@@ -9,6 +10,29 @@ import { ProductCard } from "@/components/features/product-card";
 import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel } from "@/lib/payload/utils";
 import type { Media, Pattern, Product } from "@/lib/payload/payload-types";
+
+const valueItems = [
+  {
+    title: "Diperhatikan dengan Cinta",
+    copy: "Setiap pola diuji keulekan, ditulis jelas, untuk pemula hingga yang berpengalaman.",
+    icon: HeartHandshake,
+  },
+  {
+    title: "Ramah untuk Pemula",
+    copy: "Panduan bertahap dari dasar dengan ilustrasi jelas — tak pernah bingung.",
+    icon: GraduationCap,
+  },
+  {
+    title: "Bahan Berkelanjutan",
+    copy: "Kami hanya merekomendasikan benang dan bahan ramah lingkungan serta tahan lama.",
+    icon: Leaf,
+  },
+  {
+    title: "Komunitas Maker",
+    copy: "Bergabung dengan ratusan maker — berbagi inspirasi, tips, dan dukungan.",
+    icon: Users,
+  },
+];
 
 export default async function HomePage() {
   const [patternsData, productsData] = await Promise.all([
@@ -169,6 +193,30 @@ export default async function HomePage() {
           </Container>
         </Section>
       )}
+
+      <Section spacing="lg" className="bg-primary">
+        <Container>
+          <AnimateInView>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {valueItems.map((item, i) => (
+                <AnimateInView key={item.title} className={`animate-fade-in-up-d${Math.min(i + 1, 3)}`}>
+                  <Card hover className="flex h-full flex-col items-center p-6 text-center">
+                    <div className="mb-4 rounded-full bg-primary-subtle p-4">
+                      <item.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <Heading as="h3" className="text-lg font-bold sm:text-xl">
+                      {item.title}
+                    </Heading>
+                    <Text size="sm" className="mt-2">
+                      {item.copy}
+                    </Text>
+                  </Card>
+                </AnimateInView>
+              ))}
+            </div>
+          </AnimateInView>
+        </Container>
+      </Section>
 
       <Section spacing="lg">
         <Container size="sm">

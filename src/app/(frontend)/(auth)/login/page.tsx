@@ -1,11 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -13,12 +11,18 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    const redirect = new URLSearchParams(window.location.search).get("redirect");
+    // ponytail: keep redirectTo clean — a query string breaks Supabase's exact
+    // Redirect URLs match and falls back to Site URL (localhost). Carry the
+    // target in a cookie instead; the callback reads it server-side.
+    if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+      document.cookie = `auth_redirect=${encodeURIComponent(redirect)}; path=/; samesite=lax; max-age=600`;
+    }
+
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
 
     if (authError) {

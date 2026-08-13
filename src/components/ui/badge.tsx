@@ -1,6 +1,12 @@
 import { HTMLAttributes, forwardRef } from "react";
 
-type BadgeVariant = "default" | "primary" | "secondary" | "accent" | "error";
+type BadgeVariant =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "error"
+  | "outline";
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
@@ -12,6 +18,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   secondary: "bg-secondary text-secondary-fg",
   accent: "bg-accent text-accent-fg",
   error: "bg-error text-error-fg",
+  outline: "border border-border bg-transparent text-fg-default",
 };
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(

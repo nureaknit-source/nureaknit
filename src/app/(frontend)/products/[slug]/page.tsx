@@ -6,12 +6,11 @@ import { Heading, Caption } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
-import { WishlistButton } from "@/features/products/wishlist-button";
+import { AddToCartForm } from "@/features/products/add-to-cart-form";
 import { ProductGallery } from "@/features/products/product-gallery";
 import { getBySlug } from "@/lib/payload/client";
-import { formatPrice, availabilityLabel, availabilityBadgeVariant } from "@/lib/payload/utils";
+import { formatPrice, availabilityLabel } from "@/lib/payload/utils";
 import type { Product } from "@/lib/payload/payload-types";
-import { getWishlistAction } from "@/actions/wishlist";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 
@@ -47,12 +46,7 @@ export default async function ProductDetailPage({
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
-  let wishlistIds: number[] = [];
-  if (user) {
-    try {
-      wishlistIds = await getWishlistAction();
-    } catch {}
-  }
+  const isLoggedIn = !!user;
 
   return (
     <Section>
@@ -76,18 +70,11 @@ export default async function ProductDetailPage({
 
           {/* Product info (sticks on desktop while scrolling) */}
           <div className="lg:col-start-2 lg:sticky lg:top-24">
-            <div className="flex items-start justify-between">
-              <div>
-                <Caption>Product</Caption>
-                <Heading as="h1" className="mt-2">
-                  {product.title}
-                </Heading>
-              </div>
-              <WishlistButton
-                productId={product.id}
-                initialInWishlist={wishlistIds.includes(product.id)}
-                isLoggedIn={!!user}
-              />
+            <div>
+              <Caption>Product</Caption>
+              <Heading as="h1" className="mt-2">
+                {product.title}
+              </Heading>
             </div>
 
             <p className="mt-4 text-2xl font-bold text-primary">
@@ -95,67 +82,75 @@ export default async function ProductDetailPage({
             </p>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              {product.availability && (
-                <Badge
-                  variant={availabilityBadgeVariant(product.availability)}
-                >
-                  {availabilityLabel[product.availability]}
-                </Badge>
-              )}
-              {product.categories && product.categories.length > 0 && (
-                <Badge variant="default">
-                  {typeof product.categories[0] === "object"
-                    ? (product.categories[0] as { name?: string }).name ||
-                      "Uncategorized"
-                    : "Uncategorized"}
-                </Badge>
-              )}
-              {product.availability === "in_stock" &&
+               {product.availability && (
+                 <Badge variant="outline">
+                   {availabilityLabel[product.availability]}
+                 </Badge>
+               )}
+               {product.categories && product.categories.length > 0 && (
+                 <Badge variant="outline">
+                   {typeof product.categories[0] === "object"
+                     ? (product.categories[0] as { name?: string }).name ||
+                       "Uncategorized"
+                     : "Uncategorized"}
+                 </Badge>
+               )}
+               {product.availability === "in_stock" &&
                 product.stock !== undefined &&
                 product.stock !== null && (
-                  <Badge variant="secondary">Stock: {product.stock}</Badge>
+                  <Badge variant="outline">Stock: {product.stock}</Badge>
                 )}
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               {showOrderButton ? (
                 <Link
                   href={`/contact?subject=${encodeURIComponent("Pesan: " + product.title)}`}
-                  className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95"
+                  className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95 lg:flex-none"
                 >
                   {orderLabel}
                 </Link>
               ) : (
-                <span className="inline-flex items-center rounded-full bg-error-subtle px-6 py-3 text-sm font-bold text-error-fg">
+                <span className="inline-flex flex-1 items-center justify-center rounded-full bg-error-subtle px-6 py-3 text-sm font-bold text-error-fg lg:flex-none">
                   Stok Habis
                 </span>
               )}
-              {product.linkedProducts &&
-                product.linkedProducts.length > 0 &&
-                product.linkedProducts.map(
-                  (item: Record<string, unknown>, i: number) => {
-                    const linkedProduct = item.product as Product;
-                    const label =
-                      (item.label as string) ||
-                      linkedProduct?.title ||
-                      "View";
-                    const href = linkedProduct?.slug
-                      ? `/products/${linkedProduct.slug}`
-                      : linkedProduct?.id
-                        ? `/products/${linkedProduct.id}`
-                        : "#";
-                    return (
-                      <Link
-                        key={i}
-                        href={href}
-                        className="inline-flex items-center justify-center rounded-full border-2 border-border px-6 py-3 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
-                      >
-                        {label}
-                      </Link>
-                    );
-                  },
-                )}
+              <AddToCartForm
+                productId={product.id}
+                isLoggedIn={isLoggedIn}
+                maxStock={product.stock}
+                availability={product.availability || undefined}
+              />
             </div>
+
+            {product.linkedProducts &&
+              product.linkedProducts.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {product.linkedProducts.map(
+                    (item: Record<string, unknown>, i: number) => {
+                      const linkedProduct = item.product as Product;
+                      const label =
+                        (item.label as string) ||
+                        linkedProduct?.title ||
+                        "View";
+                      const href = linkedProduct?.slug
+                        ? `/products/${linkedProduct.slug}`
+                        : linkedProduct?.id
+                          ? `/products/${linkedProduct.id}`
+                          : "#";
+                      return (
+                        <Link
+                          key={i}
+                          href={href}
+                          className="inline-flex items-center justify-center rounded-full border-2 border-border px-6 py-3 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
+                        >
+                          {label}
+                        </Link>
+                      );
+                    },
+                  )}
+                </div>
+              )}
 
             {product.description && (
               <div className="mt-6">

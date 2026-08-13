@@ -39,8 +39,8 @@ export async function downloadPatternAction(formData: FormData): Promise<void> {
 
   const pattern = result.docs[0] as Pattern;
 
-  // ponytail: log download for history tracking
-  void payload.create({
+  // ponytail: log download for history tracking (awaited before redirect so history is durable)
+  await payload.create({
     collection: "downloads",
     data: {
       userEmail: email,

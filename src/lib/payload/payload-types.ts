@@ -78,10 +78,11 @@ export interface Config {
     faq: Faq;
     pages: Page;
     navigation: Navigation;
+    'cart-items': CartItem;
     'coaching-requests': CoachingRequest;
     'contact-messages': ContactMessage;
-    'wishlist-items': WishlistItem;
     downloads: Download;
+    'user-profiles': UserProfile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,10 +101,11 @@ export interface Config {
     faq: FaqSelect<false> | FaqSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
+    'cart-items': CartItemsSelect<false> | CartItemsSelect<true>;
     'coaching-requests': CoachingRequestsSelect<false> | CoachingRequestsSelect<true>;
     'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
-    'wishlist-items': WishlistItemsSelect<false> | WishlistItemsSelect<true>;
     downloads: DownloadsSelect<false> | DownloadsSelect<true>;
+    'user-profiles': UserProfilesSelect<false> | UserProfilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -436,6 +438,18 @@ export interface Navigation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cart-items".
+ */
+export interface CartItem {
+  id: number;
+  userId: string;
+  product: number | Product;
+  quantity: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "coaching-requests".
  */
 export interface CoachingRequest {
@@ -463,17 +477,6 @@ export interface ContactMessage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wishlist-items".
- */
-export interface WishlistItem {
-  id: number;
-  email: string;
-  product: number | Product;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "downloads".
  */
 export interface Download {
@@ -481,6 +484,18 @@ export interface Download {
   userEmail: string;
   pattern: number | Pattern;
   downloadedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-profiles".
+ */
+export interface UserProfile {
+  id: number;
+  supabaseId: string;
+  email: string;
+  displayName?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -553,6 +568,10 @@ export interface PayloadLockedDocument {
         value: number | Navigation;
       } | null)
     | ({
+        relationTo: 'cart-items';
+        value: number | CartItem;
+      } | null)
+    | ({
         relationTo: 'coaching-requests';
         value: number | CoachingRequest;
       } | null)
@@ -561,12 +580,12 @@ export interface PayloadLockedDocument {
         value: number | ContactMessage;
       } | null)
     | ({
-        relationTo: 'wishlist-items';
-        value: number | WishlistItem;
-      } | null)
-    | ({
         relationTo: 'downloads';
         value: number | Download;
+      } | null)
+    | ({
+        relationTo: 'user-profiles';
+        value: number | UserProfile;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -828,6 +847,17 @@ export interface NavigationSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cart-items_select".
+ */
+export interface CartItemsSelect<T extends boolean = true> {
+  userId?: T;
+  product?: T;
+  quantity?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "coaching-requests_select".
  */
 export interface CoachingRequestsSelect<T extends boolean = true> {
@@ -853,22 +883,23 @@ export interface ContactMessagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wishlist-items_select".
- */
-export interface WishlistItemsSelect<T extends boolean = true> {
-  email?: T;
-  product?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "downloads_select".
  */
 export interface DownloadsSelect<T extends boolean = true> {
   userEmail?: T;
   pattern?: T;
   downloadedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-profiles_select".
+ */
+export interface UserProfilesSelect<T extends boolean = true> {
+  supabaseId?: T;
+  email?: T;
+  displayName?: T;
   updatedAt?: T;
   createdAt?: T;
 }
