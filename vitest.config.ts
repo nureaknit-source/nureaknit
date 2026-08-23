@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "./src"),
+      "@payload-config": path.resolve(import.meta.dirname, "./src/lib/payload/payload.config.ts"),
     },
   },
 });

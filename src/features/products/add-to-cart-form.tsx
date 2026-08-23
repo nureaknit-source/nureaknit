@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { addItemToCartAction } from "@/actions/cart";
+import { useCartStore } from "@/stores/cart-store";
 import { showToast } from "@/components/ui/toast";
 import { ShoppingCart, Check } from "lucide-react";
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function AddToCartForm({ productId, isLoggedIn, maxStock = null, availability }: Props) {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [added, setAdded] = useState(false);
   const [addedQty, setAddedQty] = useState(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -26,30 +27,35 @@ export function AddToCartForm({ productId, isLoggedIn, maxStock = null, availabi
       window.location.href = "/login";
       return;
     }
+    if (added) return;
     const requested = Math.min(1, max);
     if (requested > max) {
       showToast("Jumlah melebihi stok.", "error");
       return;
     }
-    setLoading(true);
+
+    // ponytail: optimistic — UI langsung respon, server sync di background
+    useCartStore.getState().increment(requested, 0);
+    setAdded(true);
+    setAddedQty(requested);
+    showToast("Ditambahkan ke keranjang", "success");
+    window.dispatchEvent(new CustomEvent("cart:updated"));
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setAdded(false), 1500);
+
     try {
       const { ok, error } = await addItemToCartAction(productId, requested);
       if (!ok) throw new Error(error || "Gagal menambahkan ke keranjang.");
-      setAdded(true);
-      setAddedQty(requested);
-      showToast("Ditambahkan ke keranjang", "success");
-      window.dispatchEvent(new CustomEvent("cart:updated"));
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setAdded(false), 1500);
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Gagal menambahkan ke keranjang",
         "error",
       );
-    } finally {
-      setLoading(false);
+      useCartStore.getState().decrement(requested, 0);
+      setAdded(false);
+      clearTimeout(timeoutRef.current);
     }
-  }, [productId, isLoggedIn, max]);
+  }, [productId, isLoggedIn, max, added]);
 
   const isAdded = added && !loading;
 

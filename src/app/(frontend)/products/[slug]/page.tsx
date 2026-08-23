@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
 import { AddToCartForm } from "@/features/products/add-to-cart-form";
+import { OrderNowForm } from "@/features/products/order-now-form";
 import { ProductGallery } from "@/features/products/product-gallery";
 import { getBySlug } from "@/lib/payload/client";
 import { formatPrice, availabilityLabel } from "@/lib/payload/utils";
@@ -40,8 +41,6 @@ export default async function ProductDetailPage({
 
   const availability = product.availability || "in_stock";
   const showOrderButton = availability !== "unavailable";
-  const orderLabel =
-    availability === "pre_order" ? "Pre-Order" : "Pesan Sekarang";
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -98,18 +97,37 @@ export default async function ProductDetailPage({
                {product.availability === "in_stock" &&
                 product.stock !== undefined &&
                 product.stock !== null && (
-                  <Badge variant="outline">Stock: {product.stock}</Badge>
+                  <Badge variant="outline">
+                    Stock: {Math.max(0, (product.stock ?? 0) - (product.reservedStock ?? 0))}
+                  </Badge>
                 )}
             </div>
 
+            {product.availability === "pre_order" && (
+              <div className="mt-4 rounded-lg border border-accent-subtle bg-accent-subtle/40 p-3 text-sm text-fg-secondary">
+                Pre-order memerlukan konfirmasi admin — slot Anda dikunci setelah
+                pesanan disetujui, lalu Anda menyelesaikan pembayaran.
+                {product.estimatedAvailability &&
+                  ` Perkiraan tersedia: ${product.estimatedAvailability}.`}
+              </div>
+            )}
+
+            {product.availability === "in_stock" &&
+              product.lowStockThreshold != null &&
+              (product.stock ?? 0) - (product.reservedStock ?? 0) <= product.lowStockThreshold && (
+                <div className="mt-4 rounded-lg border border-error/20 bg-error-subtle p-3 text-sm text-error">
+                  Stok menipis ({Math.max(0, (product.stock ?? 0) - (product.reservedStock ?? 0))} tersisa) — pesan segera.
+                </div>
+              )}
+
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {showOrderButton ? (
-                <Link
-                  href={`/contact?subject=${encodeURIComponent("Pesan: " + product.title)}`}
-                  className="inline-flex flex-1 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg shadow-md transition hover:opacity-90 active:scale-95 lg:flex-none"
-                >
-                  {orderLabel}
-                </Link>
+                <OrderNowForm
+                  productId={product.id}
+                  isLoggedIn={isLoggedIn}
+                  maxStock={product.stock}
+                  availability={product.availability || undefined}
+                />
               ) : (
                 <span className="inline-flex flex-1 items-center justify-center rounded-full bg-error-subtle px-6 py-3 text-sm font-bold text-error-fg lg:flex-none">
                   Stok Habis

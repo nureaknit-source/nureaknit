@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "./layout";
 import Link from "next/link";
-import { Download, ShoppingCart, Settings, LogOut } from "lucide-react";
+import { Download, ShoppingCart, Settings, LogOut, Package } from "lucide-react";
 import { Section } from "@/components/ui/section";
 import { Container } from "@/components/ui/container";
 import { LogoutButton } from "@/components/shared/logout-button";
@@ -33,6 +33,11 @@ export default async function ProfilePage() {
             href="/profile/cart"
             label="My Cart"
             icon={<ShoppingCart className="h-5 w-5" />}
+          />
+          <MenuItem
+            href="/profile/orders"
+            label="My Orders"
+            icon={<Package className="h-5 w-5" />}
           />
           <MenuItem
             href="/profile/settings"

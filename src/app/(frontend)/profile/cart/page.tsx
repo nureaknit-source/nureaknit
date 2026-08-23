@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/payload/utils";
 import { CartItemRow } from "./cart-item-row";
+import { CartTotal } from "./cart-total";
+import { CheckoutButton } from "./checkout-button";
 import type { CartItemWithProduct } from "@/actions/cart";
 
 async function clearCartFormAction() {
@@ -23,9 +24,15 @@ export default async function CartPage() {
       err instanceof Error ? err.message : "Gagal memuat keranjang.";
   }
 
-  const subtotal = items.reduce(
+  const purchasable = items.filter(
+    (item) => item.product.availability !== "unavailable",
+  );
+  const subtotal = purchasable.reduce(
     (sum, item) => sum + (item.product.price ?? 0) * item.quantity,
     0,
+  );
+  const hasPreOrder = purchasable.some(
+    (item) => item.product.availability === "pre_order",
   );
 
   return (
@@ -62,10 +69,15 @@ export default async function CartPage() {
 
             <div className="mt-8 flex items-center justify-between border-t-2 border-border pt-6">
               <span className="text-sm text-fg-muted">Subtotal</span>
-              <span className="text-2xl font-extrabold text-fg-default">
-                {formatPrice(subtotal)}
-              </span>
+              <CartTotal initialTotal={subtotal} />
             </div>
+
+            {hasPreOrder && (
+              <p className="mt-3 text-xs text-fg-muted">
+                Item pre-order memerlukan konfirmasi admin — Anda akan dihubungi
+                via WhatsApp sebelum menyelesaikan pembayaran.
+              </p>
+            )}
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/products">
@@ -76,6 +88,7 @@ export default async function CartPage() {
                   Bersihkan Keranjang
                 </Button>
               </form>
+              <CheckoutButton disabled={purchasable.length === 0} />
             </div>
           </>
         )}

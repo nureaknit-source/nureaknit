@@ -2,7 +2,8 @@
 
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { checkRateLimit, rateLimitKey, getClientIp } from "@/lib/rate-limit";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { CartItem, Product } from "@/lib/payload/payload-types";
@@ -61,6 +62,13 @@ export async function addItemToCartAction(productId: number, quantity = 1): Prom
 
 export async function updateCartItemAction(itemId: number, quantity: number): Promise<{ ok: boolean; error?: string }> {
   const { id: userId } = await getUserSession();
+
+  // ponytail: rate limit per-IP sebagai safety net jika debounce client-side lolos
+  const ip = getClientIp(await headers());
+  if (!checkRateLimit(rateLimitKey(ip, "cart-update"), 20, 60_000)) {
+    return { ok: false, error: "Terlalu banyak permintaan. Coba lagi nanti." };
+  }
+
   const payload = await getPayload({ config });
 
   const item = await payload.findByID({ collection: "cart-items", id: itemId });

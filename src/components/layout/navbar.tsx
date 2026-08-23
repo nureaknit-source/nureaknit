@@ -48,6 +48,8 @@ function DesktopGuestLinks() {
   );
 }
 
+let profileSynced = false;
+
 export function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
@@ -56,6 +58,9 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (profileSynced) return;
+    profileSynced = true;
+
     const supabase = createClient();
     const {
       data: { subscription },
@@ -72,6 +77,7 @@ export function Navbar() {
 
     return () => {
       subscription.unsubscribe();
+      profileSynced = false;
     };
   }, []);
 

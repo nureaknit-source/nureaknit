@@ -72,17 +72,18 @@ export interface Config {
     'pattern-categories': PatternCategory;
     patterns: Pattern;
     'blog-posts': BlogPost;
-    portfolio: Portfolio;
     'product-categories': ProductCategory;
     products: Product;
     faq: Faq;
-    pages: Page;
-    navigation: Navigation;
     'cart-items': CartItem;
     'coaching-requests': CoachingRequest;
     'contact-messages': ContactMessage;
     downloads: Download;
     'user-profiles': UserProfile;
+    orders: Order;
+    'order-items': OrderItem;
+    'payment-attempts': PaymentAttempt;
+    'fulfillment-groups': FulfillmentGroup;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -95,17 +96,18 @@ export interface Config {
     'pattern-categories': PatternCategoriesSelect<false> | PatternCategoriesSelect<true>;
     patterns: PatternsSelect<false> | PatternsSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
-    portfolio: PortfolioSelect<false> | PortfolioSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
-    navigation: NavigationSelect<false> | NavigationSelect<true>;
     'cart-items': CartItemsSelect<false> | CartItemsSelect<true>;
     'coaching-requests': CoachingRequestsSelect<false> | CoachingRequestsSelect<true>;
     'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
     downloads: DownloadsSelect<false> | DownloadsSelect<true>;
     'user-profiles': UserProfilesSelect<false> | UserProfilesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'order-items': OrderItemsSelect<false> | OrderItemsSelect<true>;
+    'payment-attempts': PaymentAttemptsSelect<false> | PaymentAttemptsSelect<true>;
+    'fulfillment-groups': FulfillmentGroupsSelect<false> | FulfillmentGroupsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -296,27 +298,6 @@ export interface BlogPost {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "portfolio".
- */
-export interface Portfolio {
-  id: number;
-  title: string;
-  slug?: string | null;
-  description?: string | null;
-  images?:
-    | {
-        image: number | Media;
-        id?: string | null;
-      }[]
-    | null;
-  category?: ('knitting' | 'crochet' | 'other') | null;
-  year?: number | null;
-  featured?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-categories".
  */
 export interface ProductCategory {
@@ -360,6 +341,23 @@ export interface Product {
   categories?: (number | ProductCategory)[] | null;
   availability?: ('in_stock' | 'dropship' | 'pre_order' | 'unavailable') | null;
   stock?: number | null;
+  /**
+   * Dikelola otomatis oleh sistem selama checkout/payment.
+   */
+  reservedStock?: number | null;
+  lowStockThreshold?: number | null;
+  preOrderCutoff?: string | null;
+  preOrderCapacity?: number | null;
+  /**
+   * Unit pre-order yang sudah disetujui/dibayar. Dikelola sistem.
+   */
+  preOrderCommitted?: number | null;
+  perCustomerLimit?: number | null;
+  estimatedAvailability?: string | null;
+  /**
+   * Versi produk; naik tiap perubahan. Dipakai untuk snapshot order.
+   */
+  revision?: number | null;
   linkedProducts?:
     | {
         product: number | Product;
@@ -393,46 +391,6 @@ export interface Faq {
     [k: string]: unknown;
   };
   order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: number;
-  title: string;
-  slug?: string | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  publishedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "navigation".
- */
-export interface Navigation {
-  id: number;
-  label: string;
-  url: string;
-  order?: number | null;
-  parent?: (number | null) | Navigation;
   updatedAt: string;
   createdAt: string;
 }
@@ -501,6 +459,125 @@ export interface UserProfile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  userId: string;
+  /**
+   * Snapshot email pembeli saat checkout (untuk receipt).
+   */
+  customerEmail: string;
+  reference: string;
+  type: 'in_stock' | 'pre_order';
+  status:
+    | 'pending_approval'
+    | 'approved'
+    | 'pending_payment'
+    | 'paid'
+    | 'fulfilling'
+    | 'fulfilled'
+    | 'payment_failed'
+    | 'cancelled'
+    | 'refunded'
+    | 'disputed';
+  currency: string;
+  subtotal: number;
+  shippingTotal?: number | null;
+  taxTotal?: number | null;
+  total: number;
+  providerSessionId?: string | null;
+  idempotencyKey?: string | null;
+  approvedAt?: string | null;
+  paidAt?: string | null;
+  /**
+   * Wajib diisi untuk perubahan status oleh admin.
+   */
+  reason?: string | null;
+  /**
+   * Snapshot nomor HP pembeli saat checkout.
+   */
+  customerPhone?: string | null;
+  /**
+   * Snapshot alamat pembeli saat checkout.
+   */
+  customerAddress?: string | null;
+  /**
+   * Keterangan opsional dari pembeli.
+   */
+  customerNotes?: string | null;
+  /**
+   * Persetujuan syarat & ketentuan saat checkout.
+   */
+  tosAccepted?: boolean | null;
+  /**
+   * URL gambar QRIS dari Midtrans (hanya berlaku sebelum settlement).
+   */
+  paymentQrUrl?: string | null;
+  expiresAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-items".
+ */
+export interface OrderItem {
+  id: number;
+  order: number | Order;
+  productId: number;
+  title: string;
+  unitPrice: number;
+  quantity: number;
+  currency: string;
+  saleMode: 'in_stock' | 'pre_order';
+  promisedEstimate?: string | null;
+  productRevision?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payment-attempts".
+ */
+export interface PaymentAttempt {
+  id: number;
+  order: number | Order;
+  providerEventId?: string | null;
+  eventType?: string | null;
+  status?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  raw?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  occurredAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fulfillment-groups".
+ */
+export interface FulfillmentGroup {
+  id: number;
+  order: number | Order;
+  kind: 'ship' | 'release';
+  status: 'unfulfilled' | 'processing' | 'shipped' | 'released' | 'delivered' | 'cancelled' | 'refunded';
+  estimate?: string | null;
+  trackingNumber?: string | null;
+  items?: (number | OrderItem)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -544,10 +621,6 @@ export interface PayloadLockedDocument {
         value: number | BlogPost;
       } | null)
     | ({
-        relationTo: 'portfolio';
-        value: number | Portfolio;
-      } | null)
-    | ({
         relationTo: 'product-categories';
         value: number | ProductCategory;
       } | null)
@@ -558,14 +631,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faq';
         value: number | Faq;
-      } | null)
-    | ({
-        relationTo: 'pages';
-        value: number | Page;
-      } | null)
-    | ({
-        relationTo: 'navigation';
-        value: number | Navigation;
       } | null)
     | ({
         relationTo: 'cart-items';
@@ -586,6 +651,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'user-profiles';
         value: number | UserProfile;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'order-items';
+        value: number | OrderItem;
+      } | null)
+    | ({
+        relationTo: 'payment-attempts';
+        value: number | PaymentAttempt;
+      } | null)
+    | ({
+        relationTo: 'fulfillment-groups';
+        value: number | FulfillmentGroup;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -753,26 +834,6 @@ export interface BlogPostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "portfolio_select".
- */
-export interface PortfolioSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  description?: T;
-  images?:
-    | T
-    | {
-        image?: T;
-        id?: T;
-      };
-  category?: T;
-  year?: T;
-  featured?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-categories_select".
  */
 export interface ProductCategoriesSelect<T extends boolean = true> {
@@ -800,6 +861,14 @@ export interface ProductsSelect<T extends boolean = true> {
   categories?: T;
   availability?: T;
   stock?: T;
+  reservedStock?: T;
+  lowStockThreshold?: T;
+  preOrderCutoff?: T;
+  preOrderCapacity?: T;
+  preOrderCommitted?: T;
+  perCustomerLimit?: T;
+  estimatedAvailability?: T;
+  revision?: T;
   linkedProducts?:
     | T
     | {
@@ -818,30 +887,6 @@ export interface FaqSelect<T extends boolean = true> {
   question?: T;
   answer?: T;
   order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
- */
-export interface PagesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  content?: T;
-  publishedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "navigation_select".
- */
-export interface NavigationSelect<T extends boolean = true> {
-  label?: T;
-  url?: T;
-  order?: T;
-  parent?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -900,6 +945,82 @@ export interface UserProfilesSelect<T extends boolean = true> {
   supabaseId?: T;
   email?: T;
   displayName?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  userId?: T;
+  customerEmail?: T;
+  reference?: T;
+  type?: T;
+  status?: T;
+  currency?: T;
+  subtotal?: T;
+  shippingTotal?: T;
+  taxTotal?: T;
+  total?: T;
+  providerSessionId?: T;
+  idempotencyKey?: T;
+  approvedAt?: T;
+  paidAt?: T;
+  reason?: T;
+  customerPhone?: T;
+  customerAddress?: T;
+  customerNotes?: T;
+  tosAccepted?: T;
+  paymentQrUrl?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-items_select".
+ */
+export interface OrderItemsSelect<T extends boolean = true> {
+  order?: T;
+  productId?: T;
+  title?: T;
+  unitPrice?: T;
+  quantity?: T;
+  currency?: T;
+  saleMode?: T;
+  promisedEstimate?: T;
+  productRevision?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payment-attempts_select".
+ */
+export interface PaymentAttemptsSelect<T extends boolean = true> {
+  order?: T;
+  providerEventId?: T;
+  eventType?: T;
+  status?: T;
+  amount?: T;
+  currency?: T;
+  raw?: T;
+  occurredAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fulfillment-groups_select".
+ */
+export interface FulfillmentGroupsSelect<T extends boolean = true> {
+  order?: T;
+  kind?: T;
+  status?: T;
+  estimate?: T;
+  trackingNumber?: T;
+  items?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -12,15 +12,16 @@ import { Downloads } from "../../collections/Downloads";
 import { UserProfiles } from "../../collections/UserProfiles";
 import { FAQ } from "../../collections/FAQ";
 import { Media } from "../../collections/Media";
-import { Navigation } from "../../collections/Navigation";
 import { CartItems } from "../../collections/CartItems";
-import { Pages } from "../../collections/Pages";
 import { PatternCategories } from "../../collections/PatternCategories";
 import { Patterns } from "../../collections/Patterns";
-import { Portfolio } from "../../collections/Portfolio";
 import { ProductCategories } from "../../collections/ProductCategories";
 import { Products } from "../../collections/Products";
 import { Users } from "../../collections/Users";
+import { Orders } from "../../collections/Orders";
+import { OrderItems } from "../../collections/OrderItems";
+import { PaymentAttempts } from "../../collections/PaymentAttempts";
+import { FulfillmentGroups } from "../../collections/FulfillmentGroups";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -35,17 +36,18 @@ export default buildConfig({
     PatternCategories,
     Patterns,
     BlogPosts,
-    Portfolio,
     ProductCategories,
     Products,
     FAQ,
-    Pages,
-    Navigation,
     CartItems,
     CoachingRequests,
     ContactMessages,
     Downloads,
     UserProfiles,
+    Orders,
+    OrderItems,
+    PaymentAttempts,
+    FulfillmentGroups,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

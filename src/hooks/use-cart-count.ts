@@ -1,41 +1,37 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect } from "react";
+import { useCartStore } from "@/stores/cart-store";
 import { getCartItemCountAction } from "@/actions/cart";
 import { createClient } from "@/utils/supabase/client";
 
-export function useCartCount() {
-  const [count, setCount] = useState(0);
+let synced = false;
 
-  const refresh = useCallback(async () => {
-    try {
-      setCount(await getCartItemCountAction());
-    } catch {
-      setCount(0);
-    }
-  }, []);
+export function useCartCount(): number {
+  const count = useCartStore((s) => s.count);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) refresh();
-    });
+    if (synced) return;
+    synced = true;
 
+    const supabase = createClient();
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) refresh();
-      else setCount(0);
+      if (session) {
+        getCartItemCountAction()
+          .then(useCartStore.getState().setCount)
+          .catch(() => useCartStore.getState().setCount(0));
+      } else {
+        useCartStore.getState().setCount(0);
+      }
     });
-
-    const onCartUpdated = () => refresh();
-    window.addEventListener("cart:updated", onCartUpdated);
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener("cart:updated", onCartUpdated);
+      synced = false;
     };
-  }, [refresh]);
+  }, []);
 
   return count;
 }

@@ -10,6 +10,16 @@ export const Products: CollectionConfig = {
     update: ({ req: { user } }) => user?.role === "admin",
     delete: ({ req: { user } }) => user?.role === "admin",
   },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        if (data && originalDoc) {
+          data.revision = ((originalDoc.revision as number) ?? 1) + 1;
+        }
+        return data;
+      },
+    ],
+  },
   fields: [
     {
       name: "title",
@@ -83,6 +93,93 @@ export const Products: CollectionConfig = {
       admin: {
         position: "sidebar",
         condition: (data) => data?.availability === "in_stock",
+      },
+    },
+    {
+      name: "reservedStock",
+      type: "number",
+      min: 0,
+      defaultValue: 0,
+      label: "Reserved Stock",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        condition: (data) => data?.availability === "in_stock",
+        description: "Dikelola otomatis oleh sistem selama checkout/payment.",
+      },
+    },
+    {
+      name: "lowStockThreshold",
+      type: "number",
+      min: 0,
+      defaultValue: 5,
+      label: "Low Stock Threshold",
+      admin: {
+        position: "sidebar",
+        condition: (data) => data?.availability === "in_stock",
+      },
+    },
+    {
+      name: "preOrderCutoff",
+      type: "date",
+      label: "Pre-Order Cutoff",
+      admin: {
+        position: "sidebar",
+        condition: (data) => data?.availability === "pre_order",
+      },
+    },
+    {
+      name: "preOrderCapacity",
+      type: "number",
+      min: 0,
+      label: "Pre-Order Capacity (maks unit)",
+      admin: {
+        position: "sidebar",
+        condition: (data) => data?.availability === "pre_order",
+      },
+    },
+    {
+      name: "preOrderCommitted",
+      type: "number",
+      min: 0,
+      defaultValue: 0,
+      label: "Pre-Order Committed",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        condition: (data) => data?.availability === "pre_order",
+        description: "Unit pre-order yang sudah disetujui/dibayar. Dikelola sistem.",
+      },
+    },
+    {
+      name: "perCustomerLimit",
+      type: "number",
+      min: 0,
+      label: "Per-Customer Limit (maks unit/customer)",
+      admin: {
+        position: "sidebar",
+        condition: (data) => data?.availability === "pre_order",
+      },
+    },
+    {
+      name: "estimatedAvailability",
+      type: "text",
+      label: "Estimated Availability",
+      admin: {
+        position: "sidebar",
+        condition: (data) => data?.availability === "pre_order",
+      },
+    },
+    {
+      name: "revision",
+      type: "number",
+      min: 1,
+      defaultValue: 1,
+      label: "Revision",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: "Versi produk; naik tiap perubahan. Dipakai untuk snapshot order.",
       },
     },
     {

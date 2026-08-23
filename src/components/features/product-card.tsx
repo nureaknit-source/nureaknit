@@ -60,10 +60,23 @@ export function ProductCard({
               {availabilityLabel[product.availability]}
             </Badge>
           )}
+          {product.availability === "in_stock" &&
+            product.lowStockThreshold != null &&
+            (product.stock ?? 0) - (product.reservedStock ?? 0) <= product.lowStockThreshold && (
+              <Badge variant="outline">Stok Menipis</Badge>
+            )}
           {showCategory && product.categories && product.categories.length > 0 && (
             <Badge variant="outline">{categoryName}</Badge>
           )}
         </div>
+
+        {product.availability === "pre_order" && (
+          <p className="mb-2 text-xs text-fg-muted">
+            {product.estimatedAvailability
+              ? `Perkiraan tersedia: ${product.estimatedAvailability}`
+              : "Pre-order — memerlukan konfirmasi admin"}
+          </p>
+        )}
 
         <Text className="mt-1 font-bold text-primary">
           {formatPrice(product.price)}

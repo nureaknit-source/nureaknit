@@ -1,8 +1,6 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
-const isDev = process.env.NODE_ENV === "development";
-
 const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
@@ -20,11 +18,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              `script-src 'self'${isDev ? " 'unsafe-eval' 'unsafe-inline'" : ""}`,
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.midtrans.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https://*.supabase.co data: blob:",
+              "img-src 'self' https://*.supabase.co https://*.midtrans.com https://*.veritrans.co.id data: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co https://api.sandbox.midtrans.com https://api.midtrans.com",
+              "frame-src https://*.midtrans.com",
               "frame-ancestors 'none'",
               "base-uri 'none'",
             ].join("; "),

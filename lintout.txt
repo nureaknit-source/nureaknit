@@ -1,0 +1,70 @@
+
+D:\Desktop\projects\nureaknit\eslint.config.mjs
+  4:1  warning  Assign array to a variable before exporting as module default  import/no-anonymous-default-export
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\blog\[slug]\page.tsx
+  50:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\blog\page.tsx
+  41:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\checkout\success\page.tsx
+  17:38  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\checkout\success\page.tsx:17:38
+  15 |   const pre = typeof params.pre === "string" ? params.pre : null;
+  16 |   const qr = typeof params.qr === "string" ? params.qr : null;
+> 17 |   const fallbackExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+     |                                      ^^^^^^^^^^ Cannot call impure function
+  18 |
+  19 |   let expiresAt: string | undefined;
+  20 |   if (ref) {  react-hooks/purity
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\error.tsx
+  4:3  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\page.tsx
+   52:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  118:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\patterns\[slug]\page.tsx
+  54:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\app\(frontend)\patterns\page.tsx
+  89:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\app\(payload)\admin\error.tsx
+  8:3  warning  'reset' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Desktop\projects\nureaknit\src\app\error.tsx
+  4:3  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Desktop\projects\nureaknit\src\components\checkout\qr-display.tsx
+  19:7  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\components\ui\lightbox.tsx
+  67:9  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\features\products\product-gallery.tsx
+  35:9   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  58:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  70:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  89:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\Desktop\projects\nureaknit\src\migrations\20260815_145711.ts
+    3:32  warning  'payload' is defined but never used  @typescript-eslint/no-unused-vars
+    3:41  warning  'req' is defined but never used      @typescript-eslint/no-unused-vars
+  514:34  warning  'payload' is defined but never used  @typescript-eslint/no-unused-vars
+  514:43  warning  'req' is defined but never used      @typescript-eslint/no-unused-vars
+
+Ô£û 21 problems (1 error, 20 warnings)
+
+{
+  "error": {
+    "code": 1,
+    "summary": "",
+    "detail": ""
+  }
+}

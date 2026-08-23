@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { getPayload } from "payload";
+import type { CollectionSlug } from "payload";
 import config from "@payload-config";
 import { checkRateLimit, getClientIp, rateLimitKey } from "@/lib/rate-limit";
 
@@ -15,7 +16,7 @@ interface SubmitFormOptions {
 }
 
 export async function submitFormAction(
-  collection: string,
+  collection: CollectionSlug,
   validate: (data: Record<string, string>) => { field: string; message: string }[],
   sendEmail: (data: Record<string, string>) => Promise<void>,
   revalidate: string,
@@ -37,7 +38,7 @@ export async function submitFormAction(
 
   try {
     const payload = await getPayload({ config });
-    await payload.create({ collection: collection as any, data });
+    await payload.create({ collection, data });
     void sendEmail(data);
   } catch {
     return { success: false, errors: [{ field: "form", message: "Gagal mengirim. Silakan coba lagi." }] };

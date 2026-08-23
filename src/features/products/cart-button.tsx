@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { addItemToCartAction } from "@/actions/cart";
+import { useCartStore } from "@/stores/cart-store";
 import { showToast } from "@/components/ui/toast";
 import { ShoppingCart, Check } from "lucide-react";
 
@@ -19,7 +20,7 @@ export function CartButton({
   className = "",
 }: Props) {
   const [added, setAdded] = useState(inCart);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [pop, setPop] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -32,23 +33,27 @@ export function CartButton({
       window.location.href = "/profile/cart";
       return;
     }
-    setLoading(true);
+
+    // ponytail: optimistic — badge + button state langsung update
+    useCartStore.getState().increment(1, 0);
+    setAdded(true);
+    setPop(true);
+    showToast("Ditambahkan ke keranjang", "success");
+    window.dispatchEvent(new CustomEvent("cart:updated"));
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setPop(false), 400);
+
     try {
       const { ok, error } = await addItemToCartAction(productId, 1);
       if (!ok) throw new Error(error || "Gagal menambahkan ke keranjang.");
-      setAdded(true);
-      showToast("Ditambahkan ke keranjang", "success");
-      window.dispatchEvent(new CustomEvent("cart:updated"));
-      setPop(true);
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setPop(false), 400);
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Gagal menambahkan ke keranjang",
         "error",
       );
-    } finally {
-      setLoading(false);
+      useCartStore.getState().decrement(1, 0);
+      setAdded(false);
+      clearTimeout(timeoutRef.current);
     }
   }, [added, productId, isLoggedIn]);
 

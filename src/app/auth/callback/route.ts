@@ -8,12 +8,15 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const cookieStore = await cookies();
+  // ponytail: Next dev normalizes request.url to localhost even via tunnels,
+  // so build redirects from NEXT_PUBLIC_SITE_URL instead.
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || request.url;
 
   if (code) {
     const supabase = createClient(cookieStore);
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(new URL("/login?error=auth", request.url));
+      return NextResponse.redirect(new URL("/login?error=auth", origin));
     }
     const user = data.user;
 
@@ -42,7 +45,7 @@ export async function GET(request: NextRequest) {
     ? redirect
     : "/";
 
-  const response = NextResponse.redirect(new URL(target, request.url));
+  const response = NextResponse.redirect(new URL(target, origin));
   response.cookies.set("auth_redirect", "", { path: "/", maxAge: 0 });
   return response;
 }

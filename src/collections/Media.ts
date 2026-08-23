@@ -28,9 +28,6 @@ export const Media: CollectionConfig = {
         await drizzle.execute(
           sql`DELETE FROM "products_images" WHERE "image_id" = ${id}`
         );
-        await drizzle.execute(
-          sql`DELETE FROM "portfolio_images" WHERE "image_id" = ${id}`
-        );
       },
     ],
   },

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { updateCartItemAction, removeFromCartAction } from "@/actions/cart";
+import { useCartStore } from "@/stores/cart-store";
 import { showToast } from "@/components/ui/toast";
 import { formatPrice, mediaUrl } from "@/lib/payload/utils";
 import type { CartItemWithProduct } from "@/actions/cart";
@@ -12,66 +12,93 @@ import { Trash2 } from "lucide-react";
 
 export function CartItemRow({ item }: { item: CartItemWithProduct }) {
   const { product, quantity } = item;
-  const router = useRouter();
   const [qty, setQty] = useState(quantity);
   const [loading, setLoading] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [removed, setRemoved] = useState(false);
 
   const isPhysical = product.availability === "in_stock";
+  const unavailable = product.availability === "unavailable";
   const max =
-    isPhysical && typeof product.stock === "number" && product.stock > 0
-      ? product.stock
-      : Infinity;
+    unavailable
+      ? 0
+      : isPhysical && typeof product.stock === "number" && product.stock > 0
+        ? product.stock
+        : Infinity;
 
   const dispatchUpdate = () =>
     window.dispatchEvent(new CustomEvent("cart:updated"));
 
+  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleChange = useCallback(
-    async (next: number) => {
+    (next: number) => {
       const clamped = Math.max(1, Math.min(max, next));
       if (clamped === qty) return;
+      const price = product.price ?? 0;
+      const delta = price * (clamped - qty);
+
+      // ponytail: optimistic — subtotal langsung update via store
       setQty(clamped);
-      setLoading(true);
-      try {
-        const { ok, error } = await updateCartItemAction(item.id, clamped);
-        if (!ok) throw new Error(error || "Gagal memperbarui kuantitas.");
-        dispatchUpdate();
-        router.refresh();
-      } catch (err) {
-        showToast(
-          err instanceof Error ? err.message : "Gagal memperbarui kuantitas",
-          "error",
-        );
-        setQty(quantity);
-      } finally {
-        setLoading(false);
-      }
+      useCartStore.getState().increment(0, delta);
+
+      if (saveTimeout.current) clearTimeout(saveTimeout.current);
+
+      saveTimeout.current = setTimeout(async () => {
+        setLoading(true);
+        try {
+          const { ok, error } = await updateCartItemAction(item.id, clamped);
+          if (!ok) throw new Error(error || "Gagal memperbarui kuantitas.");
+          dispatchUpdate();
+        } catch (err) {
+          showToast(
+            err instanceof Error ? err.message : "Gagal memperbarui kuantitas",
+            "error",
+          );
+          setQty(quantity);
+          useCartStore.getState().increment(0, -delta);
+        } finally {
+          setLoading(false);
+          saveTimeout.current = null;
+        }
+      }, 500);
     },
-    [qty, max, item.id, quantity, router],
+    [qty, max, item.id, quantity, product.price],
   );
+
+  // ponytail: bersihkan timeout saat unmount agai server call tidak fire
+  useEffect(() => () => {
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+  }, []);
 
   const handleRemove = useCallback(async () => {
     if (!confirm("Hapus produk ini dari keranjang?")) return;
-    setLoading(true);
+    const price = product.price ?? 0;
+
+    // ponytail: optimistic — row langsung hilang, badge + subtotal update
+    useCartStore.getState().decrement(qty, price * qty);
+    setRemoved(true);
+    dispatchUpdate();
+
     try {
       const { ok, error } = await removeFromCartAction(item.id);
       if (!ok) throw new Error(error || "Gagal menghapus.");
-      dispatchUpdate();
-      router.refresh();
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Gagal menghapus",
         "error",
       );
-    } finally {
-      setLoading(false);
+      useCartStore.getState().increment(qty, price * qty);
+      setRemoved(false);
     }
-  }, [item.id, router]);
+  }, [item.id, qty, product.price]);
 
   const subtotal = (product.price ?? 0) * qty;
   const imageUrl = product.images?.[0]?.image
     ? mediaUrl(product.images[0].image)
     : null;
+
+  if (removed) return null;
 
   return (
     <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:gap-4">
@@ -104,6 +131,16 @@ export function CartItemRow({ item }: { item: CartItemWithProduct }) {
         </Link>
         <p className="mt-1 text-sm text-fg-muted">
           {formatPrice(product.price ?? 0)}
+          {unavailable && (
+            <span className="ml-2 rounded-full bg-error-subtle px-2 py-0.5 text-xs font-semibold text-error">
+              Tidak Tersedia
+            </span>
+          )}
+          {product.availability === "pre_order" && (
+            <span className="ml-2 rounded-full bg-accent-subtle px-2 py-0.5 text-xs font-semibold text-accent">
+              Pre-order — butuh konfirmasi admin
+            </span>
+          )}
         </p>
       </div>
 
@@ -112,7 +149,7 @@ export function CartItemRow({ item }: { item: CartItemWithProduct }) {
           <button
             type="button"
             onClick={() => handleChange(qty - 1)}
-            disabled={loading || qty <= 1}
+            disabled={loading || qty <= 1 || unavailable}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-fg-default hover:bg-accent-subtle disabled:opacity-50"
             aria-label="Kurangi"
           >
@@ -130,7 +167,7 @@ export function CartItemRow({ item }: { item: CartItemWithProduct }) {
           <button
             type="button"
             onClick={() => handleChange(qty + 1)}
-            disabled={loading || qty >= max}
+            disabled={loading || qty >= max || unavailable}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-fg-default hover:bg-accent-subtle disabled:opacity-50"
             aria-label="Tambah"
           >
