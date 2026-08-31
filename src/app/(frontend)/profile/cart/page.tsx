@@ -1,17 +1,20 @@
-import { getCartAction, clearCartAction } from "@/actions/cart";
+import { getCartAction } from "@/actions/cart";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
+import { Heading } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
+
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/shared/empty-state";
 import { CartItemRow } from "./cart-item-row";
 import { CartTotal } from "./cart-total";
 import { CheckoutButton } from "./checkout-button";
+import { ClearCartButton } from "./clear-cart-button";
 import type { CartItemWithProduct } from "@/actions/cart";
+import { ShoppingBag, ArrowLeft, ShieldCheck, Info } from "lucide-react";
 
-async function clearCartFormAction() {
-  "use server";
-  await clearCartAction();
-}
 
 export default async function CartPage() {
   let items: CartItemWithProduct[] = [];
@@ -40,59 +43,102 @@ export default async function CartPage() {
       <Container>
         <Link
           href="/profile"
-          className="mb-4 inline-block text-sm text-fg-muted hover:text-primary"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-fg-muted hover:text-primary transition"
         >
-          ← Kembali ke Profil
+          <ArrowLeft className="h-4 w-4" />
+          <span>Kembali ke Profil</span>
         </Link>
-        <h1 className="font-sans text-3xl font-extrabold text-fg-default">
-          My Cart
-        </h1>
+
+        <div className="flex items-center gap-3 mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-fg-default">Keranjang Belanja</h1>
+          {items.length > 0 && (
+            <Badge variant="primary" size="md">
+              {items.length} {items.length === 1 ? "Item" : "Items"}
+            </Badge>
+          )}
+        </div>
 
         {fetchError ? (
-          <div className="mt-8 rounded-lg border border-error/20 bg-error-subtle p-4 text-sm text-error">
+          <div className="rounded-2xl border border-error/20 bg-error-subtle p-4 text-sm text-error">
             {fetchError}
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-12 py-16 text-center">
-            <p className="mb-4 text-fg-secondary">Keranjang belanja masih kosong.</p>
-            <Link href="/products">
-              <Button variant="primary">Jelajahi produk</Button>
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="mt-8 divide-y divide-border">
-              {items.map((item) => (
-                <CartItemRow key={item.id} item={item} />
-              ))}
-            </div>
-
-            <div className="mt-8 flex items-center justify-between border-t-2 border-border pt-6">
-              <span className="text-sm text-fg-muted">Subtotal</span>
-              <CartTotal initialTotal={subtotal} />
-            </div>
-
-            {hasPreOrder && (
-              <p className="mt-3 text-xs text-fg-muted">
-                Item pre-order memerlukan konfirmasi admin — Anda akan dihubungi
-                via WhatsApp sebelum menyelesaikan pembayaran.
-              </p>
-            )}
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <EmptyState
+            icon={<ShoppingBag className="h-8 w-8 text-primary" />}
+            title="Keranjang Belanja Masih Kosong"
+            message="Yuk temukan benang rajut premium, pola cantik, atau kit rajut impianmu!"
+            action={
               <Link href="/products">
-                <Button variant="outline">Lanjutkan Belanja</Button>
-              </Link>
-              <form action={clearCartFormAction}>
-                <Button type="submit" variant="outline">
-                  Bersihkan Keranjang
+                <Button variant="primary" size="lg">
+                  Mulai Belanja
                 </Button>
-              </form>
-              <CheckoutButton disabled={purchasable.length === 0} />
+              </Link>
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+            {/* Left Column: Cart Items */}
+            <div className="space-y-4 lg:col-span-8">
+              <Card padding="none" hover={false} className="divide-y divide-border overflow-hidden">
+                {items.map((item) => (
+                  <CartItemRow key={item.id} item={item} />
+                ))}
+              </Card>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <Link href="/products">
+                  <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />}>
+                    Lanjut Belanja
+                  </Button>
+                </Link>
+                <ClearCartButton />
+
+              </div>
             </div>
-          </>
+
+            {/* Right Column: Order Summary */}
+            <div className="lg:col-span-4">
+              <Card padding="md" hover={false} className="sticky top-24 space-y-5">
+                <Heading as="h3" className="text-lg border-b border-border/60 pb-3">
+                  Ringkasan Pesanan
+                </Heading>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between text-fg-muted">
+                    <span>Total Item ({purchasable.reduce((acc, i) => acc + i.quantity, 0)})</span>
+                    <span className="font-medium text-fg-default">{purchasable.length} produk</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                    <span className="font-bold text-fg-default text-base">Subtotal</span>
+                    <CartTotal initialTotal={subtotal} />
+                  </div>
+                </div>
+
+                {hasPreOrder && (
+                  <div className="flex items-start gap-2.5 rounded-xl border border-accent/20 bg-accent-subtle p-3 text-xs text-accent">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span className="leading-relaxed">
+                      Terdapat item <strong>Pre-order</strong>. Admin akan menghubungimu via WhatsApp untuk konfirmasi detail sebelum pesanan diproses.
+                    </span>
+                  </div>
+                )}
+
+                <CheckoutButton
+                  disabled={purchasable.length === 0}
+                  className="w-full"
+                  size="lg"
+                />
+
+                <div className="pt-2 border-t border-border/40 flex items-center justify-center gap-2 text-xs text-fg-muted">
+                  <ShieldCheck className="h-4 w-4 text-success" />
+                  <span>Pembayaran aman &amp; QRIS otomatis</span>
+                </div>
+              </Card>
+            </div>
+          </div>
         )}
       </Container>
     </Section>
   );
 }
+

@@ -50,11 +50,11 @@ export function ProductCard({
           <div className="-mx-6 -mt-6 mb-4 aspect-[4/3] rounded-t-2xl bg-accent-subtle" />
         )}
 
-        <h3 className="font-sans text-lg font-bold text-fg-default">
+        <h3 className="font-sans text-base sm:text-lg font-bold text-fg-default line-clamp-2">
           {product.title}
         </h3>
 
-        <div className="mb-2 flex flex-wrap gap-2">
+        <div className="mb-2 flex flex-wrap gap-1.5 sm:gap-2">
           {product.availability && (
             <Badge variant="outline">
               {availabilityLabel[product.availability]}
@@ -71,14 +71,14 @@ export function ProductCard({
         </div>
 
         {product.availability === "pre_order" && (
-          <p className="mb-2 text-xs text-fg-muted">
+          <p className="mb-2 text-2xs sm:text-xs text-fg-muted">
             {product.estimatedAvailability
               ? `Perkiraan tersedia: ${product.estimatedAvailability}`
               : "Pre-order — memerlukan konfirmasi admin"}
           </p>
         )}
 
-        <Text className="mt-1 font-bold text-primary">
+        <Text size="base" className="mt-1 text-sm sm:text-base font-bold text-primary">
           {formatPrice(product.price)}
         </Text>
       </Card>

@@ -1,16 +1,24 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import { Button } from "@/components/ui/button";
+import { Heading, Text } from "@/components/ui/typography";
+import { Trash2, AlertTriangle, CheckCircle2, X } from "lucide-react";
 
-interface ConfirmDialogProps {
+export interface ConfirmDialogProps {
   open: boolean;
   title: string;
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  variant?: "danger" | "primary" | "warning";
+  isLoading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
+
+const emptySubscribe = () => () => {};
 
 export function ConfirmDialog({
   open,
@@ -18,14 +26,23 @@ export function ConfirmDialog({
   message,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
+  variant = "danger",
+  isLoading = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
+      if (e.key === "Escape" && !isLoading) onCancel();
     },
-    [onCancel],
+    [onCancel, isLoading],
   );
 
   useEffect(() => {
@@ -38,36 +55,89 @@ export function ConfirmDialog({
     };
   }, [open, handleKeyDown]);
 
-  if (!open) return null;
+  if (!open || !isClient) return null;
 
-  return (
+  const iconMap = {
+    danger: <Trash2 className="h-6 w-6 text-error" />,
+    warning: <AlertTriangle className="h-6 w-6 text-warning" />,
+    primary: <CheckCircle2 className="h-6 w-6 text-primary" />,
+  };
+
+  const badgeBgMap = {
+    danger: "bg-error-subtle",
+    warning: "bg-warning-subtle",
+    primary: "bg-primary-subtle",
+  };
+
+  const buttonVariantMap = {
+    danger: "danger" as const,
+    warning: "primary" as const,
+    primary: "primary" as const,
+  };
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay px-4"
-      onClick={onCancel}
+      className="fixed inset-0 z-70 flex items-center justify-center bg-overlay/40 p-4 backdrop-blur-xs transition-opacity"
+      onClick={!isLoading ? onCancel : undefined}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="animate-slide-up w-full max-w-sm rounded-xl bg-bg-surface p-6 shadow-lg"
+        className="w-full max-w-sm rounded-2xl bg-bg-surface p-6 shadow-xl border border-border/80 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-xl text-fg-default">{title}</h2>
-        <p className="mt-2 text-sm text-fg-secondary">{message}</p>
-        <div className="mt-6 flex justify-end gap-3">
-          <button
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="absolute top-4 right-4 rounded-full p-1.5 text-fg-muted hover:bg-bg-surface-muted hover:text-fg-default transition active:scale-95 disabled:opacity-40"
+          aria-label="Tutup"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Header with Icon */}
+        <div className="flex items-start gap-4">
+          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${badgeBgMap[variant]} shadow-xs`}>
+            {iconMap[variant]}
+          </div>
+          <div className="flex-1 min-w-0 pr-4">
+            <Heading as="h3" display className="text-lg font-bold text-fg-default">
+              {title}
+            </Heading>
+            <Text size="sm" className="mt-1 text-fg-secondary leading-relaxed">
+              {message}
+            </Text>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-6 flex items-center justify-end gap-2.5 pt-2 border-t border-border/40">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onCancel}
-            className="inline-flex items-center justify-center rounded-full border border-border px-4 py-2 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
+            disabled={isLoading}
+            className="flex-1 sm:flex-initial"
           >
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={buttonVariantMap[variant]}
+            size="sm"
             onClick={onConfirm}
-            className="inline-flex items-center justify-center rounded-full bg-error px-4 py-2 text-sm font-bold text-error-fg transition hover:opacity-90 active:scale-95"
+            isLoading={isLoading}
+            className="flex-1 sm:flex-initial"
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
+
+
+

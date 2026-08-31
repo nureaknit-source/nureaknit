@@ -19,7 +19,7 @@ export function CheckStatus({ reference }: { reference: string }) {
       if (stopped.current) return;
       setStatus(data.status as Status);
       if (data.status === "paid") {
-        showToast("Pembayaran selesai — order akan diproses.", "success");
+        showToast("Pembayaran berhasil! Pesananmu akan segera diproses.", "success");
         setTimeout(() => router.push(`/profile/orders/${reference}`), 1500);
       }
     } catch {

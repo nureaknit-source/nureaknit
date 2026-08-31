@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
-interface ToastData {
+export interface ToastData {
   id: string;
   message: string;
   type: "success" | "error";
@@ -33,19 +34,25 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2">
+    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 max-w-sm">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`animate-slide-up rounded-lg border-l-4 px-4 py-3 text-sm font-bold shadow-lg ${
+          className={`animate-slide-up flex items-center gap-3 rounded-xl border border-border/80 bg-bg-surface px-4 py-3 text-sm font-semibold shadow-lg text-fg-default ${
             toast.type === "success"
-              ? "border-l-success bg-success-subtle text-success-fg"
-              : "border-l-error bg-error-subtle text-error-fg"
+              ? "border-l-4 border-l-success"
+              : "border-l-4 border-l-error"
           }`}
         >
-          {toast.message}
+          {toast.type === "success" ? (
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
+          ) : (
+            <AlertCircle className="h-5 w-5 shrink-0 text-error" />
+          )}
+          <span className="leading-snug">{toast.message}</span>
         </div>
       ))}
     </div>
   );
 }
+

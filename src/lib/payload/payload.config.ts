@@ -19,6 +19,7 @@ import { ProductCategories } from "../../collections/ProductCategories";
 import { Products } from "../../collections/Products";
 import { Users } from "../../collections/Users";
 import { Orders } from "../../collections/Orders";
+import { Reviews } from "../../collections/Reviews";
 import { OrderItems } from "../../collections/OrderItems";
 import { PaymentAttempts } from "../../collections/PaymentAttempts";
 import { FulfillmentGroups } from "../../collections/FulfillmentGroups";
@@ -48,6 +49,7 @@ export default buildConfig({
     OrderItems,
     PaymentAttempts,
     FulfillmentGroups,
+    Reviews,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

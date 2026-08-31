@@ -4,7 +4,7 @@ import { useActionState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
-import { Input } from "@/components/ui/input";
+import { Input, Textarea } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { submitContactAction } from "@/actions/contact";
 import { showToast } from "@/components/ui/toast";
@@ -22,7 +22,7 @@ export default function ContactPage() {
 
   useEffect(() => {
     if (state.success) {
-      showToast("Pesan berhasil dikirim!", "success");
+      showToast("Pesanmu berhasil terkirim! Terima kasih sudah menghubungi kami.", "success");
     } else if (state.errors?.length) {
       const formError = state.errors.find((e) => e.field === "form");
       if (formError) showToast(formError.message, "error");
@@ -35,81 +35,55 @@ export default function ContactPage() {
   return (
     <Section>
       <Container size="sm">
-        <Caption>Contact</Caption>
+        <Caption>Contact Us</Caption>
         <Heading as="h1" className="mt-2">
-          Get in Touch
+          Let&apos;s Get in Touch!
         </Heading>
         <Text className="mt-2">
-          Punya pertanyaan, saran, atau ingin bekerja sama? Silakan kirim pesan
-          melalui form di bawah.
+          Punya pertanyaan seputar pola, pesanan, atau ingin mengajak kerja sama seru? <em>Feel free to drop a message.</em> Kami akan dengan senang hati menyapamu kembali!
         </Text>
 
         <form action={formAction} className="mt-8 space-y-4">
-          <div>
-            <Input
-              id="name"
-              name="name"
-              label="Nama"
-              placeholder="Nama kamu"
-              required
-              aria-invalid={!!fieldError("name")}
-            />
-            {fieldError("name") && (
-              <p className="mt-1 text-xs text-error">{fieldError("name")}</p>
-            )}
-          </div>
-          <div>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="email@example.com"
-              required
-              aria-invalid={!!fieldError("email")}
-            />
-            {fieldError("email") && (
-              <p className="mt-1 text-xs text-error">{fieldError("email")}</p>
-            )}
-          </div>
-          <div>
-            <Input
-              id="subject"
-              name="subject"
-              label="Subjek"
-              placeholder="Apa yang ingin kamu sampaikan?"
-              required
-              aria-invalid={!!fieldError("subject")}
-            />
-            {fieldError("subject") && (
-              <p className="mt-1 text-xs text-error">{fieldError("subject")}</p>
-            )}
-          </div>
-          <div>
-            <label
-              htmlFor="message"
-              className="mb-1 block text-sm font-medium text-fg-default"
-            >
-              Pesan
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows={5}
-              required
-              placeholder="Tulis pesan kamu di sini..."
-              className="w-full rounded-lg border border-border bg-bg-surface-muted px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
-              aria-invalid={!!fieldError("message")}
-            />
-            {fieldError("message") && (
-              <p className="mt-1 text-xs text-error">{fieldError("message")}</p>
-            )}
-          </div>
-          <Button type="submit" disabled={pending}>
-            {pending ? "Mengirim..." : "Kirim Pesan"}
+          <Input
+            id="name"
+            name="name"
+            label="Nama"
+            placeholder="Nama kamu"
+            required
+            error={fieldError("name")}
+          />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="email@example.com"
+            required
+            error={fieldError("email")}
+          />
+          <Input
+            id="subject"
+            name="subject"
+            label="Subjek"
+            placeholder="Topik yang ingin kamu tanyakan atau diskusikan"
+            required
+            error={fieldError("subject")}
+          />
+          <Textarea
+            id="message"
+            name="message"
+            label="Pesan"
+            rows={5}
+            required
+            placeholder="Tulis pesanmu di sini..."
+            error={fieldError("message")}
+          />
+          <Button type="submit" isLoading={pending}>
+            Kirim Pesan
           </Button>
         </form>
       </Container>
     </Section>
   );
 }
+

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Download, ShoppingCart, Settings, LogOut, Package } from "lucide-react";
 import { Section } from "@/components/ui/section";
 import { Container } from "@/components/ui/container";
+import { Heading, Text } from "@/components/ui/typography";
+import { Card } from "@/components/ui/card";
 import { LogoutButton } from "@/components/shared/logout-button";
 
 export default async function ProfilePage() {
@@ -17,42 +19,46 @@ export default async function ProfilePage() {
     <Section>
       <Container size="sm">
         <div className="mb-8">
-          <h1 className="font-display text-2xl text-fg-default">
+          <Heading as="h1" display className="text-2xl sm:text-3xl">
             {user.name || "My Account"}
-          </h1>
-          <p className="mt-1 text-sm text-fg-muted">{user.email}</p>
+          </Heading>
+          <Text size="sm" className="mt-1 text-fg-muted">
+            {user.email}
+          </Text>
         </div>
 
-        <ul className="flex flex-col divide-y divide-border rounded-lg border border-border">
-          <MenuItem
-            href="/profile/downloads"
-            label="My Downloads"
-            icon={<Download className="h-5 w-5" />}
-          />
-          <MenuItem
-            href="/profile/cart"
-            label="My Cart"
-            icon={<ShoppingCart className="h-5 w-5" />}
-          />
-          <MenuItem
-            href="/profile/orders"
-            label="My Orders"
-            icon={<Package className="h-5 w-5" />}
-          />
-          <MenuItem
-            href="/profile/settings"
-            label="Account Settings"
-            icon={<Settings className="h-5 w-5" />}
-          />
-          <li>
-            <LogoutButton className="flex w-full items-center gap-3 px-4 py-3 text-sm text-fg-secondary hover:bg-accent-subtle">
-              <span className="flex-shrink-0 text-fg-muted">
-                <LogOut className="h-5 w-5" />
-              </span>
-              <span>Logout</span>
-            </LogoutButton>
-          </li>
-        </ul>
+        <Card padding="none" hover={false} className="overflow-hidden">
+          <ul className="flex flex-col divide-y divide-border">
+            <MenuItem
+              href="/profile/downloads"
+              label="Pola & Unduhan (Downloads)"
+              icon={<Download className="h-5 w-5" />}
+            />
+            <MenuItem
+              href="/profile/cart"
+              label="Keranjang Belanja (My Cart)"
+              icon={<ShoppingCart className="h-5 w-5" />}
+            />
+            <MenuItem
+              href="/profile/orders"
+              label="Pesanan Saya (My Orders)"
+              icon={<Package className="h-5 w-5" />}
+            />
+            <MenuItem
+              href="/profile/settings"
+              label="Pengaturan Akun (Settings)"
+              icon={<Settings className="h-5 w-5" />}
+            />
+            <li>
+              <LogoutButton className="flex w-full items-center gap-3 px-5 py-4 text-sm font-semibold text-fg-secondary hover:bg-accent-subtle transition">
+                <span className="flex-shrink-0 text-fg-muted">
+                  <LogOut className="h-5 w-5" />
+                </span>
+                <span>Keluar (Logout)</span>
+              </LogoutButton>
+            </li>
+          </ul>
+        </Card>
       </Container>
     </Section>
   );
@@ -71,11 +77,12 @@ function MenuItem({
     <li>
       <Link
         href={href}
-        className="flex items-center gap-3 px-4 py-3 text-fg-default hover:bg-accent-subtle"
+        className="flex items-center gap-3 px-5 py-4 text-sm font-semibold text-fg-default hover:bg-accent-subtle transition"
       >
         <span className="flex-shrink-0 text-fg-muted">{icon}</span>
-        <span className="text-sm">{label}</span>
+        <span>{label}</span>
       </Link>
     </li>
   );
 }
+

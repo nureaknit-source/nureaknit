@@ -13,23 +13,23 @@ import type { Media, Pattern, Product } from "@/lib/payload/payload-types";
 
 const valueItems = [
   {
-    title: "Diperhatikan dengan Cinta",
-    copy: "Setiap pola diuji keulekan, ditulis jelas, untuk pemula hingga yang berpengalaman.",
+    title: "Crafted with Love",
+    copy: "Setiap pola dirancang teliti dan telah diuji coba — mudah dipahami dari pemula hingga yang berpengalaman.",
     icon: HeartHandshake,
   },
   {
-    title: "Ramah untuk Pemula",
-    copy: "Panduan bertahap dari dasar dengan ilustrasi jelas — tak pernah bingung.",
+    title: "Beginner-Friendly",
+    copy: "Panduan bertahap (step-by-step) dengan instruksi jelas — anti bingung saat mulai merajut project pertamamu.",
     icon: GraduationCap,
   },
   {
-    title: "Bahan Berkelanjutan",
-    copy: "Kami hanya merekomendasikan benang dan bahan ramah lingkungan serta tahan lama.",
+    title: "Quality & Sustainable",
+    copy: "Rekomendasi benang dan alat pilihan yang awet, ramah lingkungan, dan nyaman di tangan.",
     icon: Leaf,
   },
   {
-    title: "Komunitas Maker",
-    copy: "Bergabung dengan ratusan maker — berbagi inspirasi, tips, dan dukungan.",
+    title: "Maker Community",
+    copy: "Ruang berbagi karya, tips, dan saling menyemangati bersama sesama pecinta rajut.",
     icon: Users,
   },
 ];
@@ -46,26 +46,25 @@ export default async function HomePage() {
     <>
       <section className="relative overflow-hidden bg-bg-surface" style={{ backgroundImage: "url('/hero-pattern.svg')", backgroundRepeat: "repeat", backgroundAttachment: "fixed" }}>
         <Container>
-          <div className="flex flex-col items-center gap-8 py-16 sm:gap-10 md:gap-12 sm:py-24 lg:flex-row lg:min-h-screen lg:justify-center lg:py-0">
-            <div className="flex-1">
+          <div className="flex flex-col items-center gap-0 py-10 sm:gap-10 md:gap-12 sm:py-24 lg:flex-row min-h-screen lg:justify-center lg:py-0">
+            <div className="mt-6 lg:mt-0 lg:order-2 lg:flex-1">
               <div className="mx-auto max-w-xs lg:max-w-lg lg:mx-0 animate-float">
                 <img
                   src="/heart-knite.svg"
                   alt="Flower Knit illustration"
-                  className="h-auto w-[68vw] max-w-xs max-h-[55vh] object-contain sm:w-[62vw] sm:max-w-sm md:w-[52vw] lg:w-auto lg:max-w-lg lg:max-h-none"
+                  className="h-auto w-[55vw] max-w-xs max-h-[55vh] object-contain sm:w-[62vw] sm:max-w-sm md:w-[52vw] lg:w-auto lg:max-w-lg lg:max-h-none"
                 />
               </div>
             </div>
             <div className="flex-1 text-center lg:text-left">
-              <span className="inline-block animate-fade-in-up rounded-full bg-accent-subtle px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-accent">
+              <span className="inline-block animate-fade-in-up rounded-full bg-accent-subtle px-4 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-accent">
                 Handcrafted with Love
               </span>
-              <h1 className="animate-fade-in-up-d1 mt-6 font-display text-4xl text-fg-default sm:text-6xl lg:text-7xl">
+              <h1 className="animate-fade-in-up-d1 mt-6 font-display text-4xl sm:text-6xl lg:text-7xl text-fg-default leading-[1.15]">
                 Nurea Knit
               </h1>
-              <p className="animate-fade-in-up-d2 mt-4 max-w-lg text-lg leading-relaxed text-fg-secondary">
-                Knitting &amp; Crochet patterns, tutorials, and inspiration
-                crafted with love. Discover your next project.
+              <p className="animate-fade-in-up-d2 mt-4 max-w-lg text-base sm:text-lg md:text-xl leading-relaxed text-fg-secondary">
+                Koleksi pola rajut &amp; crochet estetik, panduan praktis, dan inspirasi hangat untuk setiap kreasimu. <em>Let&apos;s make something beautiful today!</em>
               </p>
               <div className="animate-fade-in-up-d3 mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
                 <Link
@@ -95,14 +94,14 @@ export default async function HomePage() {
               <div className="flex items-end justify-between">
                 <div>
                   <Heading as="h2">Featured Patterns</Heading>
-                  <Text className="mt-2">Handpicked projects to inspire your next make.</Text>
+                  <Text className="mt-2">Pilihan pola favorit untuk temani waktu luang dan eksplorasi kreasimu.</Text>
                 </div>
                 <Link
                   href="/patterns"
                   transitionTypes={['page']}
                   className="hidden text-sm font-bold text-accent transition hover:text-primary sm:inline"
                 >
-                  View All &rarr;
+                  Lihat Semua Pola &rarr;
                 </Link>
               </div>
             </AnimateInView>
@@ -123,13 +122,13 @@ export default async function HomePage() {
                             />
                           </div>
                         )}
-                        <div className="flex flex-wrap gap-2 mb-2">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
                           {pattern.difficulty && (
                             <Badge variant="primary">{difficultyLabel(pattern.difficulty)}</Badge>
                           )}
                           {pattern.featured && <Badge variant="accent">Featured</Badge>}
                         </div>
-                        <h3 className="font-sans text-lg font-bold text-fg-default">
+                        <h3 className="font-sans text-base sm:text-lg font-bold text-fg-default line-clamp-2">
                           {pattern.title}
                         </h3>
                         {pattern.description && (
@@ -149,7 +148,7 @@ export default async function HomePage() {
                 transitionTypes={['page']}
                 className="text-sm font-bold text-accent transition hover:text-primary"
               >
-                View All Patterns &rarr;
+                Lihat Semua Pola &rarr;
               </Link>
             </div>
           </Container>
@@ -162,15 +161,15 @@ export default async function HomePage() {
             <AnimateInView>
               <div className="flex items-end justify-between">
                 <div>
-                  <Heading as="h2">Shop Preview</Heading>
-                  <Text className="mt-2">Tools, accessories, and goodies for your craft.</Text>
+                  <Heading as="h2">Shop Collection</Heading>
+                  <Text className="mt-2">Produk berkualitas, alat rajut, dan perlengkapan esensial untuk craft terbaikmu.</Text>
                 </div>
                 <Link
                   href="/products"
                   transitionTypes={['page']}
                   className="hidden text-sm font-bold text-accent transition hover:text-primary sm:inline"
                 >
-                  View All &rarr;
+                  Lihat Semua Produk &rarr;
                 </Link>
               </div>
             </AnimateInView>
@@ -187,7 +186,7 @@ export default async function HomePage() {
                 transitionTypes={['page']}
                 className="text-sm font-bold text-accent transition hover:text-primary"
               >
-                View All Products &rarr;
+                Lihat Semua Produk &rarr;
               </Link>
             </div>
           </Container>
@@ -223,11 +222,10 @@ export default async function HomePage() {
           <AnimateInView>
             <div className="rounded-2xl bg-bg-surface p-6 text-center sm:p-12">
               <Heading as="h2" display className="text-3xl sm:text-4xl">
-                Let&apos;s Create Together
+                Let&apos;s Create Something Together!
               </Heading>
               <Text className="mt-4 max-w-md mx-auto">
-                Every stitch tells a story. Whether you&apos;re a beginner or a seasoned maker,
-                there&apos;s always something new to learn and create.
+                Setiap helai benang punya cerita. Mau baru pertama kali belajar memegang hakpen atau sudah mahir membuat berbagai project, selalu ada kreasi seru yang siap dieksplorasi bersama.
               </Text>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
                 <Link
@@ -235,14 +233,14 @@ export default async function HomePage() {
                   transitionTypes={['page']}
                   className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-fg transition hover:opacity-90 active:scale-95"
                 >
-                  About Me
+                  Tentang Kami (About Us)
                 </Link>
                 <Link
                   href="/blog"
                   transitionTypes={['page']}
                   className="rounded-full border-2 border-border px-6 py-3 text-sm font-bold text-fg-default transition hover:border-accent hover:text-accent active:scale-95"
                 >
-                  Read the Blog
+                  Baca Blog &amp; Tutorial
                 </Link>
               </div>
             </div>

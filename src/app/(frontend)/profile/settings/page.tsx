@@ -110,12 +110,12 @@ export default function SettingsPage() {
           Account Settings
         </Heading>
         <Text className="mb-8 text-fg-muted">
-          Kelola nama akun Anda. Email tidak dapat diubah dari sini.
+          Kelola profil dan keamanan akunmu dengan mudah.
         </Text>
 
         <form onSubmit={handleNameUpdate} className="mb-12 space-y-4">
           <Input
-            label="Nama"
+            label="Nama Lengkap"
             id="name"
             type="text"
             value={name}
@@ -128,47 +128,13 @@ export default function SettingsPage() {
         </form>
 
         <div className="mb-4">
-          <Text className="text-sm font-medium text-fg-default">Email</Text>
+          <Text className="text-sm font-medium text-fg-default">Email Akun</Text>
           <Text className="mt-1 text-sm text-fg-muted">{email || "—"}</Text>
           <Text className="mt-1 text-xs text-fg-muted">
-            Email cannot be changed from the profile. Contact support if needed.
+            Email terhubung dengan akun loginmu dan tidak dapat diubah dari sini. Hubungi kami jika butuh bantuan.
           </Text>
         </div>
 
-        <form
-          onSubmit={handlePasswordUpdate}
-          className="border-t border-border pt-6 space-y-4"
-        >
-          <Input
-            label="Current Password"
-            id="current-password"
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            required
-          />
-          <Input
-            label="New Password"
-            id="new-password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Minimal 6 karakter"
-            minLength={6}
-            required
-          />
-          <Input
-            label="Confirm New Password"
-            id="confirm-password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" variant="primary" disabled={savingPassword}>
-            {savingPassword ? "Menyimpan..." : "Change Password"}
-          </Button>
-        </form>
       </Container>
     </Section>
   );

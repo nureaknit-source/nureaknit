@@ -82,7 +82,7 @@ export function verifyMidtransSignature(serverKey: string, body: MidtransNotific
 
   const expected = crypto
     .createHash("sha512")
-    .update(serverKey + order_id + status_code + gross_amount)
+    .update(order_id + status_code + gross_amount + serverKey)
     .digest("hex");
 
   const a = Buffer.from(expected, "hex");

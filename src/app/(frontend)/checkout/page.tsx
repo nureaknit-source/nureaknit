@@ -4,6 +4,7 @@ import { getCartAction } from "@/actions/cart";
 import { getProfileAction } from "@/actions/profile";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
+import { Heading, Text } from "@/components/ui/typography";
 import { CheckoutForm } from "./checkout-form";
 import { formatPrice } from "@/lib/payload/utils";
 
@@ -46,10 +47,10 @@ export default async function CheckoutPage({
   return (
     <Section>
       <Container size="sm">
-        <h1 className="font-sans text-3xl font-extrabold text-fg-default">Checkout</h1>
-        <p className="mt-2 text-sm text-fg-muted">
-          Lengkapi informasi pengiriman sebelum melanjutkan ke pembayaran.
-        </p>
+        <Heading as="h1">Checkout</Heading>
+        <Text className="mt-2">
+          Tinggal selangkah lagi! Lengkapi detail kontak dan alamat pengirimanmu dengan benar ya.
+        </Text>
 
         <div className="mt-6 divide-y divide-border rounded-lg border border-border">
           {lines.map((l, i) => (

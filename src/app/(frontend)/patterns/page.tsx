@@ -40,7 +40,7 @@ export default async function PatternsPage({
     <Section>
       <Container>
         <Heading as="h1">Pattern Library</Heading>
-        <Text className="mt-2">Discover your next project.</Text>
+        <Text className="mt-2">Koleksi pola rajut &amp; crochet lengkap untuk berbagai level keahlian. <em>Find your next inspiring project!</em></Text>
 
         {categories.length > 0 && (
           <div className="mt-8 flex flex-wrap gap-2">
@@ -53,7 +53,7 @@ export default async function PatternsPage({
                   : "bg-accent-subtle text-fg-secondary hover:bg-primary-subtle"
               }`}
             >
-              All
+              Semua Pola
             </Link>
             {categories.map((cat) => (
               <Link
@@ -74,7 +74,7 @@ export default async function PatternsPage({
 
         {patterns.length === 0 ? (
           <div className="mt-12">
-            <AnimateInView><EmptyState title="Belum ada pattern" message="Pattern akan segera hadir. Pantau terus!" /></AnimateInView>
+            <AnimateInView><EmptyState title="Pola Baru Segera Hadir" message="Kami sedang menyiapkan koleksi pola terbaru yang menarik. Pantau terus ya!" /></AnimateInView>
           </div>
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

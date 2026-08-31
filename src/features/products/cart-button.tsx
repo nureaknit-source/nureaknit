@@ -6,7 +6,7 @@ import { useCartStore } from "@/stores/cart-store";
 import { showToast } from "@/components/ui/toast";
 import { ShoppingCart, Check } from "lucide-react";
 
-interface Props {
+export interface CartButtonProps {
   productId: number;
   isLoggedIn: boolean;
   inCart?: boolean;
@@ -18,9 +18,9 @@ export function CartButton({
   isLoggedIn,
   inCart = false,
   className = "",
-}: Props) {
+}: CartButtonProps) {
   const [added, setAdded] = useState(inCart);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [pop, setPop] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -34,6 +34,7 @@ export function CartButton({
       return;
     }
 
+    setLoading(true);
     // ponytail: optimistic — badge + button state langsung update
     useCartStore.getState().increment(1, 0);
     setAdded(true);
@@ -54,6 +55,8 @@ export function CartButton({
       useCartStore.getState().decrement(1, 0);
       setAdded(false);
       clearTimeout(timeoutRef.current);
+    } finally {
+      setLoading(false);
     }
   }, [added, productId, isLoggedIn]);
 
@@ -63,7 +66,7 @@ export function CartButton({
         type="button"
         onClick={handleAdd}
         className={
-          "inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-success-subtle px-4 py-2.5 text-sm font-bold text-success-fg transition hover:opacity-90 " +
+          "inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-success-subtle px-4 py-2.5 text-sm font-bold text-success border border-success/30 transition hover:opacity-90 active:scale-95 " +
           (pop ? "animate-cart-pop " : "") +
           className
         }
@@ -88,7 +91,8 @@ export function CartButton({
       title="Add to cart"
     >
       <ShoppingCart className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-      <span>Add to Cart</span>
+      <span>{loading ? "Menambahkan..." : "Add to Cart"}</span>
     </button>
   );
 }
+

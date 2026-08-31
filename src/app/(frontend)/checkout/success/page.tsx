@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
+import { Heading, Text } from "@/components/ui/typography";
 import { QrDisplay } from "@/components/checkout/qr-display";
 import { CheckStatus } from "@/components/checkout/check-status";
 import { getOrderAction } from "@/actions/checkout";
@@ -28,11 +29,10 @@ export default async function CheckoutSuccessPage({
   return (
     <Section>
       <Container size="sm">
-        <h1 className="font-sans text-3xl font-extrabold text-fg-default">Order Dibuat</h1>
-        <p className="mt-2 text-sm text-fg-muted">
-          Order berhasil dibuat. Selesaikan pembayaran di bawah ini. Halaman ini akan otomatis
-          memperbarui status saat Midtrans konfirmasi.
-        </p>
+        <Heading as="h1">Pesanan Berhasil Dibuat!</Heading>
+        <Text className="mt-2">
+          Selesaikan pembayaran dengan scan kode QRIS di bawah ini. Halaman ini akan otomatis memperbarui status begitu pembayaran terverifikasi.
+        </Text>
 
         <div className="mt-8 space-y-4">
           {ref && qr ? <QrDisplay reference={ref} qr={qr} expiresAt={expiresAt} /> : null}
@@ -40,10 +40,10 @@ export default async function CheckoutSuccessPage({
           {pre && !ref ? (
             <div className="rounded-lg border border-accent/20 bg-accent-subtle p-5">
               <p className="font-sans font-bold text-fg-default">
-                Order Pre-Order <span className="text-accent">{pre}</span>
+                Pesanan Pre-Order <span className="text-accent">{pre}</span>
               </p>
               <p className="mt-1 text-sm text-fg-muted">
-                Kirim konfirmasi via WhatsApp — tombol bayar aktif setelah admin menyetujui.
+                Konfirmasi pesananmu via WhatsApp — tombol pembayaran akan aktif segera setelah admin menyetujui pesanan.
               </p>
               <a
                 href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_ADMIN_NUMBER}?text=${encodeURIComponent(
@@ -59,7 +59,7 @@ export default async function CheckoutSuccessPage({
           ) : null}
 
           {!ref && !pre ? (
-            <p className="text-sm text-fg-muted">Tidak ada order dalam parameter. Cek halaman order kamu.</p>
+            <p className="text-sm text-fg-muted">Tidak ada detail pesanan dalam parameter. Silakan cek halaman pesanan kamu.</p>
           ) : null}
         </div>
 
@@ -71,7 +71,7 @@ export default async function CheckoutSuccessPage({
 
         <div className="mt-8 flex gap-3">
           <Link href="/profile/orders" className="text-sm text-primary hover:underline">
-            Lihat Semua Order
+            Lihat Semua Pesanan
           </Link>
           <Link href="/products" className="text-sm text-primary hover:underline">
             Lanjut Belanja

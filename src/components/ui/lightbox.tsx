@@ -1,20 +1,29 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
-interface LightboxImage {
+export interface LightboxImage {
   url: string;
   alt: string;
 }
 
-interface Props {
+export interface LightboxProps {
   images: LightboxImage[];
   initialIndex: number;
   onClose: () => void;
 }
 
-export default function Lightbox({ images, initialIndex, onClose }: Props) {
+const emptySubscribe = () => () => {};
+
+export default function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -35,56 +44,55 @@ export default function Lightbox({ images, initialIndex, onClose }: Props) {
   }, [handleKeyDown]);
 
   const current = images[currentIndex];
-  if (!current) return null;
+  if (!current || !isClient) return null;
 
-  return (
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
+      className="fixed inset-0 z-70 flex items-center justify-center bg-overlay/80 backdrop-blur-sm"
       onClick={onClose}
     >
+
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 text-fg-inverse transition hover:text-fg-muted"
+        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-bg-surface/20 text-fg-inverse backdrop-blur-md transition hover:bg-bg-surface/40 hover:text-fg-default active:scale-95"
         aria-label="Close"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-8">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X className="h-6 w-6" />
       </button>
 
       <div className="flex items-center gap-4 px-4" onClick={(e) => e.stopPropagation()}>
         {currentIndex > 0 && (
           <button
             onClick={() => setCurrentIndex(currentIndex - 1)}
-            className="text-fg-inverse transition hover:text-fg-muted"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-surface/20 text-fg-inverse backdrop-blur-md transition hover:bg-bg-surface/40 hover:text-fg-default active:scale-95"
             aria-label="Previous"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
+            <ChevronLeft className="h-6 w-6" />
           </button>
         )}
         <img
           src={current.url}
           alt={current.alt}
-          className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+          className="max-h-[85vh] max-w-[85vw] rounded-2xl object-contain shadow-2xl"
         />
         {currentIndex < images.length - 1 && (
           <button
             onClick={() => setCurrentIndex(currentIndex + 1)}
-            className="text-fg-inverse transition hover:text-fg-muted"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-surface/20 text-fg-inverse backdrop-blur-md transition hover:bg-bg-surface/40 hover:text-fg-default active:scale-95"
             aria-label="Next"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
+            <ChevronRight className="h-6 w-6" />
           </button>
         )}
       </div>
 
-      <div className="absolute bottom-4 text-sm text-fg-muted">
+      <div className="absolute bottom-6 rounded-full bg-bg-surface/20 px-3 py-1 text-xs font-semibold text-fg-inverse backdrop-blur-md">
         {currentIndex + 1} / {images.length}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
+
+

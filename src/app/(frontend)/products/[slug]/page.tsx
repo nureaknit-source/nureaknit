@@ -6,8 +6,7 @@ import { Heading, Caption } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { RichText } from "@/components/shared/rich-text";
-import { AddToCartForm } from "@/features/products/add-to-cart-form";
-import { OrderNowForm } from "@/features/products/order-now-form";
+import { ProductActions } from "@/features/products/product-actions";
 import { ProductGallery } from "@/features/products/product-gallery";
 import { getBySlug } from "@/lib/payload/client";
 import { formatPrice, availabilityLabel } from "@/lib/payload/utils";
@@ -40,7 +39,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const availability = product.availability || "in_stock";
-  const showOrderButton = availability !== "unavailable";
+
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -48,7 +47,7 @@ export default async function ProductDetailPage({
   const isLoggedIn = !!user;
 
   return (
-    <Section>
+    <Section className="pt-8 sm:pt-12">
       <Container size="lg">
         <Breadcrumbs
           crumbs={[
@@ -59,7 +58,7 @@ export default async function ProductDetailPage({
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start">
           {/* Gallery */}
-          <div className="lg:pb-4">
+          <div className="pb-4">
             <ProductGallery
               images={product.images}
               title={product.title}
@@ -76,7 +75,7 @@ export default async function ProductDetailPage({
               </Heading>
             </div>
 
-            <p className="mt-4 text-2xl font-bold text-primary">
+            <p className="mt-4 text-xl sm:text-2xl md:text-3xl font-bold text-primary">
               {formatPrice(product.price)}
             </p>
 
@@ -105,8 +104,7 @@ export default async function ProductDetailPage({
 
             {product.availability === "pre_order" && (
               <div className="mt-4 rounded-lg border border-accent-subtle bg-accent-subtle/40 p-3 text-sm text-fg-secondary">
-                Pre-order memerlukan konfirmasi admin — slot Anda dikunci setelah
-                pesanan disetujui, lalu Anda menyelesaikan pembayaran.
+                Pesanan pre-order memerlukan konfirmasi admin — slot pengerjaanmu akan langsung dikunci setelah pesanan disetujui, lalu kamu bisa menyelesaikan pembayaran dengan nyaman.
                 {product.estimatedAvailability &&
                   ` Perkiraan tersedia: ${product.estimatedAvailability}.`}
               </div>
@@ -116,30 +114,16 @@ export default async function ProductDetailPage({
               product.lowStockThreshold != null &&
               (product.stock ?? 0) - (product.reservedStock ?? 0) <= product.lowStockThreshold && (
                 <div className="mt-4 rounded-lg border border-error/20 bg-error-subtle p-3 text-sm text-error">
-                  Stok menipis ({Math.max(0, (product.stock ?? 0) - (product.reservedStock ?? 0))} tersisa) — pesan segera.
+                  Stok menipis (sisa {Math.max(0, (product.stock ?? 0) - (product.reservedStock ?? 0))}) — pesan sekarang sebelum kehabisan!
                 </div>
               )}
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              {showOrderButton ? (
-                <OrderNowForm
-                  productId={product.id}
-                  isLoggedIn={isLoggedIn}
-                  maxStock={product.stock}
-                  availability={product.availability || undefined}
-                />
-              ) : (
-                <span className="inline-flex flex-1 items-center justify-center rounded-full bg-error-subtle px-6 py-3 text-sm font-bold text-error-fg lg:flex-none">
-                  Stok Habis
-                </span>
-              )}
-              <AddToCartForm
-                productId={product.id}
-                isLoggedIn={isLoggedIn}
-                maxStock={product.stock}
-                availability={product.availability || undefined}
-              />
-            </div>
+            <ProductActions
+              productId={product.id}
+              isLoggedIn={isLoggedIn}
+              maxStock={product.stock}
+              availability={product.availability || undefined}
+            />
 
             {product.linkedProducts &&
               product.linkedProducts.length > 0 && (
@@ -169,21 +153,25 @@ export default async function ProductDetailPage({
                   )}
                 </div>
               )}
-
-            {product.description && (
-              <div className="mt-6">
-                <RichText data={product.description} />
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Deskripsi di bawah */}
+        {product.description && (
+          <div className="mt-12">
+            <Heading as="h2" className="mb-4">
+              Detail &amp; Deskripsi Produk
+            </Heading>
+            <RichText data={product.description} />
+          </div>
+        )}
 
         <div className="mt-12">
           <Link
             href="/products"
             className="text-sm text-primary underline transition hover:text-accent"
           >
-            &larr; Back to Shop
+            &larr; Kembali ke Shop
           </Link>
         </div>
       </Container>

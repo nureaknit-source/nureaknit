@@ -2,7 +2,7 @@ import { getDownloadsAction } from "@/actions/download";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
-import { Text } from "@/components/ui/typography";
+import { Heading, Text } from "@/components/ui/typography";
 import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function DownloadsPage() {
@@ -17,18 +17,18 @@ export default async function DownloadsPage() {
         >
           ← Kembali ke Profil
         </Link>
-        <h1 className="font-sans text-3xl font-extrabold text-fg-default">
+        <Heading as="h1">
           My Downloads
-        </h1>
+        </Heading>
         <Text className="mt-2 text-fg-muted">
-          Patterns you&apos;ve downloaded.
+          Daftar pola digital yang sudah kamu unduh. Akses dan pelajari kembali kapan saja!
         </Text>
 
         {downloads.length === 0 ? (
           <div className="mt-12">
             <EmptyState
-              title="Belum ada unduhan"
-              message="Download pattern PDF untuk melihat riwayat di sini."
+              title="Belum Ada Unduhan"
+              message="Kamu belum mengunduh pola apa pun. Yuk jelajahi koleksi pola rajut kami!"
             />
           </div>
         ) : (
@@ -43,7 +43,7 @@ export default async function DownloadsPage() {
                   {d.title}
                 </h3>
                 <Text size="sm" className="mt-1 text-fg-muted">
-                  Downloaded{" "}
+                  Diunduh pada{" "}
                   {new Date(d.downloadedAt).toLocaleDateString("id-ID", {
                     year: "numeric",
                     month: "long",

@@ -5,7 +5,7 @@ import { verifyMidtransSignature } from "@/lib/payments/midtrans";
 const serverKey = "SB-Mid-server-test-123";
 
 function sign(serverKey: string, orderId: string, statusCode: string, gross: string): string {
-  return crypto.createHash("sha512").update(serverKey + orderId + statusCode + gross).digest("hex");
+  return crypto.createHash("sha512").update(orderId + statusCode + gross + serverKey).digest("hex");
 }
 
 describe("verifyMidtransSignature", () => {

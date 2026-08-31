@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { startCheckoutAction } from "@/actions/checkout";
 import { showToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
+import { Input, Textarea } from "@/components/ui/input";
 
-interface Props {
+export interface CheckoutFormProps {
   defaultName?: string;
   productId?: number;
   qty?: number;
 }
 
-export function CheckoutForm({ defaultName = "", productId, qty = 1 }: Props) {
+export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(defaultName);
@@ -23,14 +24,18 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: Props) {
 
   const submit = async () => {
     if (loading) return;
-    if (!phone.trim() || !address.trim()) return showToast("No. telepon dan alamat wajib diisi.", "error");
-    if (!tos) return showToast("Anda harus menyetujui syarat & ketentuan.", "error");
+    if (!phone.trim() || !address.trim()) {
+      return showToast("Nomor telepon dan alamat pengiriman wajib diisi ya.", "error");
+    }
+    if (!tos) {
+      return showToast("Mohon setujui syarat & ketentuan sebelum melanjutkan.", "error");
+    }
 
     setLoading(true);
     try {
       const result = await startCheckoutAction({ productId, qty, phone, address, notes, tosAccepted: tos });
       if (!result.ok) {
-        showToast(result.error || "Checkout gagal, coba lagi.", "error");
+        showToast(result.error || "Checkout gagal, silakan coba lagi.", "error");
         return;
       }
       if (result.inStock) {
@@ -41,55 +46,73 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: Props) {
         router.push(`/checkout/success?pre=${encodeURIComponent(result.preOrder.reference)}`);
       }
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Checkout gagal, coba lagi.", "error");
+      showToast(err instanceof Error ? err.message : "Checkout gagal, silakan coba lagi.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const inputClass =
-    "w-full rounded-lg border border-border bg-transparent px-4 py-2.5 text-sm text-fg-default focus:outline-none focus:ring-2 focus:ring-accent/40";
-
   return (
     <div className="mt-8 space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-bold text-fg-default" htmlFor="co-name">
-          Nama Penerima
-        </label>
-        <input id="co-name" className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama lengkap" />
-      </div>
+      <Input
+        id="co-name"
+        label="Nama Penerima"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Nama lengkap penerima"
+      />
 
-      <div>
-        <label className="mb-1 block text-sm font-bold text-fg-default" htmlFor="co-phone">
-          No. Telepon / WhatsApp *
-        </label>
-        <input id="co-phone" className={inputClass} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="08xxxxxxxxxx" required />
-      </div>
+      <Input
+        id="co-phone"
+        label="No. Telepon / WhatsApp *"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        placeholder="08xxxxxxxxxx"
+        required
+      />
 
-      <div>
-        <label className="mb-1 block text-sm font-bold text-fg-default" htmlFor="co-address">
-          Alamat Pengiriman *
-        </label>
-        <textarea id="co-address" className={inputClass} rows={3} value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Alamat lengkap" required />
-      </div>
+      <Textarea
+        id="co-address"
+        label="Alamat Pengiriman Lengkap *"
+        rows={3}
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        placeholder="Alamat lengkap (nama jalan, nomor rumah, kecamatan, kota, kode pos)"
+        required
+      />
 
-      <div>
-        <label className="mb-1 block text-sm font-bold text-fg-default" htmlFor="co-notes">
-          Catatan (opsional)
-        </label>
-        <textarea id="co-notes" className={inputClass} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Warna, ukuran, dll" />
-      </div>
+      <Textarea
+        id="co-notes"
+        label="Catatan Pesanan (opsional)"
+        rows={2}
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Warna benang, ukuran, atau instruksi khusus..."
+      />
 
-      <label className="flex items-start gap-2 text-sm text-fg-secondary">
-        <input type="checkbox" checked={tos} onChange={(e) => setTos(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" required />
-        <span>
-          Saya menyetujui syarat &amp; ketentuan: pesanan akan diproses setelah pembayaran diverifikasi Midtrans.
+      <label className="flex items-start gap-2.5 text-sm text-fg-secondary cursor-pointer pt-1">
+        <input
+          type="checkbox"
+          checked={tos}
+          onChange={(e) => setTos(e.target.checked)}
+          className="mt-1 h-4 w-4 rounded accent-primary text-primary focus:ring-primary-subtle"
+          required
+        />
+        <span className="leading-snug">
+          Saya menyetujui syarat &amp; ketentuan: pesanan akan segera diproses setelah pembayaran terverifikasi otomatis.
         </span>
       </label>
 
-      <Button type="button" onClick={submit} disabled={loading} className="w-full">
-        {loading ? "Memproses..." : "Lanjutkan ke Pembayaran"}
+      <Button
+        type="button"
+        size="lg"
+        onClick={submit}
+        isLoading={loading}
+        className="w-full mt-4"
+      >
+        Lanjutkan ke Pembayaran
       </Button>
     </div>
   );
 }
+

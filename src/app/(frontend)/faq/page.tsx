@@ -8,7 +8,7 @@ import type { Faq } from "@/lib/payload/payload-types";
 
 export const metadata = {
   title: "FAQ — Nurea Knit",
-  description: "Pertanyaan yang sering diajukan.",
+  description: "Pertanyaan yang sering diajukan seputar pola, pesanan, dan layanan Nurea Knit.",
 };
 
 export default async function FAQPage() {
@@ -17,14 +17,17 @@ export default async function FAQPage() {
   return (
     <Section>
       <Container size="sm">
-        <Heading as="h1">FAQ</Heading>
+        <Heading as="h1">Frequently Asked Questions</Heading>
         <Text className="mt-2">
-          Pertanyaan yang sering diajukan.
+          Jawaban praktis dan ringkas seputar pola digital, panduan pemesanan, pengiriman, dan layanan kami.
         </Text>
 
         {items.length === 0 ? (
           <div className="mt-12">
-            <EmptyState title="Belum ada FAQ" />
+            <EmptyState
+              title="Belum Ada FAQ"
+              message="Daftar tanya jawab sedang kami siapkan. Silakan hubungi kami jika ada yang ingin ditanyakan!"
+            />
           </div>
         ) : (
           <div className="mt-8 space-y-3">

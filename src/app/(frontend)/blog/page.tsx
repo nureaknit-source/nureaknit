@@ -21,12 +21,12 @@ export default async function BlogPage() {
   return (
     <Section>
       <Container>
-        <Heading as="h1">Blog</Heading>
-        <Text className="mt-2">Tutorials, tips, and inspiration.</Text>
+        <Heading as="h1">The Knit Journal &amp; Blog</Heading>
+        <Text className="mt-2">Kumpulan tutorial rajut, tips memilih benang, dan inspirasi kreatif untuk menemani harimu.</Text>
 
         {posts.length === 0 ? (
           <div className="mt-12">
-            <AnimateInView><EmptyState title="Belum ada artikel" message="Blog akan segera hadir!" /></AnimateInView>
+            <AnimateInView><EmptyState title="Artikel Segera Hadir" message="Tulisan dan tutorial seru sedang kami siapkan. Jangan lewatkan ya!" /></AnimateInView>
           </div>
         ) : (
           <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

@@ -4,7 +4,12 @@ import { useEffect } from "react";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/payload/utils";
 
-export function CartTotal({ initialTotal }: { initialTotal: number }) {
+export interface CartTotalProps {
+  initialTotal: number;
+  className?: string;
+}
+
+export function CartTotal({ initialTotal, className = "" }: CartTotalProps) {
   const total = useCartStore((s) => s.total);
   const setTotal = useCartStore((s) => s.setTotal);
 
@@ -13,8 +18,9 @@ export function CartTotal({ initialTotal }: { initialTotal: number }) {
   }, [initialTotal, setTotal]);
 
   return (
-    <span className="text-2xl font-extrabold text-fg-default">
+    <span className={`text-xl sm:text-2xl font-extrabold text-primary ${className}`}>
       {formatPrice(total)}
     </span>
   );
 }
+

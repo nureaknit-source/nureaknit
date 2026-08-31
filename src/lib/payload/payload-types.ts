@@ -84,6 +84,7 @@ export interface Config {
     'order-items': OrderItem;
     'payment-attempts': PaymentAttempt;
     'fulfillment-groups': FulfillmentGroup;
+    reviews: Review;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -108,6 +109,7 @@ export interface Config {
     'order-items': OrderItemsSelect<false> | OrderItemsSelect<true>;
     'payment-attempts': PaymentAttemptsSelect<false> | PaymentAttemptsSelect<true>;
     'fulfillment-groups': FulfillmentGroupsSelect<false> | FulfillmentGroupsSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -578,6 +580,41 @@ export interface FulfillmentGroup {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  /**
+   * Product ID
+   */
+  product: number;
+  /**
+   * Supabase User ID
+   */
+  userId: string;
+  /**
+   * Email user pembuat ulasan
+   */
+  userEmail: string;
+  /**
+   * Nama display user (opsional)
+   */
+  userName?: string | null;
+  /**
+   * Order ID used to verify purchase
+   */
+  order: number;
+  /**
+   * Rating from 1 to 5 stars
+   */
+  rating: number;
+  comment: string;
+  status: 'pending' | 'approved' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -667,6 +704,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'fulfillment-groups';
         value: number | FulfillmentGroup;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1021,6 +1062,22 @@ export interface FulfillmentGroupsSelect<T extends boolean = true> {
   estimate?: T;
   trackingNumber?: T;
   items?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  product?: T;
+  userId?: T;
+  userEmail?: T;
+  userName?: T;
+  order?: T;
+  rating?: T;
+  comment?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

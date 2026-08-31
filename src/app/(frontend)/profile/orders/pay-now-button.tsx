@@ -4,8 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { payNowAction } from "@/actions/checkout";
 import { showToast } from "@/components/ui/toast";
+import { Button } from "@/components/ui/button";
+import { CreditCard } from "lucide-react";
 
-export function PayNowButton({ orderId }: { orderId: number }) {
+export interface PayNowButtonProps {
+  orderId: number;
+}
+
+export function PayNowButton({ orderId }: PayNowButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -29,13 +35,14 @@ export function PayNowButton({ orderId }: { orderId: number }) {
   };
 
   return (
-    <button
+    <Button
       type="button"
       onClick={handlePayNow}
-      disabled={loading}
-      className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-fg hover:opacity-90 disabled:opacity-60"
+      isLoading={loading}
+      leftIcon={<CreditCard className="h-4 w-4" />}
+      className="mt-4"
     >
-      {loading ? "Memproses..." : "Pay Now"}
-    </button>
+      Bayar Sekarang (Pay Now)
+    </Button>
   );
 }

@@ -4,7 +4,7 @@ import { useActionState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
-import { Input } from "@/components/ui/input";
+import { Input, Textarea } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { submitCoachingAction } from "@/actions/coaching";
 import { showToast } from "@/components/ui/toast";
@@ -22,7 +22,7 @@ export default function CoachingPage() {
 
   useEffect(() => {
     if (state.success) {
-      showToast("Permintaan coaching berhasil terkirim!", "success");
+      showToast("Permintaan coaching berhasil terkirim! Kami akan segera menghubungimu.", "success");
     } else if (state.errors?.length) {
       const formError = state.errors.find((e) => e.field === "form");
       if (formError) showToast(formError.message, "error");
@@ -35,68 +35,47 @@ export default function CoachingPage() {
   return (
     <Section>
       <Container size="sm">
-        <Caption>Coaching</Caption>
+        <Caption>Private Coaching</Caption>
         <Heading as="h1" className="mt-2">
           One-on-One Coaching
         </Heading>
         <Text className="mt-2">
-          Tertarik untuk belajar menenun atau mengikat secara pribadi? Kirimkan
-          permintaan coaching offline dengan mengisi form di bawah.
+          Ingin belajar merajut (<em>knitting</em> atau <em>crochet</em>) secara lebih intensif dan terarah? Yuk, ikuti sesi <em>offline coaching</em> privat bersama kami. Cukup isi form di bawah untuk mendiskusikan jadwal dan teknik yang ingin kamu pelajari.
         </Text>
 
         <form action={formAction} className="mt-8 space-y-4">
-          <div>
-            <Input
-              id="name"
-              name="name"
-              label="Nama"
-              placeholder="Nama kamu"
-              required
-              aria-invalid={!!fieldError("name")}
-            />
-            {fieldError("name") && (
-              <p className="mt-1 text-xs text-error">{fieldError("name")}</p>
-            )}
-          </div>
-          <div>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="email@example.com"
-              required
-              aria-invalid={!!fieldError("email")}
-            />
-            {fieldError("email") && (
-              <p className="mt-1 text-xs text-error">{fieldError("email")}</p>
-            )}
-          </div>
-          <div>
-            <label
-              htmlFor="message"
-              className="mb-1 block text-sm font-medium text-fg-default"
-            >
-              Pesan
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows={5}
-              required
-              placeholder="Ceritakan kebutuhan coaching kamu..."
-              className="w-full rounded-lg border border-border bg-bg-surface-muted px-4 py-2 text-sm text-fg-default placeholder:text-fg-muted focus:border-primary focus:ring-2 focus:ring-primary-subtle"
-              aria-invalid={!!fieldError("message")}
-            />
-            {fieldError("message") && (
-              <p className="mt-1 text-xs text-error">{fieldError("message")}</p>
-            )}
-          </div>
-          <Button type="submit" disabled={pending}>
-            {pending ? "Mengirim..." : "Kirim Permintaan"}
+          <Input
+            id="name"
+            name="name"
+            label="Nama"
+            placeholder="Nama lengkap atau panggilanmu"
+            required
+            error={fieldError("name")}
+          />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="email@example.com"
+            required
+            error={fieldError("email")}
+          />
+          <Textarea
+            id="message"
+            name="message"
+            label="Pesan & Kebutuhan Belajar"
+            rows={5}
+            required
+            placeholder="Ceritakan project impianmu atau teknik rajut yang ingin kamu pelajari..."
+            error={fieldError("message")}
+          />
+          <Button type="submit" isLoading={pending}>
+            Kirim Permintaan Coaching
           </Button>
         </form>
       </Container>
     </Section>
   );
 }
+

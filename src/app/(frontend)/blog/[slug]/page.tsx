@@ -64,7 +64,7 @@ export default async function BlogPostPage({
         </div>
 
         {post.excerpt && (
-          <p className="mt-6 text-lg text-fg-secondary leading-relaxed">
+          <p className="mt-6 text-base sm:text-lg text-fg-secondary leading-relaxed">
             {post.excerpt}
           </p>
         )}
@@ -80,7 +80,7 @@ export default async function BlogPostPage({
             href="/blog"
             className="text-sm text-primary underline transition hover:text-accent"
           >
-            &larr; Back to Blog
+            &larr; Kembali ke Blog
           </Link>
         </div>
       </Container>

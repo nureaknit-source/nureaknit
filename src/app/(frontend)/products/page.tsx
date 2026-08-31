@@ -11,10 +11,10 @@ import { Search, Funnel } from "lucide-react";
 const ALLOWED_SORTS = ["-createdAt", "price", "-price", "title", "-title"];
 
 const sortOptions = [
-  { value: "-createdAt", label: "Newest" },
-  { value: "price", label: "Price: Low → High" },
-  { value: "-price", label: "Price: High → Low" },
-  { value: "title", label: "Name A–Z" },
+  { value: "-createdAt", label: "Terbaru (Newest)" },
+  { value: "price", label: "Harga: Rendah → Tinggi" },
+  { value: "-price", label: "Harga: Tinggi → Rendah" },
+  { value: "title", label: "Nama: A – Z" },
 ];
 
 function buildHref(
@@ -59,7 +59,7 @@ function SearchForm({
         type="search"
         name="q"
         defaultValue={q}
-        placeholder="Search yarn, needles, kits…"
+        placeholder="Cari benang, jarum, alat rajut, kits…"
         className="w-full rounded-full border border-border bg-bg-surface px-4 py-2.5 text-sm text-fg-secondary placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent-subtle"
       />
       <button
@@ -87,9 +87,6 @@ function FilterPills({
   const qsParams = { category, q, sort };
   return (
     <>
-      <p className="px-1 pb-2 text-xs font-bold uppercase text-fg-muted">
-        Sort by
-      </p>
       <div className="flex flex-wrap gap-2">
         {sortOptions.map((opt) => (
           <Link
@@ -106,7 +103,7 @@ function FilterPills({
         <>
           <div className="my-2 h-px bg-border" />
           <p className="px-1 pb-1 text-xs font-bold uppercase text-fg-muted">
-            Category
+            Kategori
           </p>
           <div className="flex flex-wrap gap-2">
             <Link
@@ -114,7 +111,7 @@ function FilterPills({
               transitionTypes={["page"]}
               className={!category ? pillActive : pillInactive}
             >
-              All
+              Semua
             </Link>
             {categories.map((cat) => (
               <Link
@@ -184,7 +181,7 @@ export default async function ProductsPage({
   const hasActiveFilters = q || category;
 
   return (
-    <Section spacing="sm">
+    <Section className="pt-4 pb-20 sm:pt-12 sm:pb-24">
       <Container>
         {/* Mobile toolbar: search + filter funnel (native <details>) */}
         <div className="mb-4 flex items-center gap-3 lg:hidden">
@@ -206,7 +203,7 @@ export default async function ProductsPage({
         </div>
 
         {/* Desktop: full-width search + inline filter pills */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block mb-10">
           <div className="mb-4">
             <SearchForm q={q} category={category} sort={sort} />
           </div>
@@ -216,14 +213,17 @@ export default async function ProductsPage({
         {products.length === 0 ? (
           <div className="mt-12 text-center">
             <AnimateInView>
-              <EmptyState title="No products yet" message="Produk akan segeri hadir!" />
+              <EmptyState
+                title="Produk Tidak Ditemukan"
+                message="Belum ada produk yang cocok dengan pencarian atau filter yang dipilih."
+              />
             </AnimateInView>
             {hasActiveFilters && (
               <Link
                 href="/products"
                 className="mt-4 inline-block text-sm font-bold text-primary hover:text-accent"
               >
-                Clear search &amp; filters
+                Reset pencarian &amp; filter
               </Link>
             )}
           </div>
@@ -264,7 +264,7 @@ export default async function ProductsPage({
                   p === "…" ? (
                     <span
                       key={`ellipsis-${i}`}
-                      className="flex min-w-[44px] min-h-[44px] items-center justify-center text-fg-muted"
+                      className="flex min-w-11 min-h-11 items-center justify-center text-fg-muted"
                     >
                       …
                     </span>

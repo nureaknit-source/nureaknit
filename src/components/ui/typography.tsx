@@ -8,10 +8,10 @@ interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
 }
 
 const headingStyles: Record<HeadingLevel, string> = {
-  h1: "text-4xl font-extrabold tracking-tight sm:text-5xl",
-  h2: "text-3xl font-extrabold sm:text-4xl",
-  h3: "text-2xl font-bold sm:text-3xl",
-  h4: "text-xl font-bold",
+  h1: "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight",
+  h2: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight",
+  h3: "text-lg sm:text-xl md:text-2xl font-bold tracking-normal",
+  h4: "text-base sm:text-lg md:text-xl font-bold",
 };
 
 export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
@@ -32,9 +32,9 @@ interface TextProps extends HTMLAttributes<HTMLParagraphElement> {
 }
 
 const textStyles = {
-  sm: "text-sm",
-  base: "text-base",
-  lg: "text-lg",
+  sm: "text-xs sm:text-sm",
+  base: "text-sm sm:text-base",
+  lg: "text-base sm:text-lg",
 };
 
 export const Text = forwardRef<HTMLParagraphElement, TextProps>(
@@ -60,7 +60,7 @@ export const Caption = forwardRef<HTMLSpanElement, CaptionProps>(
       ref={ref}
       className={`${
         variant === "display" ? "font-display" : "font-sans"
-      } text-xs font-bold uppercase tracking-widest text-fg-muted ${className}`}
+      } text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest text-fg-muted ${className}`}
       {...props}
     >
       {children}
