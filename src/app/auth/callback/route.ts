@@ -8,9 +8,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const cookieStore = await cookies();
-  // ponytail: Next dev normalizes request.url to localhost even via tunnels,
-  // so build redirects from NEXT_PUBLIC_SITE_URL instead.
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || request.url;
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const proto = request.headers.get("x-forwarded-proto") || "https";
+  const requestOrigin = host ? `${proto}://${host}` : request.nextUrl.origin;
+  const origin = requestOrigin || process.env.NEXT_PUBLIC_SITE_URL || request.url;
 
   if (code) {
     const supabase = createClient(cookieStore);
