@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="bg-primary text-primary-fg">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
-        <div className="grid gap-8 sm:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <h3 className="font-display text-xl sm:text-2xl">
               Nurea Knit
@@ -33,6 +33,16 @@ export function Footer() {
               <li><Link href="/contact" transitionTypes={['page']} className="transition hover:text-primary-fg">Contact Us</Link></li>
               <li><Link href="/coaching" transitionTypes={['page']} className="transition hover:text-primary-fg">Private Coaching</Link></li>
               <li><Link href="/faq" transitionTypes={['page']} className="transition hover:text-primary-fg">FAQ</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="mb-3 text-xs sm:text-sm font-bold tracking-wider uppercase">
+              Kebijakan &amp; Legal
+            </h4>
+            <ul className="space-y-2 text-xs sm:text-sm text-primary-fg/80">
+              <li><Link href="/terms" transitionTypes={['page']} className="transition hover:text-primary-fg">Syarat &amp; Ketentuan</Link></li>
+              <li><Link href="/privacy" transitionTypes={['page']} className="transition hover:text-primary-fg">Kebijakan Privasi</Link></li>
+              <li><Link href="/refund" transitionTypes={['page']} className="transition hover:text-primary-fg">Kebijakan Pengembalian</Link></li>
             </ul>
           </div>
         </div>

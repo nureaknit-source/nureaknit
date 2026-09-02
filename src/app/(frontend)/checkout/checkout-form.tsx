@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startCheckoutAction } from "@/actions/checkout";
 import { showToast } from "@/components/ui/toast";
@@ -99,7 +100,37 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutF
           required
         />
         <span className="leading-snug">
-          Saya menyetujui syarat &amp; ketentuan: pesanan akan segera diproses setelah pembayaran terverifikasi otomatis.
+          Saya menyetujui{" "}
+          <Link
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+          >
+            Syarat &amp; Ketentuan
+          </Link>
+          ,{" "}
+          <Link
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+          >
+            Kebijakan Privasi
+          </Link>
+          , serta{" "}
+          <Link
+            href="/refund"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+          >
+            Kebijakan Pengembalian
+          </Link>{" "}
+          Nurea Knit.
         </span>
       </label>
 
