@@ -141,7 +141,14 @@ export default async function OrderDetailPage({
             </p>
           ) : null}
           <p className="text-fg-muted">
-            Syarat &amp; Ketentuan: <span className="font-semibold text-fg-default">{order.tosAccepted ? "Disetujui" : "-"}</span>
+            Syarat &amp; Ketentuan: <span className="font-semibold text-fg-default">{order.tosAccepted ? "Disetujui" : "-"}</span>{" "}
+            (<Link href="/terms" className="text-primary underline hover:text-primary-hover">Lihat Ketentuan</Link>)
+          </p>
+          <p className="text-fg-muted">
+            Kebijakan Retur:{" "}
+            <Link href="/refund" className="text-primary underline hover:text-primary-hover">
+              Garansi 1x24 Jam dengan Video Unboxing
+            </Link>
           </p>
         </Card>
 

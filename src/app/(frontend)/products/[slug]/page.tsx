@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Caption } from "@/components/ui/typography";
@@ -124,6 +125,23 @@ export default async function ProductDetailPage({
               maxStock={product.stock}
               availability={product.availability || undefined}
             />
+
+            <div className="mt-6 rounded-xl border border-border/80 bg-bg-surface-muted p-4 space-y-2 text-xs text-fg-secondary">
+              <div className="flex items-center gap-2 font-bold text-fg-default">
+                <ShieldCheck className="h-4 w-4 text-accent" />
+                <span>Jaminan Kualitas &amp; Pengiriman Aman</span>
+              </div>
+              <p className="leading-relaxed text-fg-muted">
+                Produk dicek cermat sebelum dikirim. Garansi retur/tukar 1x24 jam jika cacat produksi dengan menyertakan video unboxing. Pelajari{" "}
+                <Link
+                  href="/refund"
+                  className="font-semibold text-primary underline underline-offset-2 hover:text-primary-hover"
+                >
+                  Kebijakan Pengembalian (Refund)
+                </Link>
+                .
+              </p>
+            </div>
 
             {product.linkedProducts &&
               product.linkedProducts.length > 0 && (

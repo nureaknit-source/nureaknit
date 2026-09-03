@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 
 export default function LoginPage() {
@@ -68,9 +69,26 @@ export default function LoginPage() {
           {loading ? "Memuat..." : "Masuk dengan Google"}
         </button>
 
-        <p className="text-center text-xs text-fg-muted">
-          Login dengan akun Google. Email kamu otomatis terverifikasi.
-        </p>
+        <div className="space-y-2 text-center text-xs text-fg-muted">
+          <p>Login dengan akun Google. Email kamu otomatis terverifikasi.</p>
+          <p className="leading-relaxed">
+            Dengan masuk, kamu menyetujui{" "}
+            <Link
+              href="/terms"
+              className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+            >
+              Syarat &amp; Ketentuan
+            </Link>{" "}
+            serta{" "}
+            <Link
+              href="/privacy"
+              className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+            >
+              Kebijakan Privasi
+            </Link>{" "}
+            Nurea Knit.
+          </p>
+        </div>
       </div>
     </div>
   );

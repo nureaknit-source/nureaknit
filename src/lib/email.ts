@@ -28,10 +28,11 @@ export async function sendAdminNotification(subject: string, text: string) {
 }
 
 export async function sendOrderReceipt(to: string, orderRef: string, total: number, lines: string) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nureaknit.com";
   await sendEmail(
     to,
     `[Nurea Knit] Pembayaran diterima — ${orderRef}`,
-    `Pembayaran untuk order ${orderRef} sudah kami terima.\n\n${lines}\n\nTotal: Rp${total.toLocaleString("id-ID")}\n\nTerima kasih!\nNurea Knit`,
+    `Pembayaran untuk order ${orderRef} sudah kami terima.\n\n${lines}\n\nTotal: Rp${total.toLocaleString("id-ID")}\n\nKebijakan Pengembalian & Retur: ${siteUrl}/refund\nSyarat & Ketentuan: ${siteUrl}/terms\n\nTerima kasih!\nNurea Knit`,
   );
 }
 
