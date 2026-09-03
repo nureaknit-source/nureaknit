@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOrderAction } from "@/actions/checkout";
 import { PayNowButton } from "../pay-now-button";
+import { ManualPaymentFallback } from "@/components/checkout/manual-payment-fallback";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading } from "@/components/ui/typography";
@@ -64,6 +65,30 @@ export default async function OrderDetailPage({
               Konfirmasi via WhatsApp
             </a>
             {order.status === "approved" ? <PayNowButton orderId={order.id} /> : null}
+          </div>
+        ) : null}
+
+        {order.status === "pending_payment" ? (
+          <div className="mt-6">
+            <ManualPaymentFallback
+              order={{
+                id: order.id,
+                reference: order.reference,
+                total: order.total,
+                customerName: null,
+                customerPhone: order.customerPhone,
+                customerAddress: order.customerAddress,
+                customerNotes: order.customerNotes,
+                items: order.items.map((i) => ({
+                  title: i.title,
+                  quantity: i.quantity,
+                  unitPrice: i.unitPrice,
+                })),
+                paymentQrUrl: order.paymentQrUrl,
+                expiresAt: order.expiresAt,
+              }}
+              initialQr={order.paymentQrUrl}
+            />
           </div>
         ) : null}
 

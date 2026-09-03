@@ -23,8 +23,13 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutF
   const [notes, setNotes] = useState("");
   const [tos, setTos] = useState(false);
 
+  const cleanDigits = phone.replace(/\D/g, "");
+  const isPhoneValid = cleanDigits.length >= 9 && cleanDigits.length <= 15;
+  const isAddressValid = address.trim().length >= 5;
+  const isFormValid = isPhoneValid && isAddressValid && tos;
+
   const submit = async () => {
-    if (loading) return;
+    if (loading || !isFormValid) return;
     if (!phone.trim() || !address.trim()) {
       return showToast("Nomor telepon dan alamat pengiriman wajib diisi ya.", "error");
     }
@@ -40,9 +45,15 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutF
         return;
       }
       if (result.inStock) {
-        router.push(
-          `/checkout/success?ref=${encodeURIComponent(result.inStock.reference)}&qr=${encodeURIComponent(result.inStock.qrImageUrl)}`,
-        );
+        if (result.inStock.paymentPendingFallback || !result.inStock.qrImageUrl) {
+          router.push(
+            `/checkout/success?ref=${encodeURIComponent(result.inStock.reference)}&fallback=1`,
+          );
+        } else {
+          router.push(
+            `/checkout/success?ref=${encodeURIComponent(result.inStock.reference)}&qr=${encodeURIComponent(result.inStock.qrImageUrl)}`,
+          );
+        }
       } else if (result.preOrder) {
         router.push(`/checkout/success?pre=${encodeURIComponent(result.preOrder.reference)}`);
       }
@@ -65,11 +76,23 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutF
 
       <Input
         id="co-phone"
+        type="tel"
+        inputMode="numeric"
         label="No. Telepon / WhatsApp *"
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        onChange={(e) => {
+          // Hanya izinkan angka dan tanda '+' di awal (untuk kode negara)
+          const val = e.target.value.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
+          setPhone(val);
+        }}
         placeholder="08xxxxxxxxxx"
         required
+        maxLength={16}
+        error={
+          phone.length > 0 && !isPhoneValid
+            ? "Masukkan 9–15 digit angka nomor WhatsApp yang valid."
+            : undefined
+        }
       />
 
       <Textarea
@@ -139,10 +162,20 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutF
         size="lg"
         onClick={submit}
         isLoading={loading}
+        disabled={!isFormValid || loading}
         className="w-full mt-4"
       >
         Lanjutkan ke Pembayaran
       </Button>
+
+      {!isFormValid && (
+        <p className="text-center text-xs text-fg-muted mt-2">
+          {!isPhoneValid || !isAddressValid
+            ? "Lengkapi nomor telepon dan alamat pengiriman"
+            : "Centang persetujuan syarat & ketentuan"}{" "}
+          untuk melanjutkan ke pembayaran.
+        </p>
+      )}
     </div>
   );
 }

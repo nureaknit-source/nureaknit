@@ -26,7 +26,12 @@ const PAYMENT_EXPIRY_MINUTES = 15;
 export interface CheckoutResult {
   ok: boolean;
   error?: string;
-  inStock?: { reference: string; qrImageUrl: string; midtransTxId: string };
+  inStock?: {
+    reference: string;
+    qrImageUrl?: string;
+    midtransTxId?: string;
+    paymentPendingFallback?: boolean;
+  };
   preOrder?: { reference: string; waLink: string };
 }
 
@@ -237,14 +242,22 @@ async function createInStockOrder(
     });
     return { reference, qrImageUrl: qr.qrImageUrl, midtransTxId: qr.transactionId };
   } catch (e) {
-    console.error("[checkout] createQrCodeToken failed:", e);
-    for (const c of claimed) await releaseInStock(runner, c.productId, c.quantity);
+    console.error("[checkout] createQrCodeToken failed, falling back to manual pending payment:", e);
+    // FALLBACK: Jangan batalkan order atau lepas stok.
+    // Order tetap disimpan dalam status pending_payment dengan toleransi waktu 24 jam untuk transfer manual.
+    const fallbackExpiryHours = 24;
     await payload.update({
       collection: "orders",
       id: order.id,
-      data: { status: "cancelled", reason: "Gagal membuat pembayaran (QRIS)" },
+      data: {
+        reason: "Gagal membuat pembayaran otomatis (QRIS). Menunggu konfirmasi pembayaran manual via WhatsApp atau percobaan ulang.",
+        expiresAt: new Date(Date.now() + fallbackExpiryHours * 3600_000).toISOString(),
+      },
     });
-    return null;
+    return {
+      reference,
+      paymentPendingFallback: true,
+    };
   }
 }
 
@@ -353,8 +366,13 @@ export async function payNowAction(
 
   const order = await payload.findByID({ collection: "orders", id: orderId });
   if (!order || order.userId !== session.id) return { ok: false, error: "Order tidak ditemukan." };
-  if (order.type !== "pre_order" || order.status !== "approved") {
-    return { ok: false, error: "Pembayaran belum bisa dibuka." };
+
+  const canPay =
+    (order.type === "pre_order" && order.status === "approved") ||
+    order.status === "pending_payment";
+
+  if (!canPay) {
+    return { ok: false, error: "Pembayaran belum bisa dibuka atau sudah selesai." };
   }
 
   const items = await payload.find({
@@ -363,7 +381,7 @@ export async function payNowAction(
     limit: 100,
   });
 
-   let qr;
+  let qr;
   try {
     qr = await createQrCodeToken({
       orderId: order.reference,
@@ -379,10 +397,13 @@ export async function payNowAction(
     });
   } catch (e) {
     console.error("[payNow] createQrCodeToken failed:", e);
-    return { ok: false, error: "Gagal membuka pembayaran. Coba lagi." };
+    return { ok: false, error: "Layanan pembayaran otomatis (QRIS) masih belum tersedia. Silakan gunakan opsi pembayaran manual via WhatsApp." };
   }
 
-  assertTransition(order.status, "pending_payment", "Pay Now");
+  if (order.status !== "pending_payment") {
+    assertTransition(order.status, "pending_payment", "Pay Now");
+  }
+
   await payload.update({
     collection: "orders",
     id: order.id,
@@ -395,4 +416,21 @@ export async function payNowAction(
     },
   });
   return { ok: true, reference: order.reference, qrImageUrl: qr.qrImageUrl, midtransTxId: qr.transactionId };
+}
+
+export async function retryPaymentAction(
+  reference: string,
+): Promise<{ ok: boolean; error?: string; qrImageUrl?: string; midtransTxId?: string }> {
+  const session = await getUserSession();
+  const payload = await getPayload({ config });
+
+  const found = await payload.find({
+    collection: "orders",
+    where: { reference: { equals: reference }, userId: { equals: session.id } },
+    limit: 1,
+  });
+  const order = found.docs[0] as Order | undefined;
+  if (!order) return { ok: false, error: "Pesanan tidak ditemukan." };
+
+  return payNowAction(order.id);
 }
