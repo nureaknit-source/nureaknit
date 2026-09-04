@@ -32,6 +32,9 @@ export default buildConfig({
   sharp,
   admin: {
     user: "users",
+    components: {
+      beforeLogin: ["@/components/admin/TurnstileField#TurnstileField"],
+    },
   },
   collections: [
     Users,
@@ -63,11 +66,12 @@ export default buildConfig({
     disablePlaygroundInProduction: process.env.NODE_ENV === "production",
   },
   db: postgresAdapter({
+    push: false,
     pool: {
       connectionString: process.env.DATABASE_URL || "",
-      max: process.env.NODE_ENV === "production" ? 2 : 10,
-      idleTimeoutMillis: 10000,
-      connectionTimeoutMillis: 10000,
+      max: process.env.NODE_ENV === "production" ? 2 : 3,
+      idleTimeoutMillis: 1000,
+      connectionTimeoutMillis: 5000,
     },
   }),
   plugins: [
