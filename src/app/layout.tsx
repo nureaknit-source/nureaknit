@@ -6,6 +6,7 @@ import { handleServerFunctions, RootLayout as PayloadRootLayout } from "@payload
 
 import configPromise from "@payload-config";
 import { importMap } from "./(payload)/admin/importMap";
+import { Analytics } from "@vercel/analytics/next";
 
 
 const pacifico = Pacifico({
@@ -53,6 +54,7 @@ export default async function RootLayout({
       }}
     >
       {children}
+      <Analytics />
     </PayloadRootLayout>
   );
 }
