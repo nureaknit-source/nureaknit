@@ -86,7 +86,6 @@ export interface Config {
     'fulfillment-groups': FulfillmentGroup;
     reviews: Review;
     'payload-kv': PayloadKv;
-    'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -111,7 +110,6 @@ export interface Config {
     'fulfillment-groups': FulfillmentGroupsSelect<false> | FulfillmentGroupsSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
-    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
@@ -632,93 +630,6 @@ export interface PayloadKv {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "payload-locked-documents".
- */
-export interface PayloadLockedDocument {
-  id: number;
-  document?:
-    | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'pattern-categories';
-        value: number | PatternCategory;
-      } | null)
-    | ({
-        relationTo: 'patterns';
-        value: number | Pattern;
-      } | null)
-    | ({
-        relationTo: 'blog-posts';
-        value: number | BlogPost;
-      } | null)
-    | ({
-        relationTo: 'product-categories';
-        value: number | ProductCategory;
-      } | null)
-    | ({
-        relationTo: 'products';
-        value: number | Product;
-      } | null)
-    | ({
-        relationTo: 'faq';
-        value: number | Faq;
-      } | null)
-    | ({
-        relationTo: 'cart-items';
-        value: number | CartItem;
-      } | null)
-    | ({
-        relationTo: 'coaching-requests';
-        value: number | CoachingRequest;
-      } | null)
-    | ({
-        relationTo: 'contact-messages';
-        value: number | ContactMessage;
-      } | null)
-    | ({
-        relationTo: 'downloads';
-        value: number | Download;
-      } | null)
-    | ({
-        relationTo: 'user-profiles';
-        value: number | UserProfile;
-      } | null)
-    | ({
-        relationTo: 'orders';
-        value: number | Order;
-      } | null)
-    | ({
-        relationTo: 'order-items';
-        value: number | OrderItem;
-      } | null)
-    | ({
-        relationTo: 'payment-attempts';
-        value: number | PaymentAttempt;
-      } | null)
-    | ({
-        relationTo: 'fulfillment-groups';
-        value: number | FulfillmentGroup;
-      } | null)
-    | ({
-        relationTo: 'reviews';
-        value: number | Review;
-      } | null);
-  globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
@@ -1088,17 +999,6 @@ export interface ReviewsSelect<T extends boolean = true> {
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T;
   data?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "payload-locked-documents_select".
- */
-export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
-  document?: T;
-  globalSlug?: T;
-  user?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

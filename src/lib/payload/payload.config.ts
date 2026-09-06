@@ -55,7 +55,10 @@ export default buildConfig({
     PaymentAttempts,
     FulfillmentGroups,
     Reviews,
-  ],
+  ].map((collection) => ({
+    ...collection,
+    lockDocuments: collection.lockDocuments ?? false,
+  })),
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
@@ -69,9 +72,9 @@ export default buildConfig({
     push: false,
     pool: {
       connectionString: process.env.DATABASE_URL || "",
-      max: process.env.NODE_ENV === "production" ? 2 : 3,
-      idleTimeoutMillis: 1000,
-      connectionTimeoutMillis: 5000,
+      max: Number(process.env.DB_POOL_MAX || 10),
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
     },
   }),
   plugins: [

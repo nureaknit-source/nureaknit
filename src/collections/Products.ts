@@ -3,6 +3,7 @@ import { generateSlug } from "@/lib/payload/slug";
 
 export const Products: CollectionConfig = {
   slug: "products",
+  lockDocuments: false,
   admin: { group: "Content", useAsTitle: "title" },
   access: {
     read: () => true,
