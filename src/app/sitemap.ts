@@ -1,18 +1,21 @@
 import type { MetadataRoute } from "next";
+import { getPayload } from "payload";
+import config from "@payload-config";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-async function fetchSlugs(collection: string): Promise<string[]> {
+async function fetchSlugs(collection: "patterns" | "blog-posts" | "products"): Promise<string[]> {
   try {
-    const res = await fetch(
-      `${BASE_URL}/api/${collection}?limit=1000&depth=0&fields=slug`,
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.docs || [])
-      .map((doc: { slug?: string | null }) => doc.slug)
-      .filter(Boolean);
+    const payload = await getPayload({ config });
+    const result = await payload.find({
+      collection,
+      limit: 1000,
+      depth: 0,
+      select: { slug: true },
+    });
+    return (result.docs || [])
+      .map((doc) => doc.slug)
+      .filter((slug): slug is string => Boolean(slug));
   } catch {
     return [];
   }

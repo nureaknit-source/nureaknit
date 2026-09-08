@@ -1,7 +1,16 @@
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
-export default [
+const eslintConfig = [
+  {
+    ignores: [
+      ".next/**",
+      "graphify-out/**",
+      "node_modules/**",
+    ],
+  },
   ...nextVitals,
   ...nextTs,
 ];
+
+export default eslintConfig;

@@ -1,12 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import Lightbox from "@/components/ui/lightbox";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { mediaUrl } from "@/lib/payload/utils";
 import type { Media } from "@/lib/payload/payload-types";
 
+const Lightbox = dynamic(() => import("@/components/ui/lightbox"), {
+  ssr: false,
+});
+
 interface GalleryImage {
   url: string;
+  cardUrl: string;
+  thumbUrl: string;
   alt: string;
 }
 
@@ -20,7 +27,15 @@ export function ProductGallery({ images, title, priority = true }: Props) {
   const items: GalleryImage[] = (images ?? [])
     .map((item) => {
       const media = typeof item.image === "object" ? item.image : null;
-      return { url: mediaUrl(item.image) ?? "", alt: media?.alt ?? "" };
+      const fullUrl = mediaUrl(item.image) ?? "";
+      const cardUrl = mediaUrl(item.image, "card") ?? fullUrl;
+      const thumbUrl = mediaUrl(item.image, "thumbnail") ?? cardUrl;
+      return {
+        url: fullUrl,
+        cardUrl,
+        thumbUrl,
+        alt: media?.alt ?? "",
+      };
     })
     .filter((i) => i.url);
 
@@ -31,14 +46,26 @@ export function ProductGallery({ images, title, priority = true }: Props) {
 
   if (items.length === 1) {
     return (
-      <div className="overflow-hidden rounded-lg">
-        <img
-          src={items[0].url}
-          alt={items[0].alt || title}
-          className="aspect-[4/3] w-full object-cover"
-          loading={priority ? "eager" : "lazy"}
-        />
-      </div>
+      <>
+        <div className="overflow-hidden rounded-lg relative aspect-[4/3] w-full">
+          <Image
+            src={items[0].cardUrl}
+            alt={items[0].alt || title}
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="aspect-[4/3] w-full object-cover cursor-zoom-in"
+            priority={priority}
+            onClick={() => setLbOpen(true)}
+          />
+        </div>
+        {lbOpen && (
+          <Lightbox
+            images={items}
+            initialIndex={0}
+            onClose={() => setLbOpen(false)}
+          />
+        )}
+      </>
     );
   }
 
@@ -55,23 +82,28 @@ export function ProductGallery({ images, title, priority = true }: Props) {
               aria-label={`View image ${i + 1}`}
               className="overflow-hidden rounded-lg ring-1 ring-border transition-colors hover:ring-2 hover:ring-accent focus:outline-none focus:ring-2 focus:ring-accent"
             >
-              <img
-                src={img.url}
-                alt={img.alt}
-                className="aspect-square w-full object-cover"
-                loading="lazy"
-              />
+              <div className="relative aspect-square w-full">
+                <Image
+                  src={img.thumbUrl}
+                  alt={img.alt}
+                  fill
+                  sizes="72px"
+                  className="object-cover"
+                />
+              </div>
             </button>
           ))}
         </nav>
 
         {/* Main image */}
-        <div className="overflow-hidden rounded-lg">
-          <img
-            src={items[main].url}
+        <div className="overflow-hidden rounded-lg relative aspect-[4/3] w-full">
+          <Image
+            src={items[main].cardUrl}
             alt={items[main].alt || title}
-            className="aspect-[4/3] w-full cursor-zoom-in object-cover transition duration-300"
-            loading={priority ? "eager" : "lazy"}
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="cursor-zoom-in object-cover transition duration-300"
+            priority={priority}
             onClick={() => setLbOpen(true)}
           />
         </div>
@@ -86,12 +118,15 @@ export function ProductGallery({ images, title, priority = true }: Props) {
               aria-label={`View image ${i + 1}`}
               className="shrink-0 overflow-hidden rounded-lg ring-1 ring-border transition-colors hover:ring-2 hover:ring-accent focus:outline-none focus:ring-2 focus:ring-accent"
             >
-              <img
-                src={img.url}
-                alt={img.alt}
-                className="aspect-square w-16 object-cover"
-                loading="lazy"
-              />
+              <div className="relative aspect-square w-16">
+                <Image
+                  src={img.thumbUrl}
+                  alt={img.alt}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+              </div>
             </button>
           ))}
         </div>

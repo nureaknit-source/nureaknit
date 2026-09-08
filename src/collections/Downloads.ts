@@ -10,8 +10,8 @@ export const Downloads: CollectionConfig = {
     delete: ({ req: { user } }) => !!user,
   },
   fields: [
-    { name: "userEmail", type: "email", required: true, label: "User Email" },
-    { name: "pattern", type: "relationship", relationTo: "patterns", required: true, label: "Pattern" },
+    { name: "userEmail", type: "email", required: true, label: "User Email", index: true },
+    { name: "pattern", type: "relationship", relationTo: "patterns", required: true, label: "Pattern", index: true },
     { name: "downloadedAt", type: "date", defaultValue: () => new Date().toISOString(), label: "Downloaded At", admin: { position: "sidebar", readOnly: true } },
   ],
 };

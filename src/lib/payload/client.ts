@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getPayload } from "payload";
 import type { CollectionSlug, Where } from "payload";
 import config from "@payload-config";
@@ -41,7 +42,7 @@ export async function getCollection<T>(collection: CollectionSlug, opts?: FindOp
   }) as unknown as PaginatedDocs<T>;
 }
 
-export async function getBySlug<T>(collection: CollectionSlug, slug: string, depth = 2) {
+export const getBySlug = cache(async function getBySlug<T>(collection: CollectionSlug, slug: string, depth = 2) {
   const result = await getCollection<T>(collection, { where: { slug: { equals: slug } }, depth, limit: 1 });
-  return result.docs[0] || null;
-}
+  return (result.docs[0] as T) || null;
+});

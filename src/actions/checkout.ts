@@ -322,15 +322,54 @@ export interface OrderDetail extends Order {
 export async function getOrdersAction(): Promise<OrderDetail[]> {
   const { id } = await getUserSession();
   const payload = await getPayload({ config });
-  const orders = await payload.find({
+  const ordersResult = await payload.find({
     collection: "orders",
     where: { userId: { equals: id } },
     sort: "-createdAt",
     limit: 50,
   });
-  return Promise.all(
-    (orders.docs as Order[]).map((o) => orderDetail(payload, o)),
-  );
+  const orders = ordersResult.docs as Order[];
+  if (orders.length === 0) return [];
+
+  const orderIds = orders.map((o) => o.id);
+  const [itemsResult, groupsResult] = await Promise.all([
+    payload.find({
+      collection: "order-items",
+      where: { order: { in: orderIds } },
+      limit: 500,
+    }),
+    payload.find({
+      collection: "fulfillment-groups",
+      where: { order: { in: orderIds } },
+      limit: 200,
+    }),
+  ]);
+
+  const itemsByOrder = new Map<number, OrderItem[]>();
+  for (const item of itemsResult.docs as OrderItem[]) {
+    const oId = typeof item.order === "number" ? item.order : item.order?.id;
+    if (oId) {
+      const arr = itemsByOrder.get(oId) || [];
+      arr.push(item);
+      itemsByOrder.set(oId, arr);
+    }
+  }
+
+  const groupsByOrder = new Map<number, FulfillmentGroup[]>();
+  for (const group of groupsResult.docs as FulfillmentGroup[]) {
+    const oId = typeof group.order === "number" ? group.order : group.order?.id;
+    if (oId) {
+      const arr = groupsByOrder.get(oId) || [];
+      arr.push(group);
+      groupsByOrder.set(oId, arr);
+    }
+  }
+
+  return orders.map((o) => ({
+    ...o,
+    items: itemsByOrder.get(o.id) || [],
+    groups: groupsByOrder.get(o.id) || [],
+  }));
 }
 
 async function orderDetail(payload: Payload, order: Order): Promise<OrderDetail> {

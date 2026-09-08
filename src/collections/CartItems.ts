@@ -54,7 +54,7 @@ export const CartItems: CollectionConfig = {
     update: () => false,
   },
   fields: [
-    { name: "userId", type: "text", required: true },
+    { name: "userId", type: "text", required: true, index: true },
     { name: "product", type: "relationship", relationTo: "products", required: true },
     { name: "quantity", type: "number", required: true, min: 1, defaultValue: 1 },
   ],

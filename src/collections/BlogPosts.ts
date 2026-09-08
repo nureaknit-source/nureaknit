@@ -49,6 +49,7 @@ export const BlogPosts: CollectionConfig = {
       type: "checkbox",
       defaultValue: false,
       label: "Featured",
+      index: true,
       admin: { position: "sidebar" },
     },
     {
@@ -56,6 +57,7 @@ export const BlogPosts: CollectionConfig = {
       type: "date",
       defaultValue: () => new Date(),
       label: "Published At",
+      index: true,
       admin: { position: "sidebar", date: { pickerAppearance: "dayAndTime" } },
     },
   ],

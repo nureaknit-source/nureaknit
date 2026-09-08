@@ -3,7 +3,6 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
 import { QrDisplay } from "@/components/checkout/qr-display";
-import { CheckStatus } from "@/components/checkout/check-status";
 import { ManualPaymentFallback } from "@/components/checkout/manual-payment-fallback";
 import { getOrderAction, type OrderDetail } from "@/actions/checkout";
 
@@ -103,12 +102,6 @@ export default async function CheckoutSuccessPage({
             <p className="text-sm text-fg-muted">Tidak ada detail pesanan dalam parameter. Silakan cek halaman pesanan kamu.</p>
           ) : null}
         </div>
-
-        {ref && !showFallback ? (
-          <div className="mt-6 text-center">
-            <CheckStatus reference={ref} />
-          </div>
-        ) : null}
 
         <div className="mt-8 flex gap-4">
           <Link href="/profile/orders" className="text-sm font-medium text-primary hover:underline">

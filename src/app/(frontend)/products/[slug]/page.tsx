@@ -12,8 +12,25 @@ import { ProductGallery } from "@/features/products/product-gallery";
 import { getBySlug } from "@/lib/payload/client";
 import { formatPrice, availabilityLabel } from "@/lib/payload/utils";
 import type { Product } from "@/lib/payload/payload-types";
-import { cookies } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
+
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  try {
+    const { getPayload } = await import("payload");
+    const configPromise = (await import("@payload-config")).default;
+    const payload = await getPayload({ config: configPromise });
+    const items = await payload.find({
+      collection: "products",
+      limit: 100,
+      select: { slug: true },
+      depth: 0,
+    });
+    return items.docs.map((doc) => ({ slug: doc.slug }));
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -39,13 +56,6 @@ export default async function ProductDetailPage({
 
   if (!product) notFound();
 
-  const availability = product.availability || "in_stock";
-
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-  const isLoggedIn = !!user;
 
   return (
     <Section className="pt-8 sm:pt-12">
@@ -121,7 +131,6 @@ export default async function ProductDetailPage({
 
             <ProductActions
               productId={product.id}
-              isLoggedIn={isLoggedIn}
               maxStock={product.stock}
               availability={product.availability || undefined}
             />

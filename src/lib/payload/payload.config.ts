@@ -72,7 +72,7 @@ export default buildConfig({
     push: false,
     pool: {
       connectionString: process.env.DATABASE_URL || "",
-      max: Number(process.env.DB_POOL_MAX || 10),
+      max: Number(process.env.DB_POOL_MAX || 2),
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
     },

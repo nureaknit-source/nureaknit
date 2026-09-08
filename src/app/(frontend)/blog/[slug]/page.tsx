@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
@@ -8,6 +9,25 @@ import { RichText } from "@/components/shared/rich-text";
 import { getBySlug } from "@/lib/payload/client";
 import { mediaUrl, formatDate } from "@/lib/payload/utils";
 import type { BlogPost } from "@/lib/payload/payload-types";
+
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  try {
+    const { getPayload } = await import("payload");
+    const configPromise = (await import("@payload-config")).default;
+    const payload = await getPayload({ config: configPromise });
+    const items = await payload.find({
+      collection: "blog-posts",
+      limit: 100,
+      select: { slug: true },
+      depth: 0,
+    });
+    return items.docs.map((doc) => ({ slug: doc.slug }));
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -33,7 +53,7 @@ export default async function BlogPostPage({
 
   if (!post) notFound();
 
-  const img = mediaUrl(post.coverImage);
+  const img = mediaUrl(post.coverImage, "card");
 
   return (
     <Section>
@@ -46,8 +66,15 @@ export default async function BlogPostPage({
         />
 
         {img && (
-          <div className="overflow-hidden rounded-lg">
-            <img src={img} alt="" className="aspect-[16/9] w-full object-cover" />
+          <div className="overflow-hidden rounded-lg relative aspect-[16/9] w-full">
+            <Image
+              src={img}
+              alt={post.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+            />
           </div>
         )}
 

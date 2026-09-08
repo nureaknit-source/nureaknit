@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text, Caption } from "@/components/ui/typography";
@@ -10,6 +11,25 @@ import { getBySlug } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel, formatDate } from "@/lib/payload/utils";
 import { downloadPatternAction } from "@/actions/download";
 import type { Pattern } from "@/lib/payload/payload-types";
+
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  try {
+    const { getPayload } = await import("payload");
+    const configPromise = (await import("@payload-config")).default;
+    const payload = await getPayload({ config: configPromise });
+    const items = await payload.find({
+      collection: "patterns",
+      limit: 100,
+      select: { slug: true },
+      depth: 0,
+    });
+    return items.docs.map((doc) => ({ slug: doc.slug }));
+  } catch {
+    return [];
+  }
+}
 
 // ponytail: getBySlug<Pattern> provides proper typing for pattern pages
 
@@ -37,7 +57,7 @@ export default async function PatternDetailPage({
 
   if (!pattern) notFound();
 
-  const img = mediaUrl(pattern.image);
+  const img = mediaUrl(pattern.image, "card");
 
   return (
     <Section>
@@ -50,11 +70,14 @@ export default async function PatternDetailPage({
         />
 
         {img && (
-          <div className="overflow-hidden rounded-lg">
-            <img
+          <div className="overflow-hidden rounded-lg relative aspect-[16/9] w-full">
+            <Image
               src={img}
-              alt=""
-              className="aspect-[16/9] w-full object-cover"
+              alt={pattern.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
             />
           </div>
         )}

@@ -1,9 +1,19 @@
 import type { Media } from "./payload-types";
 
-export function mediaUrl(media?: Media | string | number | null): string | null {
+export type MediaSize = "thumbnail" | "card" | "hero";
+
+export function mediaUrl(
+  media?: Media | string | number | null,
+  size?: MediaSize,
+): string | null {
   if (!media) return null;
   if (typeof media === "string") return media;
   if (typeof media === "number") return null;
+
+  if (size && media.sizes && media.sizes[size]?.url) {
+    return media.sizes[size].url || null;
+  }
+
   return media.url || null;
 }
 

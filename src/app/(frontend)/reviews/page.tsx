@@ -5,6 +5,8 @@ import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
 import { PublicReviewList } from "@/components/reviews/PublicReviewList";
 
+export const revalidate = 60;
+
 export default async function ReviewsPage() {
   const payload = await getPayload({ config });
 
@@ -18,13 +20,21 @@ export default async function ReviewsPage() {
   });
 
   // 2. Fetch unique product details needed for review display
-  const productIds = Array.from(new Set(reviewsData.docs.map((r) => Number(r.product))));
-  const products = await payload.find({
-    collection: "products",
-    where: { id: { in: productIds } },
-    limit: 100,
-    overrideAccess: true,
-  });
+  const productIds = Array.from(
+    new Set(
+      reviewsData.docs
+        .map((r) => Number(r.product))
+        .filter((id) => Boolean(id) && !Number.isNaN(id)),
+    ),
+  );
+  const products = productIds.length > 0
+    ? await payload.find({
+        collection: "products",
+        where: { id: { in: productIds } },
+        limit: 100,
+        overrideAccess: true,
+      })
+    : { docs: [] };
 
   const productMap = new Map(products.docs.map((p) => [p.id, p.title]));
 

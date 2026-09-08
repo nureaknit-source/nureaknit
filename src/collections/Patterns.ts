@@ -92,6 +92,7 @@ export const Patterns: CollectionConfig = {
       type: "checkbox",
       defaultValue: false,
       label: "Featured",
+      index: true,
       admin: { position: "sidebar" },
     },
     {
@@ -99,6 +100,7 @@ export const Patterns: CollectionConfig = {
       type: "date",
       defaultValue: () => new Date(),
       label: "Published At",
+      index: true,
       admin: { position: "sidebar", date: { pickerAppearance: "dayAndTime" } },
     },
   ],

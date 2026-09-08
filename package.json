@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node -e \"try{require('fs').unlinkSync('.next/lock')}catch(e){}\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

@@ -76,6 +76,7 @@ export const Products: CollectionConfig = {
     {
       name: "availability",
       type: "select",
+      index: true,
       options: [
         { label: "In Stock", value: "in_stock" },
         { label: "Dropship", value: "dropship" },

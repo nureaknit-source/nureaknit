@@ -148,6 +148,8 @@ function pageNumbers(total: number, current: number): (number | "…")[] {
   );
 }
 
+export const revalidate = 60;
+
 export const metadata = {
   title: "Shop — Nurea Knit",
   description: "Browse knitting and crochet products, tools, and accessories.",
@@ -168,15 +170,19 @@ export default async function ProductsPage({
   if (category) where["categories.slug"] = { equals: category };
   if (q) where["title"] = { contains: q };
 
-  const {
-    docs: products,
-    totalPages,
-    hasNextPage,
-    hasPrevPage,
-    page: currentPage,
-  } = await getCollection<Product>("products", { where, page, sort });
-  const { docs: categories } =
-    await getCollection<ProductCategory>("product-categories");
+  const [
+    {
+      docs: products,
+      totalPages,
+      hasNextPage,
+      hasPrevPage,
+      page: currentPage,
+    },
+    { docs: categories },
+  ] = await Promise.all([
+    getCollection<Product>("products", { where, page, sort }),
+    getCollection<ProductCategory>("product-categories"),
+  ]);
 
   const hasActiveFilters = q || category;
 

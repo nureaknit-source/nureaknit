@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { HeartHandshake, GraduationCap, Leaf, Users } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
@@ -10,6 +11,8 @@ import { ProductCard } from "@/components/features/product-card";
 import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel } from "@/lib/payload/utils";
 import type { Media, Pattern, Product } from "@/lib/payload/payload-types";
+
+export const revalidate = 60;
 
 const valueItems = [
   {
@@ -49,9 +52,12 @@ export default async function HomePage() {
           <div className="flex flex-col items-center gap-0 py-10 sm:gap-10 md:gap-12 sm:py-24 lg:flex-row min-h-screen lg:justify-center lg:py-0">
             <div className="mt-6 lg:mt-0 lg:order-2 lg:flex-1">
               <div className="mx-auto max-w-xs lg:max-w-lg lg:mx-0 animate-float">
-                <img
+                <Image
                   src="/heart-knite.svg"
                   alt="Flower Knit illustration"
+                  width={512}
+                  height={512}
+                  priority
                   className="h-auto w-[55vw] max-w-xs max-h-[55vh] object-contain sm:w-[62vw] sm:max-w-sm md:w-[52vw] lg:w-auto lg:max-w-lg lg:max-h-none"
                 />
               </div>
@@ -107,18 +113,19 @@ export default async function HomePage() {
             </AnimateInView>
             <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {patterns.map((pattern, i) => {
-                const img = mediaUrl(pattern.image as Media | number | null);
+                const img = mediaUrl(pattern.image as Media | number | null, "card");
                 return (
                   <AnimateInView key={pattern.id} className={`animate-fade-in-up-d${Math.min(i + 1, 3)}`}>
                     <Link href={`/patterns/${pattern.slug || pattern.id}`} transitionTypes={['page']}>
                       <Card hover className="group h-full flex flex-col p-4 sm:p-6">
                         {img && (
-                          <div className="-mx-4 -mt-4 mb-4 overflow-hidden rounded-t-2xl sm:-mx-6 sm:-mt-6">
-                            <img
+                          <div className="-mx-4 -mt-4 mb-4 overflow-hidden rounded-t-2xl sm:-mx-6 sm:-mt-6 relative aspect-[4/3]">
+                            <Image
                               src={img}
-                              alt=""
-                              className="aspect-4/3 w-full object-cover transition duration-500 group-hover:scale-105"
-                              loading="lazy"
+                              alt={pattern.title}
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                              className="object-cover transition duration-500 group-hover:scale-105"
                             />
                           </div>
                         )}

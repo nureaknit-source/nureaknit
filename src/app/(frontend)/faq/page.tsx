@@ -6,6 +6,8 @@ import { RichText } from "@/components/shared/rich-text";
 import { getCollection } from "@/lib/payload/client";
 import type { Faq } from "@/lib/payload/payload-types";
 
+export const revalidate = 300;
+
 export const metadata = {
   title: "FAQ — Nurea Knit",
   description: "Pertanyaan yang sering diajukan seputar pola, pesanan, dan layanan Nurea Knit.",

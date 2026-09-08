@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
@@ -9,6 +10,8 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { getCollection } from "@/lib/payload/client";
 import { mediaUrl, difficultyLabel } from "@/lib/payload/utils";
 import type { Media, Pattern, PatternCategory } from "@/lib/payload/payload-types";
+
+export const revalidate = 300;
 
 export const metadata = {
   title: "Pattern Library — Nurea Knit",
@@ -79,18 +82,19 @@ export default async function PatternsPage({
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {patterns.map((pattern, i) => {
-              const img = mediaUrl(pattern.image as Media | number | null);
+              const img = mediaUrl(pattern.image as Media | number | null, "card");
               return (
                 <AnimateInView key={pattern.id} className={`animate-fade-in-up-d${Math.min(i + 1, 3)}`}>
                   <Link href={`/patterns/${pattern.slug || pattern.id}`} transitionTypes={['page']}>
                     <Card hover className="h-full flex flex-col">
                       {img && (
-                          <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
-                          <img
+                        <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl relative aspect-[4/3]">
+                          <Image
                             src={img}
-                            alt=""
-                            className="aspect-[4/3] w-full object-cover transition duration-300 hover:scale-105"
-                            loading="lazy"
+                            alt={pattern.title}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover transition duration-300 hover:scale-105"
                           />
                         </div>
                       )}

@@ -22,8 +22,17 @@ import {
   sendRefundNotice,
 } from "@/lib/email";
 import type { Order, OrderItem } from "@/lib/payload/payload-types";
+import { after } from "next/server";
 
 export const runtime = "nodejs";
+
+async function runBackground(fn: () => Promise<void> | void): Promise<void> {
+  try {
+    after(fn);
+  } catch {
+    await fn();
+  }
+}
 
 export async function POST(request: Request) {
   const raw = await request.text();
@@ -102,15 +111,43 @@ export async function processNotification(
     // Jangan kirim notifikasi gagal bila order sudah dibayar (late expire). Only act on payment-active orders.
     if (canTransition(order.status as Order["status"], "payment_failed")) {
       await handleFailure(payload, runner, order, items, reason);
-      await sendAdminNotification(`[Payment ${status}] ${order.reference}`, reason);
-      if (order.customerEmail) await sendOrderFailed(order.customerEmail, order.reference, status);
+      const email = order.customerEmail;
+      const ref = order.reference;
+      await runBackground(async () => {
+        try {
+          await sendAdminNotification(`[Payment ${status}] ${ref}`, reason);
+          if (email) await sendOrderFailed(email, ref, status);
+        } catch (err) {
+          console.error("[midtrans] background failure email failed:", err);
+        }
+      });
     }
   } else if (status === "refund" || status === "partial_refund") {
     await transitionOrder(payload, order, "refunded", reason);
-    if (order.customerEmail) await sendRefundNotice(order.customerEmail, order.reference, status);
+    if (order.customerEmail) {
+      const email = order.customerEmail;
+      const ref = order.reference;
+      await runBackground(async () => {
+        try {
+          await sendRefundNotice(email, ref, status);
+        } catch (err) {
+          console.error("[midtrans] background refund notice failed:", err);
+        }
+      });
+    }
   } else if (status === "chargeback") {
     await transitionOrder(payload, order, "disputed", reason);
-    if (order.customerEmail) await sendRefundNotice(order.customerEmail, order.reference, status);
+    if (order.customerEmail) {
+      const email = order.customerEmail;
+      const ref = order.reference;
+      await runBackground(async () => {
+        try {
+          await sendRefundNotice(email, ref, status);
+        } catch (err) {
+          console.error("[midtrans] background chargeback notice failed:", err);
+        }
+      });
+    }
   }
   // status lain (pending, challenge, dll): hanya dicatat sebagai PaymentAttempt.
 
@@ -178,20 +215,37 @@ async function handleSettlement(
     data: { status: "paid", paidAt: new Date().toISOString(), reason },
   });
 
-  // Cart: hapus hanya baris produk yang sudah dibeli (mixed cart tetap menyisakan lainnya).
-  const purchased = await payload.find({
-    collection: "cart-items",
-    where: { userId: { equals: order.userId }, product: { in: items.map((i) => i.productId) } },
-    limit: 500,
-  });
-  for (const line of purchased.docs) {
-    await payload.delete({ collection: "cart-items", id: line.id });
-  }
+  // Cart cleanup dan kirim receipt di background via after()
+  const customerEmail = order.customerEmail;
+  const orderRef = order.reference;
+  const orderTotal = order.total;
+  const orderUserId = order.userId;
+  const itemProductIds = items.map((i) => i.productId);
+  const receiptLines = items.map((i) => `- ${i.quantity}x ${i.title} (${formatIDR(i.unitPrice * i.quantity)})`).join("\n");
 
-  if (order.customerEmail) {
-    const lines = items.map((i) => `- ${i.quantity}x ${i.title} (${formatIDR(i.unitPrice * i.quantity)})`).join("\n");
-    await sendOrderReceipt(order.customerEmail, order.reference, order.total, lines);
-  }
+  await runBackground(async () => {
+    try {
+      if (itemProductIds.length > 0) {
+        await payload.delete({
+          collection: "cart-items",
+          where: {
+            userId: { equals: orderUserId },
+            product: { in: itemProductIds },
+          },
+        });
+      }
+    } catch (err) {
+      console.error("[midtrans] background cart cleanup failed:", err);
+    }
+
+    if (customerEmail) {
+      try {
+        await sendOrderReceipt(customerEmail, orderRef, orderTotal, receiptLines);
+      } catch (err) {
+        console.error("[midtrans] background sendOrderReceipt failed:", err);
+      }
+    }
+  });
 
   console.log(`[midtrans] order ${order.reference} paid (group ${group.id})`);
 }

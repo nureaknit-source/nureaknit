@@ -1,8 +1,22 @@
 // ponytail: in-memory rate limiter, migrasi ke Upstash Redis saat multi-instance
 const store = new Map<string, { count: number; resetAt: number }>();
+let lastCleanup = Date.now();
+const CLEANUP_INTERVAL_MS = 60_000;
+
+function cleanupExpiredEntries(now: number) {
+  if (now - lastCleanup < CLEANUP_INTERVAL_MS && store.size < 1000) return;
+  lastCleanup = now;
+  for (const [key, value] of store.entries()) {
+    if (now > value.resetAt) {
+      store.delete(key);
+    }
+  }
+}
 
 export function checkRateLimit(key: string, max: number, windowMs: number): boolean {
   const now = Date.now();
+  cleanupExpiredEntries(now);
+
   const entry = store.get(key);
 
   if (!entry || now > entry.resetAt) {

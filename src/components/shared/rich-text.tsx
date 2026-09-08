@@ -1,5 +1,3 @@
-"use client";
-
 import { RichText as PayloadRichText } from "@payloadcms/richtext-lexical/react";
 import type { SerializedEditorState } from "lexical";
 

@@ -18,6 +18,12 @@ export async function GET(request: Request) {
       collection: "orders",
       where: { reference: { equals: ref }, userId: { equals: userId } },
       limit: 1,
+      depth: 0,
+      select: {
+        id: true,
+        status: true,
+        expiresAt: true,
+      },
     });
     const order = found.docs[0];
     if (!order) return Response.json({ error: "not found" }, { status: 404 });

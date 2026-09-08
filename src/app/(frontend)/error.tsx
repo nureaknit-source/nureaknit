@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 export default function FrontendError({
   error,
   reset,
@@ -7,6 +9,10 @@ export default function FrontendError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
       <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl font-extrabold text-fg-default">

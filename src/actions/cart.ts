@@ -2,9 +2,9 @@
 
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { checkRateLimit, rateLimitKey, getClientIp } from "@/lib/rate-limit";
-import { createClient } from "@/utils/supabase/server";
+import { getCachedUserSession } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { CartItem, Product } from "@/lib/payload/payload-types";
 
@@ -14,9 +14,7 @@ interface UserSession {
 }
 
 export async function getUserSession(): Promise<UserSession> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCachedUserSession();
   if (!user?.id || !user?.email) throw new Error("Unauthorized");
   return { id: user.id, email: user.email };
 }
@@ -39,6 +37,8 @@ export async function addItemToCartAction(productId: number, quantity = 1): Prom
     collection: "cart-items",
     where: { userId: { equals: userId }, product: { equals: productId } },
     limit: 1,
+    depth: 0,
+    select: { id: true, quantity: true },
   });
 
   if (existing.docs.length > 0) {
@@ -71,7 +71,7 @@ export async function updateCartItemAction(itemId: number, quantity: number): Pr
 
   const payload = await getPayload({ config });
 
-  const item = await payload.findByID({ collection: "cart-items", id: itemId });
+  const item = await payload.findByID({ collection: "cart-items", id: itemId, depth: 0 });
   if (!item || item.userId !== userId) return { ok: false, error: "Unauthorized" };
 
   await payload.update({
@@ -88,7 +88,7 @@ export async function removeFromCartAction(itemId: number): Promise<{ ok: boolea
   const { id: userId } = await getUserSession();
   const payload = await getPayload({ config });
 
-  const item = await payload.findByID({ collection: "cart-items", id: itemId });
+  const item = await payload.findByID({ collection: "cart-items", id: itemId, depth: 0 });
   if (!item || item.userId !== userId) return { ok: false, error: "Unauthorized" };
 
   await payload.delete({ collection: "cart-items", id: itemId });
@@ -123,24 +123,28 @@ export async function getCartAction(): Promise<CartItemWithProduct[]> {
  * product cards/listing pages). Returns empty array when not logged in.
  */
 export async function getCartProductIdsAction(): Promise<number[]> {
-  const { id: userId } = await getUserSession();
+  const user = await getCachedUserSession();
+  if (!user?.id) return [];
   const payload = await getPayload({ config });
   const result = await payload.find({
     collection: "cart-items",
+    depth: 0,
     select: { product: true },
-    where: { userId: { equals: userId } },
+    where: { userId: { equals: user.id } },
     limit: 999,
   });
   return (result.docs as CartItem[]).map(productIdOf);
 }
 
 export async function getCartItemCountAction(): Promise<number> {
-  const { id: userId } = await getUserSession();
+  const user = await getCachedUserSession();
+  if (!user?.id) return 0;
   const payload = await getPayload({ config });
   const result = await payload.find({
     collection: "cart-items",
+    depth: 0,
     select: { quantity: true },
-    where: { userId: { equals: userId } },
+    where: { userId: { equals: user.id } },
     limit: 999,
   });
   return (result.docs as CartItem[]).reduce((sum, item) => sum + quantityOf(item), 0);
@@ -149,16 +153,10 @@ export async function getCartItemCountAction(): Promise<number> {
 export async function clearCartAction(): Promise<{ ok: boolean; error?: string }> {
   const { id: userId } = await getUserSession();
   const payload = await getPayload({ config });
-  const result = await payload.find({
+  await payload.delete({
     collection: "cart-items",
     where: { userId: { equals: userId } },
-    limit: 999,
   });
-  await Promise.all(
-    (result.docs as CartItem[]).map((item) =>
-      payload.delete({ collection: "cart-items", id: item.id }),
-    ),
-  );
   revalidatePath("/profile/cart");
   return { ok: true };
 }

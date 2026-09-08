@@ -21,7 +21,7 @@ export function ProductCard({
   className = "",
 }: ProductCardProps) {
   const firstImage = product.images?.[0]?.image
-    ? mediaUrl(product.images[0].image)
+    ? mediaUrl(product.images[0].image, "card")
     : null;
   const categoryName =
     product.categories && product.categories.length > 0 &&

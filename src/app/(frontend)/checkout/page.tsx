@@ -19,28 +19,36 @@ export default async function CheckoutPage({
   const qty =
     typeof params.qty === "string" ? Math.max(1, Math.floor(Number(params.qty) || 1)) : 1;
 
-  const payload = await getPayload({ config });
-  const profile = await getProfileAction();
+  const [profile, checkoutData] = await Promise.all([
+    getProfileAction(),
+    (async () => {
+      if (productId) {
+        const payload = await getPayload({ config });
+        const product = await payload.findByID({ collection: "products", id: productId });
+        if (product) {
+          return {
+            prefillProductId: productId,
+            prefillQty: qty,
+            lines: [{ title: product.title, price: product.price ?? 0, quantity: qty }],
+          };
+        }
+        return { prefillProductId: undefined, prefillQty: 1, lines: [] };
+      } else {
+        const cart = await getCartAction();
+        return {
+          prefillProductId: undefined,
+          prefillQty: 1,
+          lines: cart.map((l) => ({
+            title: l.product.title,
+            price: l.product.price ?? 0,
+            quantity: l.quantity,
+          })),
+        };
+      }
+    })(),
+  ]);
 
-  let lines: { title: string; price: number; quantity: number }[] = [];
-  let prefillProductId: number | undefined;
-  let prefillQty = 1;
-
-  if (productId) {
-    const product = await payload.findByID({ collection: "products", id: productId });
-    if (product) {
-      prefillProductId = productId;
-      prefillQty = qty;
-      lines = [{ title: product.title, price: product.price ?? 0, quantity: qty }];
-    }
-  } else {
-    const cart = await getCartAction();
-    lines = cart.map((l) => ({
-      title: l.product.title,
-      price: l.product.price ?? 0,
-      quantity: l.quantity,
-    }));
-  }
+  const { lines, prefillProductId, prefillQty } = checkoutData;
 
   const subtotal = lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
 

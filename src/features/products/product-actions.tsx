@@ -9,7 +9,7 @@ import { showToast } from "@/components/ui/toast";
 
 export interface ProductActionsProps {
   productId: number;
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
   maxStock?: number | null;
   availability?: string;
 }
@@ -27,6 +27,16 @@ export function ProductActions({
   const [ordering, setOrdering] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  const checkAuth = useCallback(async () => {
+    if (typeof isLoggedIn === "boolean") return isLoggedIn;
+    const { createClient } = await import("@/utils/supabase/client");
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return !!session?.user;
+  }, [isLoggedIn]);
+
   const isUnavailable = availability === "unavailable";
   const isPhysical = availability === "in_stock";
   const max =
@@ -38,8 +48,10 @@ export function ProductActions({
   const handleIncrease = () => setQty((prev) => Math.min(Number.isFinite(max) ? max : prev + 1, prev + 1));
 
   const handleAddToCart = useCallback(async () => {
-    if (!isLoggedIn) {
-      window.location.href = "/login";
+    const authed = await checkAuth();
+    if (!authed) {
+      const returnUrl = typeof window !== "undefined" ? window.location.pathname : "";
+      window.location.href = returnUrl ? `/login?redirect=${encodeURIComponent(returnUrl)}` : "/login";
       return;
     }
     if (added || adding) return;
@@ -72,11 +84,13 @@ export function ProductActions({
     } finally {
       setAdding(false);
     }
-  }, [productId, isLoggedIn, max, qty, added, adding]);
+  }, [productId, checkAuth, max, qty, added, adding]);
 
-  const handleOrderNow = () => {
-    if (!isLoggedIn) {
-      window.location.href = "/login";
+  const handleOrderNow = async () => {
+    const authed = await checkAuth();
+    if (!authed) {
+      const returnUrl = typeof window !== "undefined" ? window.location.pathname : "";
+      window.location.href = returnUrl ? `/login?redirect=${encodeURIComponent(returnUrl)}` : "/login";
       return;
     }
     if (ordering) return;
