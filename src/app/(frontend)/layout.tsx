@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Pacifico, Outfit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { ToastContainer } from "@/components/ui/toast";
 import "../globals.css";
 
@@ -23,6 +21,15 @@ export const metadata: Metadata = {
   title: "Nurea Knit — Knitting & Crochet Patterns",
   description:
     "Discover knitting and crochet patterns, tutorials, and inspiration. Craft your next project with Nurea Knit.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function FrontendLayout({
@@ -37,11 +44,7 @@ export default function FrontendLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col font-sans text-fg-default bg-bg-base">
-        <Navbar />
-        <main id="main-content" className="flex-1 bg-bg-base">
-          {children}
-        </main>
-        <Footer />
+        {children}
         <ToastContainer />
         <Analytics />
       </body>

@@ -25,7 +25,7 @@ export function PayNowButton({ orderId }: PayNowButtonProps) {
         return;
       }
       router.push(
-        `/checkout/success?ref=${encodeURIComponent(result.reference ?? "")}&qr=${encodeURIComponent(result.qrImageUrl ?? "")}`,
+        `/checkout/success?ref=${encodeURIComponent(result.reference ?? "")}`,
       );
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Gagal membuka pembayaran, coba lagi.", "error");

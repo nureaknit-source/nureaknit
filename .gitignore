@@ -61,3 +61,7 @@ opencode.jsonc
 .opencode
 .claude
 .action
+
+# Archify outputs
+/docs/architecture/
+*.architecture.html

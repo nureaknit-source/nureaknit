@@ -51,11 +51,11 @@ export function CheckoutForm({ defaultName = "", productId, qty = 1 }: CheckoutF
           );
         } else {
           router.push(
-            `/checkout/success?ref=${encodeURIComponent(result.inStock.reference)}&qr=${encodeURIComponent(result.inStock.qrImageUrl)}`,
+            `/checkout/success?ref=${encodeURIComponent(result.inStock.reference)}`,
           );
         }
       } else if (result.preOrder) {
-        router.push(`/checkout/success?pre=${encodeURIComponent(result.preOrder.reference)}`);
+        router.push(`/checkout/success?ref=${encodeURIComponent(result.preOrder.reference)}`);
       }
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Checkout gagal, silakan coba lagi.", "error");

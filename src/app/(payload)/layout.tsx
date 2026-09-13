@@ -6,6 +6,12 @@ import { importMap } from "./admin/importMap";
 export const metadata = {
   title: "Payload Admin",
   description: "Payload Admin Panel",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 const serverFunction: ServerFunctionClient = async function (args) {
