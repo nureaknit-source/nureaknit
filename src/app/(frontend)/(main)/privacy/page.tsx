@@ -70,7 +70,7 @@ export default function PrivacyPage() {
             </Text>
             <ul className="list-disc pl-5 space-y-2 text-sm leading-relaxed">
               <li>
-                <strong>Payment Gateway (Midtrans):</strong> Untuk memproses instruksi transaksi QRIS, Virtual Account, atau e-wallet secara aman dan terenkripsi.
+                <strong>Payment Gateway (Mayar):</strong> Untuk memproses instruksi transaksi QRIS secara aman dan terenkripsi.
               </li>
               <li>
                 <strong>Mitra Jasa Ekspedisi / Kurir:</strong> Memberikan nama penerima, nomor kontak, dan alamat tujuan guna mengantarkan pesanan fisik sampai ke tujuan.

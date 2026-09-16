@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, RefreshCw, AlertCircle, CheckCircle2, ShieldCheck } from "lucide-react";
+import { MessageCircle, RefreshCw, AlertCircle, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Heading, Text } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
@@ -71,7 +71,16 @@ export function ManualPaymentFallback({ order, initialQr }: ManualPaymentFallbac
   if (qrUrl) {
     return (
       <div className="space-y-4">
-        <QrDisplay reference={order.reference} qr={qrUrl} expiresAt={order.expiresAt ?? undefined} />
+        <QrDisplay
+          reference={order.reference}
+          qr={qrUrl}
+          expiresAt={order.expiresAt ?? undefined}
+          total={order.total}
+          items={order.items}
+          customerPhone={order.customerPhone}
+          customerAddress={order.customerAddress}
+          customerNotes={order.customerNotes}
+        />
         <Card hover={false} className="p-4 text-center bg-bg-surface-hover border-dashed">
           <p className="text-xs text-fg-muted">
             Mengalami kendala saat scan QRIS?{" "}

@@ -17,7 +17,7 @@ import {
 } from "@/lib/commerce/availability";
 import { claimInStock, releaseInStock, createPgRunner } from "@/lib/commerce/reservation";
 import { assertTransition } from "@/lib/commerce/state-machine";
-import { createQrCodeToken } from "@/lib/payments/midtrans";
+import { createDynamicQrCode } from "@/lib/payments/mayar";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Order, OrderItem, Product, FulfillmentGroup } from "@/lib/payload/payload-types";
 
@@ -29,6 +29,7 @@ export interface CheckoutResult {
   inStock?: {
     reference: string;
     qrImageUrl?: string;
+    providerTxId?: string;
     midtransTxId?: string;
     paymentPendingFallback?: boolean;
   };
@@ -223,26 +224,25 @@ async function createInStockOrder(
   }
 
   try {
-    const qr = await createQrCodeToken({
+    const qr = await createDynamicQrCode({
       orderId: reference,
       grossAmount: totals.total,
-      items: lines.map((l) => ({
-        id: String(l.product.id),
-        price: l.product.price,
-        quantity: l.quantity,
-        name: l.product.title,
-      })),
       customerEmail,
-      expiryMinutes: PAYMENT_EXPIRY_MINUTES,
+      customerMobile: details.phone,
     });
     await payload.update({
       collection: "orders",
       id: order.id,
       data: { providerSessionId: qr.transactionId, paymentQrUrl: qr.qrImageUrl },
     });
-    return { reference, qrImageUrl: qr.qrImageUrl, midtransTxId: qr.transactionId };
+    return {
+      reference,
+      qrImageUrl: qr.qrImageUrl,
+      providerTxId: qr.transactionId,
+      midtransTxId: qr.transactionId,
+    };
   } catch (e) {
-    console.error("[checkout] createQrCodeToken failed, falling back to manual pending payment:", e);
+    console.error("[checkout] createDynamicQrCode failed, falling back to manual pending payment:", e);
     // FALLBACK: Jangan batalkan order atau lepas stok.
     // Order tetap disimpan dalam status pending_payment dengan toleransi waktu 24 jam untuk transfer manual.
     const fallbackExpiryHours = 24;
@@ -399,7 +399,7 @@ export async function getOrderAction(reference: string): Promise<OrderDetail | n
 
 export async function payNowAction(
   orderId: number,
-): Promise<{ ok: boolean; error?: string; reference?: string; qrImageUrl?: string; midtransTxId?: string }> {
+): Promise<{ ok: boolean; error?: string; reference?: string; qrImageUrl?: string; providerTxId?: string; midtransTxId?: string }> {
   const session = await getUserSession();
   const payload = await getPayload({ config });
 
@@ -414,28 +414,16 @@ export async function payNowAction(
     return { ok: false, error: "Pembayaran belum bisa dibuka atau sudah selesai." };
   }
 
-  const items = await payload.find({
-    collection: "order-items",
-    where: { order: { equals: order.id } },
-    limit: 100,
-  });
-
   let qr;
   try {
-    qr = await createQrCodeToken({
+    qr = await createDynamicQrCode({
       orderId: order.reference,
       grossAmount: order.total,
-      items: (items.docs as OrderItem[]).map((i) => ({
-        id: String(i.productId),
-        price: i.unitPrice,
-        quantity: i.quantity,
-        name: i.title,
-      })),
       customerEmail: order.customerEmail ?? session.email,
-      expiryMinutes: PAYMENT_EXPIRY_MINUTES,
+      customerMobile: order.customerPhone ?? undefined,
     });
   } catch (e) {
-    console.error("[payNow] createQrCodeToken failed:", e);
+    console.error("[payNow] createDynamicQrCode failed:", e);
     return { ok: false, error: "Layanan pembayaran otomatis (QRIS) masih belum tersedia. Silakan gunakan opsi pembayaran manual via WhatsApp." };
   }
 
@@ -454,12 +442,18 @@ export async function payNowAction(
       reason: "Pay Now",
     },
   });
-  return { ok: true, reference: order.reference, qrImageUrl: qr.qrImageUrl, midtransTxId: qr.transactionId };
+  return {
+    ok: true,
+    reference: order.reference,
+    qrImageUrl: qr.qrImageUrl,
+    providerTxId: qr.transactionId,
+    midtransTxId: qr.transactionId,
+  };
 }
 
 export async function retryPaymentAction(
   reference: string,
-): Promise<{ ok: boolean; error?: string; qrImageUrl?: string; midtransTxId?: string }> {
+): Promise<{ ok: boolean; error?: string; qrImageUrl?: string; providerTxId?: string; midtransTxId?: string }> {
   const session = await getUserSession();
   const payload = await getPayload({ config });
 

@@ -511,7 +511,7 @@ export interface Order {
    */
   tosAccepted?: boolean | null;
   /**
-   * URL gambar QRIS dari Midtrans (hanya berlaku sebelum settlement).
+   * URL gambar QRIS dari Mayar (hanya berlaku sebelum settlement).
    */
   paymentQrUrl?: string | null;
   expiresAt?: string | null;

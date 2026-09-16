@@ -50,7 +50,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <Section>
-      <Container size="sm">
+      <Container size="md">
         <Heading as="h1">
           {order.status === "paid" ? "Pembayaran Terverifikasi!" : "Pesanan Berhasil Dibuat!"}
         </Heading>
@@ -120,9 +120,22 @@ export default async function CheckoutSuccessPage({
               initialQr={effectiveQr}
             />
           ) : effectiveQr ? (
-            <div className="space-y-4">
-              <QrDisplay reference={order.reference} qr={effectiveQr} expiresAt={order.expiresAt ?? undefined} />
-            </div>
+            <QrDisplay
+              reference={order.reference}
+              qr={effectiveQr}
+              expiresAt={order.expiresAt ?? undefined}
+              total={order.total}
+              subtotal={order.subtotal}
+              items={order.items.map((i) => ({
+                id: i.id,
+                title: i.title,
+                quantity: i.quantity,
+                unitPrice: i.unitPrice,
+              }))}
+              customerPhone={order.customerPhone}
+              customerAddress={order.customerAddress}
+              customerNotes={order.customerNotes}
+            />
           ) : null}
         </div>
 

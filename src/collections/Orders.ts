@@ -121,7 +121,7 @@ export const Orders: CollectionConfig = {
       admin: {
         position: "sidebar",
         readOnly: true,
-        description: "URL gambar QRIS dari Midtrans (hanya berlaku sebelum settlement).",
+        description: "URL gambar QRIS dari Mayar (hanya berlaku sebelum settlement).",
       },
     },
     { name: "expiresAt", type: "date", label: "Payment Expires At", index: true, admin: { position: "sidebar", readOnly: true } },

@@ -32,8 +32,19 @@ export default buildConfig({
   sharp,
   admin: {
     user: "users",
+    theme: "light",
+    avatar: "default",
+    meta: {
+      titleSuffix: " - Nureaknit Studio",
+    },
     components: {
       beforeLogin: ["@/components/admin/TurnstileField#TurnstileField"],
+      graphics: {
+        Logo: "@/components/admin/Logo#Logo",
+        Icon: "@/components/admin/Icon#Icon",
+      },
+      actions: ["@/components/admin/StorefrontLink#StorefrontLink"],
+      beforeDashboard: ["@/components/admin/DashboardOverview#DashboardOverview"],
     },
   },
   collections: [

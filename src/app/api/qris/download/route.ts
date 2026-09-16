@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_HOSTS = new Set([
+  "media.mayar.id",
+  "media.mayar.club",
+  "media.mayar.io",
+  "api.mayar.id",
+  "api.mayar.club",
+  "api.mayar.io",
+  "pub.mayar.id",
+  "pub.mayar.club",
+  "pub.mayar.io",
   "api.sandbox.midtrans.com",
   "api.sandbox.veritrans.co.id",
   "api.midtrans.com",

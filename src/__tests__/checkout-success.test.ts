@@ -125,7 +125,7 @@ describe("CheckoutSuccessPage security & authorization", () => {
       type: "in_stock",
       status: "pending_payment",
       total: 200000,
-      paymentQrUrl: "https://api.sandbox.midtrans.com/v2/qris/real-qr.png",
+      paymentQrUrl: "https://media.mayar.id/images/resized/480/real-qr.png",
       expiresAt: "2026-09-09T22:00:00.000Z",
       customerPhone: "08123456789",
       customerAddress: "Jakarta",
