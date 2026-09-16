@@ -2,6 +2,7 @@ import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   serverExternalPackages: ["sharp"],
   allowedDevOrigins: ["semirigorously-branchial-margit.ngrok-free.dev"],
   images: {
@@ -14,7 +15,19 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "*.midtrans.com",
+        hostname: "media.mayar.id",
+      },
+      {
+        protocol: "https",
+        hostname: "*.mayar.id",
+      },
+      {
+        protocol: "https",
+        hostname: "*.mayar.club",
+      },
+      {
+        protocol: "https",
+        hostname: "*.mayar.io",
       },
     ],
   },
@@ -36,12 +49,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.midtrans.com https://challenges.cloudflare.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https://*.supabase.co https://*.midtrans.com https://*.veritrans.co.id data: blob:",
+              "img-src 'self' https://*.supabase.co https://media.mayar.id https://*.mayar.id https://*.mayar.club https://*.mayar.io data: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://api.sandbox.midtrans.com https://api.midtrans.com https://challenges.cloudflare.com",
-              "frame-src https://*.midtrans.com https://challenges.cloudflare.com",
+              "connect-src 'self' https://*.supabase.co https://api.mayar.id https://api.mayar.club https://api.mayar.io https://challenges.cloudflare.com",
+              "frame-src https://challenges.cloudflare.com",
               "frame-ancestors 'none'",
               "base-uri 'none'",
             ].join("; "),

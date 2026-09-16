@@ -2,10 +2,12 @@ import type { ServerFunctionClient } from "payload";
 import { handleServerFunctions, RootLayout as PayloadRootLayout } from "@payloadcms/next/layouts";
 import configPromise from "@payload-config";
 import { importMap } from "./admin/importMap";
+import { MobileNavDock } from "@/components/admin/MobileNavDock";
+import "./custom-admin.css";
 
 export const metadata = {
-  title: "Payload Admin",
-  description: "Payload Admin Panel",
+  title: "Nureaknit Studio Admin",
+  description: "Nureaknit Studio CMS Admin Panel",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -35,6 +37,7 @@ export default async function Layout({
       serverFunction={serverFunction}
     >
       {children}
+      <MobileNavDock />
     </PayloadRootLayout>
   );
 }

@@ -3,9 +3,9 @@ import config from "@payload-config";
 import type { Payload } from "payload";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import {
-  verifyMidtransSignature,
-  type MidtransNotification,
-} from "@/lib/payments/midtrans";
+  verifyMayarWebhookToken,
+  type MayarWebhookPayload,
+} from "@/lib/payments/mayar";
 import {
   createPgRunner,
   commitInStock,
@@ -35,17 +35,19 @@ async function runBackground(fn: () => Promise<void> | void): Promise<void> {
 }
 
 export async function POST(request: Request) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token");
+
+  if (!verifyMayarWebhookToken(token)) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const raw = await request.text();
-  let body: MidtransNotification;
+  let body: MayarWebhookPayload;
   try {
     body = JSON.parse(raw);
   } catch {
     return Response.json({ error: "invalid json" }, { status: 400 });
-  }
-
-  const serverKey = process.env.MIDTRANS_SERVER_KEY;
-  if (!serverKey || !verifyMidtransSignature(serverKey, body)) {
-    return Response.json({ error: "invalid signature" }, { status: 401 });
   }
 
   const payload = await getPayload({ config });
@@ -58,31 +60,78 @@ export async function POST(request: Request) {
     if (!handled) return Response.json({ error: "order not found" }, { status: 400 });
     return Response.json({ ok: true });
   } catch (e) {
-    // 500 agar Midtrans mengulang; semua mutasi bersifat idempotent (guard status + unique).
-    console.error("[midtrans-webhook]", e);
+    // 500 agar Mayar melakukan retry; semua mutasi bersifat idempotent
+    console.error("[mayar-webhook]", e);
     return Response.json({ error: "internal" }, { status: 500 });
   }
 }
 
-// Event key unik per (transaksi, status, status_code) → replay aman via unique providerEventId.
-export function eventKey(body: MidtransNotification): string {
-  return `${body.transaction_id ?? body.order_id}:${body.transaction_status}:${body.status_code}`;
+// Event key unik per (id/transactionId, event, status) untuk menjamin replay aman
+export function eventKey(body: MayarWebhookPayload): string {
+  const id = body.data?.id || body.data?.transactionId || "unknown";
+  const event = body.event || "event";
+  const status = body.data?.status || body.data?.transactionStatus || "received";
+  return `mayar:${id}:${event}:${status}`;
+}
+
+export async function findTargetOrder(payload: Payload, body: MayarWebhookPayload): Promise<Order | null> {
+  const data = body.data;
+  if (!data) return null;
+
+  // 1. Cek explicit orderReference di extraData
+  const refFromExtra = data.extraData?.orderReference as string | undefined;
+  if (refFromExtra) {
+    const found = await payload.find({
+      collection: "orders",
+      where: { reference: { equals: refFromExtra } },
+      limit: 1,
+    });
+    if (found.docs[0]) return found.docs[0] as Order;
+  }
+
+  // 2. Cek parsing reference dari description (format "Order NK-XXXX" atau "NK-XXXX")
+  if (data.description) {
+    const match = data.description.match(/NK-[A-Z0-9]+/i);
+    if (match) {
+      const found = await payload.find({
+        collection: "orders",
+        where: { reference: { equals: match[0].toUpperCase() } },
+        limit: 1,
+      });
+      if (found.docs[0]) return found.docs[0] as Order;
+    }
+  }
+
+  // 3. Cek providerSessionId matching data.id atau data.transactionId
+  const candidateIds = [data.id, data.transactionId].filter(Boolean) as string[];
+  for (const cid of candidateIds) {
+    const found = await payload.find({
+      collection: "orders",
+      where: { providerSessionId: { equals: cid } },
+      limit: 1,
+    });
+    if (found.docs[0]) return found.docs[0] as Order;
+  }
+
+  // 4. Fallback matching langsung reference ke candidateIds
+  for (const cid of candidateIds) {
+    const found = await payload.find({
+      collection: "orders",
+      where: { reference: { equals: cid } },
+      limit: 1,
+    });
+    if (found.docs[0]) return found.docs[0] as Order;
+  }
+
+  return null;
 }
 
 export async function processNotification(
   payload: Payload,
   runner: SqlRunner,
-  body: MidtransNotification,
+  body: MayarWebhookPayload,
 ): Promise<boolean> {
-  const reference = body.order_id;
-  if (!reference) return false;
-
-  const found = await payload.find({
-    collection: "orders",
-    where: { reference: { equals: reference } },
-    limit: 1,
-  });
-  const order = found.docs[0] as Order | undefined;
+  const order = await findTargetOrder(payload, body);
   if (!order) return false;
 
   const key = eventKey(body);
@@ -91,7 +140,7 @@ export async function processNotification(
     where: { providerEventId: { equals: key } },
     limit: 1,
   });
-  if (existing.docs.length > 0) return true; // replay
+  if (existing.docs.length > 0) return true; // Replay / duplicate
 
   const items = (
     await payload.find({
@@ -101,68 +150,67 @@ export async function processNotification(
     })
   ).docs as OrderItem[];
 
-  const status = body.transaction_status;
-  const fraud = body.fraud_status;
-  const reason = `webhook ${status}${fraud ? `/${fraud}` : ""} (${key})`;
+  const eventName = body.event || "payment.received";
+  const dataStatus = (body.data?.status || "SUCCESS").toUpperCase();
+  const reason = `webhook ${eventName} [${dataStatus}] (${key})`;
 
-  if (status === "capture" || (status === "settlement" && fraud === "accept")) {
+  const isSuccess =
+    eventName === "payment.received" ||
+    dataStatus === "SUCCESS" ||
+    dataStatus === "PAID" ||
+    dataStatus === "SETTLEMENT";
+
+  if (isSuccess) {
     await handleSettlement(payload, runner, order, items, reason);
-  } else if (status === "deny" || status === "cancel" || status === "expire") {
-    // Jangan kirim notifikasi gagal bila order sudah dibayar (late expire). Only act on payment-active orders.
+  } else if (
+    eventName === "payment.failed" ||
+    eventName === "payment.expired" ||
+    dataStatus === "FAILED" ||
+    dataStatus === "EXPIRED" ||
+    dataStatus === "CANCELLED"
+  ) {
     if (canTransition(order.status as Order["status"], "payment_failed")) {
       await handleFailure(payload, runner, order, items, reason);
       const email = order.customerEmail;
       const ref = order.reference;
       await runBackground(async () => {
         try {
-          await sendAdminNotification(`[Payment ${status}] ${ref}`, reason);
-          if (email) await sendOrderFailed(email, ref, status);
+          await sendAdminNotification(`[Mayar Payment Failed] ${ref}`, reason);
+          if (email) await sendOrderFailed(email, ref, dataStatus);
         } catch (err) {
-          console.error("[midtrans] background failure email failed:", err);
+          console.error("[mayar] background failure email failed:", err);
         }
       });
     }
-  } else if (status === "refund" || status === "partial_refund") {
+  } else if (eventName === "payment.refund" || dataStatus === "REFUNDED") {
     await transitionOrder(payload, order, "refunded", reason);
     if (order.customerEmail) {
       const email = order.customerEmail;
       const ref = order.reference;
       await runBackground(async () => {
         try {
-          await sendRefundNotice(email, ref, status);
+          await sendRefundNotice(email, ref, "refund");
         } catch (err) {
-          console.error("[midtrans] background refund notice failed:", err);
-        }
-      });
-    }
-  } else if (status === "chargeback") {
-    await transitionOrder(payload, order, "disputed", reason);
-    if (order.customerEmail) {
-      const email = order.customerEmail;
-      const ref = order.reference;
-      await runBackground(async () => {
-        try {
-          await sendRefundNotice(email, ref, status);
-        } catch (err) {
-          console.error("[midtrans] background chargeback notice failed:", err);
+          console.error("[mayar] background refund notice failed:", err);
         }
       });
     }
   }
-  // status lain (pending, challenge, dll): hanya dicatat sebagai PaymentAttempt.
 
-  // Rekaman terakhir: jika unique violation, berarti event sama diproses bersamaan → abaikan.
+  // Rekam attempt untuk audit & pencegahan replay
   try {
     await payload.create({
       collection: "payment-attempts",
       data: {
         order: order.id,
         providerEventId: key,
-        eventType: status,
-        status: fraud ? `${status}:${fraud}` : status,
-        amount: body.gross_amount ? Number(body.gross_amount) : undefined,
+        eventType: eventName,
+        status: dataStatus,
+        amount: body.data?.amount ? Number(body.data.amount) : undefined,
         raw: body as unknown as Record<string, unknown>,
-        occurredAt: body.transaction_time ? new Date(body.transaction_time).toISOString() : undefined,
+        occurredAt: body.data?.paidAt
+          ? new Date(body.data.paidAt).toISOString()
+          : new Date().toISOString(),
       },
     });
   } catch (e) {
@@ -179,8 +227,8 @@ async function handleSettlement(
   items: OrderItem[],
   reason: string,
 ) {
-  if (order.status === "paid") return; // idempotent (replay)
-  // Expire lalu settle (mis. transfer bank telat): buka kembali order yang payment_failed.
+  if (order.status === "paid") return; // Idempotent
+  // Buka kembali order yang sempat payment_failed jika pembayaran akhirnya terverifikasi
   if (order.status === "payment_failed") {
     await payload.update({
       collection: "orders",
@@ -188,14 +236,13 @@ async function handleSettlement(
       data: { status: "pending_payment" },
     });
   }
-  // Jangan revive order yang sudah cancelled/expired/refunded/disputed karena cron.
+
   if (!canTransition(order.status as Order["status"], "paid")) return;
 
   for (const item of items) {
     if (item.saleMode === "in_stock") {
       await commitInStock(runner, item.productId, item.quantity);
     }
-    // pre_order: capacity sudah tercommit saat approval — tidak berubah di sini.
   }
 
   const group = await payload.create({
@@ -215,13 +262,14 @@ async function handleSettlement(
     data: { status: "paid", paidAt: new Date().toISOString(), reason },
   });
 
-  // Cart cleanup dan kirim receipt di background via after()
   const customerEmail = order.customerEmail;
   const orderRef = order.reference;
   const orderTotal = order.total;
   const orderUserId = order.userId;
   const itemProductIds = items.map((i) => i.productId);
-  const receiptLines = items.map((i) => `- ${i.quantity}x ${i.title} (${formatIDR(i.unitPrice * i.quantity)})`).join("\n");
+  const receiptLines = items
+    .map((i) => `- ${i.quantity}x ${i.title} (${formatIDR(i.unitPrice * i.quantity)})`)
+    .join("\n");
 
   await runBackground(async () => {
     try {
@@ -235,19 +283,19 @@ async function handleSettlement(
         });
       }
     } catch (err) {
-      console.error("[midtrans] background cart cleanup failed:", err);
+      console.error("[mayar] background cart cleanup failed:", err);
     }
 
     if (customerEmail) {
       try {
         await sendOrderReceipt(customerEmail, orderRef, orderTotal, receiptLines);
       } catch (err) {
-        console.error("[midtrans] background sendOrderReceipt failed:", err);
+        console.error("[mayar] background sendOrderReceipt failed:", err);
       }
     }
   });
 
-  console.log(`[midtrans] order ${order.reference} paid (group ${group.id})`);
+  console.log(`[mayar] order ${order.reference} paid (group ${group.id})`);
 }
 
 async function handleFailure(
@@ -257,7 +305,7 @@ async function handleFailure(
   items: OrderItem[],
   reason: string,
 ) {
-  if (order.status !== "pending_payment") return; // sudah diproses/berubah → lewati
+  if (order.status !== "pending_payment") return;
 
   for (const item of items) {
     if (item.saleMode === "in_stock") {
